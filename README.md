@@ -1,9 +1,9 @@
 # donation-service
 
-## instructions
+## 介绍
 
 公益捐赠小程序后端服务。
 
-## dependency
+## 依赖
 
-golang 1.11.1 or greater
+golang版本1.11.1或更高
