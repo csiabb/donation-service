@@ -1,0 +1,5 @@
+build/
+*.key
+.idea/*
+.DS_Store
+*.log
