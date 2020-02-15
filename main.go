@@ -10,18 +10,18 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/common/metadata"
 	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/service"
 
-	"github.com/op/go-logging"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 //command line flags
 var (
 	programName = "donation-service"
-	logger      = logging.MustGetLogger("main")
+	logger      = log.MustGetLogger("main")
 
 	app = kingpin.New(metadata.ProgramName, "rest server for client business integration")
 
@@ -39,9 +39,11 @@ func main() {
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	// "start" command
 	case startCmd.FullCommand():
-		logger.Infof("Starting %s", metadata.ProgramVersion.FullVersion())
-		logger.Infof("Beginning to serve requests")
+		// parse configure
 		conf := config.GetServiceCfg(metadata.ProgramName)
+		// init log
+		log.InitLogConfig(&conf.Log)
+		logger.Infof("Starting %s", metadata.ProgramVersion.FullVersion())
 		logger.Debugf("initialize configure %+v", conf)
 		server, err := service.NewServer(conf, metadata.ProgramVersion)
 		if err != nil {

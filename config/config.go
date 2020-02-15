@@ -8,12 +8,12 @@ package config
 
 import (
 	"fmt"
-	
-	"github.com/op/go-logging"
+
+	"github.com/csiabb/donation-service/common/log"
 )
 
 var (
-	logger = logging.MustGetLogger("config")
+	logger = log.MustGetLogger("config")
 
 	// LeaveOnInt quit server on int signal
 	LeaveOnInt = true
@@ -24,25 +24,13 @@ var (
 // SrvcCfg  service configure
 type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
-	Log           LogCfg
+	Log           log.Config
 }
 
 // ServerGeneralCfg general configure of service
 type ServerGeneralCfg struct {
 	Host string
 	Port int
-}
-
-// LogCfg config with rolling backend
-// MaxSize is the maximum size in megabytes
-// MaxBackups is the maximum number of old log files to retain
-// MaxAge is the maximum number of days to retain old log files
-type LogCfg struct {
-	LogFile    string
-	LogLevel   string
-	MaxSize    int
-	MaxBackups int
-	MaxAge     int
 }
 
 // GetServiceCfg returns the configurations for the service

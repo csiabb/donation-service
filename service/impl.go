@@ -15,10 +15,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/common/metadata"
 	"github.com/csiabb/donation-service/config"
-
-	logging "github.com/op/go-logging"
 )
 
 // gracefulTimeout controls how long we wait before forcefully terminating
@@ -27,7 +26,7 @@ const gracefulTimeout = 5 * time.Second
 var (
 	// DonationServer donation service instance
 	DonationServer *ServerImpl
-	logger         = logging.MustGetLogger("service")
+	logger         = log.MustGetLogger("service")
 )
 
 // ServerImpl is the unite did server
