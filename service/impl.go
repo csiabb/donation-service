@@ -15,8 +15,8 @@ import (
 	"syscall"
 	"time"
 
-	"donation-service/common/metadata"
-	"donation-service/config"
+	"github.com/csiabb/donation-service/common/metadata"
+	"github.com/csiabb/donation-service/config"
 
 	logging "github.com/op/go-logging"
 )
