@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"os"
 
-	"donation-service/common/metadata"
-	"donation-service/config"
-	"donation-service/service"
+	"github.com/csiabb/donation-service/common/metadata"
+	"github.com/csiabb/donation-service/config"
+	"github.com/csiabb/donation-service/service"
 
 	"github.com/op/go-logging"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -41,7 +41,8 @@ func main() {
 	case startCmd.FullCommand():
 		logger.Infof("Starting %s", metadata.ProgramVersion.FullVersion())
 		logger.Infof("Beginning to serve requests")
-		conf := &config.SrvcCfg{}
+		conf := config.GetServiceCfg(metadata.ProgramName)
+		logger.Debugf("initialize configure %+v", conf)
 		server, err := service.NewServer(conf, metadata.ProgramVersion)
 		if err != nil {
 			logger.Panicf("Failed to create %s server, %+v", metadata.ProgramName, err)

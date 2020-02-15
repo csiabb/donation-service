@@ -10,7 +10,7 @@ package metadata
 var BuildNumber = "Development Build"
 
 // ProgramName ...
-const ProgramName = "donation-srvc"
+const ProgramName = "donation-service"
 
 // ProgramVersion ...
 var ProgramVersion = DefaultVersion(ProgramName, BuildNumber)

@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package service
 
 import (
-	"donation-service/common/metadata"
-	"donation-service/config"
+	"github.com/csiabb/donation-service/common/metadata"
+	"github.com/csiabb/donation-service/config"
 )
 
 // Server interface ...

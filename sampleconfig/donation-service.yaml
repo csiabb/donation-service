@@ -1,0 +1,29 @@
+# Copyright ArxanChain Ltd. 2020 All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+################################################################################
+#
+#   ServerGeneral Configuration
+#
+#   - This controls the general type and configuration of the service.
+#
+################################################################################
+ServerGeneral:
+    Host: 192.168.20.88
+    Port: 8888
+
+# Log Level: The level at which to log. This accepts logging specifications
+# Valid Levels: "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"
+Log:
+    LogFile: /var/log/donation-service.log
+    # Log Level: The level at which to log. This accepts logging specifications
+    # Valid Levels: "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"
+    LogLevel: debug
+    # MaxSize is the maximum size in megabytes
+    MaxSize: 10
+    # MaxBackups is the maximum number of old log files to retain
+    MaxBackups: 10
+    # MaxAge is the maximum number of days to retain old log files
+    MaxAge: 30
