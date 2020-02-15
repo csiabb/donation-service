@@ -9,7 +9,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,6 +17,9 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/common/metadata"
 	"github.com/csiabb/donation-service/config"
+	"github.com/csiabb/donation-service/router"
+
+	"github.com/gin-gonic/gin"
 )
 
 // gracefulTimeout controls how long we wait before forcefully terminating
@@ -33,7 +35,7 @@ var (
 type ServerImpl struct {
 	config     *config.SrvcCfg
 	version    *metadata.Version
-	httpSrv    *http.Server
+	httpSrv    *gin.Engine
 	ShutdownCh <-chan struct{}
 	myName     string
 	serviceID  string
@@ -42,11 +44,11 @@ type ServerImpl struct {
 // Start ...
 func (s *ServerImpl) Start() (err error) {
 	logger.Infof("Starting %s server ...", s.version.ProgramName)
+
 	// start to serve http connections
-	if err := s.httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Fatalf("failed to start http server: %s\n", err)
-	}
-	logger.Debugf("%s server started successfully.", s.version.ProgramName)
+	address := fmt.Sprintf("%s:%d", s.config.ServerGeneral.Host, s.config.ServerGeneral.Port)
+	logger.Infof("starting server on %s", address)
+	s.httpSrv.Run(address)
 
 	return
 }
@@ -72,21 +74,16 @@ func (s *ServerImpl) init() (err error) {
 
 func (s *ServerImpl) httpSrvInit() (err error) {
 	// init api router
-	if err := s.httpHandlerInit(); err != nil {
+	if err := s.httpControllerInit(); err != nil {
 		return fmt.Errorf("failed to init http handler: %s", err.Error())
 	}
 
-	// TODO: handle errors here
-	logger.Infof("starting server on %s", "0.0.0.0:8888")
-	s.httpSrv = &http.Server{
-		Addr: "0.0.0.0:8888",
-		// Handler: r,
-	}
+	s.httpSrv = router.SetupRouter()
 
 	return nil
 }
 
-func (s *ServerImpl) httpHandlerInit() (err error) {
+func (s *ServerImpl) httpControllerInit() (err error) {
 
 	return nil
 }

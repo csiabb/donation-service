@@ -11,7 +11,7 @@
 #
 ################################################################################
 ServerGeneral:
-    Host: 192.168.20.88
+    Host: 0.0.0.0
     Port: 8888
 
 # Log Level: The level at which to log. This accepts logging specifications
