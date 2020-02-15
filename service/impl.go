@@ -17,6 +17,7 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/common/metadata"
 	"github.com/csiabb/donation-service/config"
+	srvctx "github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/router"
 
 	"github.com/gin-gonic/gin"
@@ -34,8 +35,10 @@ var (
 // ServerImpl is the unite did server
 type ServerImpl struct {
 	config     *config.SrvcCfg
+	context    *srvctx.Context
 	version    *metadata.Version
 	httpSrv    *gin.Engine
+	httpRouter *router.Router
 	ShutdownCh <-chan struct{}
 	myName     string
 	serviceID  string
@@ -64,6 +67,29 @@ func (s *ServerImpl) Shutdown() {
 
 func (s *ServerImpl) init() (err error) {
 	logger.Debugf("Initializing %s server ...", s.version.ProgramName)
+
+	//Init the server context
+	s.context = srvctx.GetServerContext()
+	if nil == s.context {
+		logger.Errorf("Server context is nil")
+		return fmt.Errorf("context is nil")
+	}
+	s.context.Config = s.config
+
+	// init server context
+	err = s.context.Init()
+	if nil != err {
+		logger.Errorf("Initalize server context error: %v", err)
+		return err
+	}
+
+	s.httpRouter = &router.Router{}
+	err = s.httpRouter.InitRouter(s.context)
+	if nil != err {
+		logger.Errorf("Initalize router error: %v", err)
+		return err
+	}
+
 	//Init the rest http service
 	if err = s.httpSrvInit(); err != nil {
 		logger.Errorf("Failed to initialize %s restful API: %s", s.version.ProgramName, err)
@@ -73,33 +99,7 @@ func (s *ServerImpl) init() (err error) {
 }
 
 func (s *ServerImpl) httpSrvInit() (err error) {
-	// init api router
-	if err := s.httpControllerInit(); err != nil {
-		return fmt.Errorf("failed to init http handler: %s", err.Error())
-	}
-
-	s.httpSrv = router.SetupRouter()
-
-	return nil
-}
-
-func (s *ServerImpl) httpControllerInit() (err error) {
-
-	return nil
-}
-
-// GetID ...
-func (s *ServerImpl) GetID() string {
-	return s.serviceID
-}
-
-// GetName ...
-func (s *ServerImpl) GetName() string {
-	return s.version.ProgramName
-}
-
-// GetTags ...
-func (s *ServerImpl) GetTags() []string {
+	s.httpSrv = s.httpRouter.SetupRouter()
 	return nil
 }
 

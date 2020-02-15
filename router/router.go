@@ -7,16 +7,59 @@ SPDX-License-Identifier: Apache-2.0
 package router
 
 import (
+	"fmt"
 	"net/http"
+
+	"github.com/csiabb/donation-service/common/log"
+	srvctx "github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/controllers/version"
 
 	"github.com/gin-gonic/gin"
 )
 
+// api version
+const (
+	APIVersion = "v1"
+)
+
+var (
+	logger = log.MustGetLogger("router")
+
+	//checkAPI
+	checkVersionURL = "version"
+)
+
+// Router service router
+type Router struct {
+	context        *srvctx.Context
+	versionHandler *version.RestHandler
+}
+
+// InitRouter init router
+func (r *Router) InitRouter(ctx *srvctx.Context) error {
+	if nil == ctx {
+		return fmt.Errorf("param is nil")
+	}
+
+	// Init version handler
+	var err error
+	r.versionHandler, err = version.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create version rest http handler instance, %+v", err)
+		return err
+	}
+
+	return nil
+}
+
 // SetupRouter add routes for rest api server
-func SetupRouter() *gin.Engine {
+func (r *Router) SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Delims("{{", "}}")
 	router.Use(Cors())
+
+	// service version
+	router.GET(checkVersionURL, r.versionHandler.Version)
 
 	return router
 }
