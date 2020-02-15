@@ -17,6 +17,7 @@ ServerGeneral:
 # Log Level: The level at which to log. This accepts logging specifications
 # Valid Levels: "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"
 Log:
+    # log file path
     LogFile: /var/log/donation-service.log
     # Log Level: The level at which to log. This accepts logging specifications
     # Valid Levels: "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"

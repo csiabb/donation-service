@@ -7,4 +7,5 @@ require (
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/spf13/viper v1.3.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
