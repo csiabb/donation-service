@@ -11,6 +11,8 @@ import (
 
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/config"
+	"github.com/csiabb/donation-service/models"
+	dbimpl "github.com/csiabb/donation-service/models/impl"
 )
 
 var (
@@ -20,7 +22,8 @@ var (
 
 // Context the context of service
 type Context struct {
-	Config *config.SrvcCfg
+	Config     *config.SrvcCfg
+	DBStrorage models.IDBBackend
 }
 
 // GetServerContext ...
@@ -39,6 +42,30 @@ func (c *Context) Init() error {
 	}
 	fmt.Println("init config:", c.Config)
 	logger.Debugf("Initalization configure: %v", c.Config)
+
+	err := c.initStorage()
+	if nil != err {
+		logger.Errorf("Initalize database storage faild, %v", err)
+		return err
+	}
+
+	logger.Infof("initalize context success.")
+
+	return nil
+}
+
+func (c *Context) initStorage() error {
+	if !c.Config.Database.Enabled {
+		logger.Infof("database is disabled")
+		return nil
+	}
+
+	var err error
+	c.DBStrorage, err = dbimpl.NewDBBackend(&c.Config.Database)
+	if nil != err {
+		logger.Errorf("New database backend error, %v", err)
+		return err
+	}
 
 	return nil
 }

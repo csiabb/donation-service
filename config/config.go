@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"github.com/csiabb/donation-service/common/log"
+	"github.com/csiabb/donation-service/components/database"
 )
 
 var (
@@ -25,6 +26,7 @@ var (
 type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
+	Database      database.DBConnectCfg
 }
 
 // ServerGeneralCfg general configure of service

@@ -28,3 +28,21 @@ Log:
     MaxBackups: 10
     # MaxAge is the maximum number of days to retain old log files
     MaxAge: 30
+
+################################################################################
+#
+# Database Configuration
+# - database to store digital asset data
+#
+################################################################################
+Database:
+    Enabled: true
+    Driver: postgres
+    Address: 127.0.0.1:5432
+    DBname: donation_service
+    User: postgres
+    Password: postgres
+    # whether enable ssl secure connection
+    SSLMode: disable # verify-full
+    MaxIdleConns: 5
+    MaxConns: 30
