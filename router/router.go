@@ -13,6 +13,7 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	srvctx "github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/controllers/version"
+	"github.com/csiabb/donation-service/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +25,9 @@ const (
 
 var (
 	logger = log.MustGetLogger("router")
+
+	//main url prefix
+	apiPrefix = fmt.Sprintf("api/%s", APIVersion)
 
 	//checkAPI
 	checkVersionURL = "version"
@@ -61,6 +65,12 @@ func (r *Router) SetupRouter() *gin.Engine {
 	// service version
 	router.GET(checkVersionURL, r.versionHandler.Version)
 
+	// v1 group api
+	apiPrefix := router.Group(apiPrefix)
+	{
+		// log reponse and request
+		apiPrefix.Use(middleware.RequestResponseLogger())
+	}
 	return router
 }
 
