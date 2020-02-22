@@ -9,4 +9,6 @@ package models
 // IDBBackend database operate interface
 type IDBBackend interface {
 	CreateAccount(*Account) error
+	ListDonationsByFund(*Request) ([]*PubFunds, error)
+	ListDonationsBySupply(*Request) ([]*PubSupply, error)
 }

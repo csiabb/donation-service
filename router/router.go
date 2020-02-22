@@ -8,6 +8,7 @@ package router
 
 import (
 	"fmt"
+	"github.com/csiabb/donation-service/controllers/donation"
 	"net/http"
 
 	"github.com/csiabb/donation-service/common/log"
@@ -20,23 +21,28 @@ import (
 
 // api version
 const (
+	// APIVersion ...
 	APIVersion = "v1"
 )
 
 var (
 	logger = log.MustGetLogger("router")
 
-	//main url prefix
+	// main url prefix
 	apiPrefix = fmt.Sprintf("api/%s", APIVersion)
 
-	//checkAPI
+	// checkAPI
 	checkVersionURL = "version"
+
+	// donations API
+	listDonations = "listDonations"
 )
 
 // Router service router
 type Router struct {
-	context        *srvctx.Context
-	versionHandler *version.RestHandler
+	context         *srvctx.Context
+	versionHandler  *version.RestHandler
+	donationHandler *donation.RestHandler
 }
 
 // InitRouter init router
@@ -53,6 +59,13 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 		return err
 	}
 
+	// Init donation handler
+	r.donationHandler, err = donation.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create donation rest http handler instance, %+v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -64,6 +77,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 
 	// service version
 	router.GET(checkVersionURL, r.versionHandler.Version)
+
+	// donations
+	router.POST(listDonations, r.donationHandler.ListDonations)
 
 	// v1 group api
 	apiPrefix := router.Group(apiPrefix)
