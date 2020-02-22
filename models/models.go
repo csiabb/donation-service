@@ -157,3 +157,14 @@ type Cover struct {
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time `sql:"index"`
 }
+
+// Request ...
+type Request struct {
+	UserType        string `json:"user_type"`     // user type
+	PubType         string `json:"pub_type"`      // the type of publicity
+	DonationType    string `json:"donation_type"` // the type of donation
+	CorrelationID   string `json:"correlation_id"`
+	CorrelationType string `json:"correlation_type"`
+	PageToken       string `json:"page_token"`
+	PageCount       string `json:"page_count"`
+}
