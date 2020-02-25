@@ -32,16 +32,16 @@ Log:
 ################################################################################
 #
 # Database Configuration
-# - database to store digital asset data
+# - database to store digital donation data
 #
 ################################################################################
 Database:
     Enabled: true
     Driver: postgres
-    Address: 127.0.0.1:5432
-    DBname: donation_service
+    Address: 192.168.20.90:5432
+    DBname: donation
     User: postgres
-    Password: postgres
+    Password: zhu88jie
     # whether enable ssl secure connection
     SSLMode: disable # verify-full
     MaxIdleConns: 5
