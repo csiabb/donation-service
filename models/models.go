@@ -7,8 +7,9 @@ SPDX-License-Identifier: Apache-2.0
 package models
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 // Account defines the common information of user
@@ -70,7 +71,7 @@ type PersonKyc struct {
 	CertNum     string `gorm:"type:varchar(128)"`             // the num of certification
 	Status      string `gorm:"type:varchar(32)"`              // the status of certification
 	Remark      string `gorm:"size:1024"`                     // remark
-	CertExpired int64  //the expired of certification
+	CertExpired int64  // the expired of certification
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time `sql:"index"`
@@ -110,7 +111,8 @@ type Image struct {
 // PubFunds defines the publicity funds
 type PubFunds struct {
 	ID          string          `gorm:"type:varchar(256);primary_key"` // funds id
-	UID         string          `gorm:"type:varchar(256);not null"`    // user id
+	UID         string          `gorm:"type:varchar(256)"`             // user id
+	UserType    string          `gorm:"type:varchar(16)"`              // user type
 	AidUID      string          `gorm:"type:varchar(256)"`             // aid user id
 	TargetUID   string          `gorm:"type:varchar(256)"`             // user id of charity
 	PubType     string          `gorm:"type:varchar(16)"`              // the type of publicity
@@ -126,10 +128,11 @@ type PubFunds struct {
 	DeletedAt   *time.Time `sql:"index"`
 }
 
-// PubSupply defines the publicity supplies
-type PubSupply struct {
+// PubSupplies defines the publicity supplies
+type PubSupplies struct {
 	ID          string `gorm:"type:varchar(256);primary_key"` // supply id
-	UID         string `gorm:"type:varchar(256);not null"`    // user id
+	UID         string `gorm:"type:varchar(256)"`             // user id
+	UserType    string `gorm:"type:varchar(16)"`              // user type
 	AidUID      string `gorm:"type:varchar(256)"`             // aid user id
 	TargetUID   string `gorm:"type:varchar(256)"`             // user id of charity
 	PubType     string `gorm:"type:varchar(16)"`              // the type of publicity
