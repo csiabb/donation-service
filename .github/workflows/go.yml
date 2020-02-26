@@ -25,9 +25,12 @@ jobs:
 
     - name: Check fmt
       run: make fmt-check vet
-      
+
     - name: Build Binary
       run: make default
-      
+
     - name: Run Test
       run: make test
+
+    - name: Build docker image
+      run: make docker

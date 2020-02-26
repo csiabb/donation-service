@@ -25,7 +25,7 @@ VETPACKAGES=`go list ./... | grep -v /sampleconfig/ | grep -v /scripts/`
 GOFILES=`find . -name "*.go"`
 
 default:
-	@go build -o ${BUILDBINPATH}/${BINARY} -tags=jsoniter
+	@CGO_ENABLED=0 go build -o ${BUILDBINPATH}/${BINARY}
 	@cp sampleconfig/donation-service.yaml ${BUILDBINPATH}
 
 list:
@@ -53,8 +53,8 @@ test:
 vet:
 	@go vet $(VETPACKAGES)
 
-#docker:
-#   @docker build -t csiabb/donation-service:${VERSION} .
+docker: default
+	@docker build -t csiabb/donation-service:$(VERSION) -f dockerfile/Dockerfile ./
 
 clean:
 	@rm -rf ${BUILDPATH}

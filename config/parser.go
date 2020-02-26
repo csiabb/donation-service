@@ -20,47 +20,7 @@ var (
 )
 
 // defaultCfgPath default conigure file path
-const defaultCfgPath = "/etc/donation-service/"
-
-// get component's name from configuration file path
-// like for /etc/arxanchain/baymax.yaml return baymax
-// func getSrvNameFromCfgPath(cfgFile string) string {
-// 	fName := filepath.Base(cfgFile)
-// 	extName := filepath.Ext(cfgFile)
-// 	componentName := fName[:len(fName)-len(extName)]
-// 	return componentName
-// }
-
-// SetupConfig setup the config during test execution
-// func SetupConfig(cfgFile string) {
-// 	if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
-// 		panic(fmt.Errorf("Fatal error when reading %s config file: %s\n", cfgFile, err))
-// 	}
-
-// 	MyViper = viper.New()
-// 	cName := getSrvNameFromCfgPath(cfgFile)
-
-// 	MyViper.SetEnvPrefix(strings.ToUpper(cName))
-// 	MyViper.AutomaticEnv()
-// 	replacer := strings.NewReplacer(".", "_")
-// 	MyViper.SetEnvKeyReplacer(replacer)
-
-// 	// Now set the configuration file.
-// 	MyViper.SetConfigName(cName)                 // Name of config file (without extension)
-// 	MyViper.AddConfigPath(filepath.Dir(cfgFile)) // Path to look for the config file in
-
-// 	err := MyViper.ReadInConfig() // Find and read the config file
-// 	if err != nil {               // Handle errors reading the config file
-// 		panic(fmt.Errorf("Fatal error when reading %s config file: %s\n", cfgFile, err))
-// 	}
-// 	// err = cachConfigure()
-// 	// if err != nil { // Handle errors reading the config file
-// 	// 	panic(fmt.Errorf("Fatal error when reading %s config file: %s\n", cmdRoot, err))
-// 	// }
-// 	runtime.GOMAXPROCS(MyViper.GetInt("common.gomaxprocs"))
-// 	flag.Parse()
-
-// }
+const defaultCfgPath = "/etc/csiabb/"
 
 // initConfig Init configuration and return the viper instance
 func initConfig(configName string) *viper.Viper {
