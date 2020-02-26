@@ -38,6 +38,7 @@ const (
 	urlPubFundsQuery      = "pub/funds/query"
 	urlPubSuppliesReceive = "pub/supplies/receive"
 	urlPubSuppliesQuery   = "pub/supplies/query"
+	urlPubList            = "pub/list"
 )
 
 // Router service router
@@ -92,6 +93,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 		apiPrefix.GET(urlPubFundsQuery, r.pubHandler.QueryFunds)
 		apiPrefix.POST(urlPubSuppliesReceive, r.pubHandler.ReceiveSupplies)
 		apiPrefix.GET(urlPubSuppliesQuery, r.pubHandler.QuerySupplies)
+		apiPrefix.GET(urlPubList, r.pubHandler.PubUserList)
 	}
 	return router
 }

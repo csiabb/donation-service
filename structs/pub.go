@@ -8,6 +8,7 @@ package structs
 
 import (
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 // ReceiveFundsRequest defines the request of receiving funds
@@ -112,4 +113,50 @@ type QuerySuppliesItems struct {
 	BlockHeight int64  `json:"block_height"` // block height
 	BlockTime   int64  `json:"block_time"`   // block time
 	CreatedAt   int64  `json:"create_at"`    // create time
+}
+
+// PubUserRequest defines the request of publicity information
+type PubUserRequest struct {
+	UserType  string `form:"user_type" binding:"required"` // user type
+	PageNum   int    `form:"page_num"`                     // page num
+	PageLimit int    `form:"page_limit"`                   // page limit
+	StartTime int64  `form:"start_time"`                   // start time
+	EndTime   int64  `form:"end_time"`                     // end time
+}
+
+// PubUserResp defines the response of publicity information
+type PubUserResp struct {
+	PageNum   int            `json:"page_num"`   // page num
+	PageLimit int            `json:"page_limit"` // page limit
+	StartTime int64          `json:"start_time"` // start time
+	EndTime   int64          `json:"end_time"`   // end time
+	Total     int64          `json:"total"`      // total number of query result
+	Results   []*PubUserItem `json:"results"`    // funds items
+}
+
+// PubUserItem defines the item of publicity information
+type PubUserItem struct {
+	ID          string    `json:"id"`           // funds id
+	UID         string    `json:"uid"`          // user id
+	UserType    string    `json:"user_type"`    // user type
+	AidUID      string    `json:"aid_uid"`      // aid user id
+	TargetUID   string    `json:"target_uid"`   // user id of charity
+	PubType     string    `json:"pub_type"`     // the type of publicity
+	PayType     string    `json:"pay_type"`     // pay type of funds
+	Amount      string    `json:"amount"`       // the amount of funds
+	Name        string    `json:"name"`         // name of supplies
+	Number      int64     `json:"number"`       // number of supplies
+	Unit        string    `json:"unit"`         // unit of supplies
+	TxID        string    `json:"tx_id"`        // block chain tx id
+	Remark      string    `json:"remark"`       // remark
+	BlockType   string    `json:"block_type"`   // block type
+	BlockHeight int64     `json:"block_height"` // block height
+	BlockTime   int64     `json:"block_time"`   // block time
+	CreatedAt   int64     `json:"create_at"`    // create time
+	Time        time.Time `json:"-"`    // time
+}
+
+// ConvertTime defines the covert of created_at
+func (pui *PubUserItem) ConvertTime() {
+	pui.CreatedAt = pui.Time.Unix()
 }
