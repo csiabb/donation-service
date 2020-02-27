@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// QueryFundsRequest defines the request of query organizations
+// QueryOrganizationsRequest defines the request of query organizations
 type QueryOrganizationsRequest struct {
 	PageNum   int   `form:"page_num"`   // page num
 	PageLimit int   `form:"page_limit"` // page limit
@@ -18,7 +18,7 @@ type QueryOrganizationsRequest struct {
 	EndTime   int64 `form:"end_time"`   // end time
 }
 
-// OrganizationInformationItem defines the struct of organization item
+// OrganizationsItems defines the struct of organization item
 type OrganizationsItems struct {
 	ID                  string          `json:"id"`                   // donation stat id
 	UID                 string          `json:"uid"`                  // user id of the one who donate
