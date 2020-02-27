@@ -24,6 +24,7 @@ const (
 
 // query page default value
 const (
-	PageLimit = 10
-	PageNum   = 1
+	PageLimit      = 10                // default page limit
+	PageNum        = 1                 // default page number
+	TenDayBySecond = 10 * 24 * 60 * 60 // seconds of ten days
 )
