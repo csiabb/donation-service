@@ -6,13 +6,15 @@ SPDX-License-Identifier: Apache-2.0
 
 package rest
 
+// publicity type
 const (
-	// publicity type
 	PubTypeDonate     = "donate"
 	PubTypeReceive    = "receive"
 	PubTypeDistribute = "distribute"
+)
 
-	// pay type
+// pay type
+const (
 	PayTypeOffline    = "offline"
 	PayTypeWeChat     = "wechat"
 	PayTypeAliPay     = "alipay"
@@ -20,6 +22,7 @@ const (
 	PayTypeCreditCard = "creditcard"
 )
 
+// query page default value
 const (
 	PageLimit = 10
 	PageNum   = 1
