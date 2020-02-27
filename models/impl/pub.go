@@ -171,3 +171,95 @@ func (b *DbBackendImpl) QueryPubByUserType(userType string, params *structs.Quer
 	params.Total = int64(len(out))
 	return out, nil
 }
+
+// QueryFundsDetail defines query publicity funds detail
+func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error) {
+	if id == "" {
+		e := fmt.Errorf("id can not be \\'\\'")
+		logger.Error(e)
+		return nil, e
+	}
+
+	detail := models.FundsDetail{}
+	if err := b.GetConn().Where(&models.PubFunds{ID: id}).First(&detail.Funds).Error; err != nil {
+		e := fmt.Errorf("query funds error, %v", err)
+		logger.Error(e)
+		return nil, e
+	}
+
+	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			e := fmt.Errorf("billing address records not found")
+			logger.Debug(e)
+		} else {
+			e := fmt.Errorf("query billing address error, %v", err)
+			logger.Error(e)
+			return nil, e
+		}
+	}
+
+	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			e := fmt.Errorf("shipping address records not found")
+			logger.Debug(e)
+		} else {
+			e := fmt.Errorf("query shipping address error, %v", err)
+			logger.Error(e)
+			return nil, e
+		}
+	}
+
+	if err := b.GetConn().Where(&models.Image{RelatedID: id, Type: rest.ImageProof}).Find(&detail.ProofImages).Error; err != nil {
+		e := fmt.Errorf("query images error, %v", err)
+		logger.Error(e)
+		return nil, e
+	}
+
+	return &detail, nil
+}
+
+// QuerySuppliesDetail defines query publicity funds detail
+func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, error) {
+	if id == "" {
+		e := fmt.Errorf("id can not be \\'\\'")
+		logger.Error(e)
+		return nil, e
+	}
+
+	detail := models.SuppliesDetail{}
+	if err := b.GetConn().Where(&models.PubSupplies{ID: id}).First(&detail.Supplies).Error; err != nil {
+		e := fmt.Errorf("query supplies error, %v", err)
+		logger.Error(e)
+		return nil, e
+	}
+
+	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			e := fmt.Errorf("billing address records not found")
+			logger.Debug(e)
+		} else {
+			e := fmt.Errorf("query billing address error, %v", err)
+			logger.Error(e)
+			return nil, e
+		}
+	}
+
+	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			e := fmt.Errorf("shipping address records not found")
+			logger.Debug(e)
+		} else {
+			e := fmt.Errorf("query shipping address error, %v", err)
+			logger.Error(e)
+			return nil, e
+		}
+	}
+
+	if err := b.GetConn().Where(&models.Image{RelatedID: id, Type: rest.ImageProof}).Find(&detail.ProofImages).Error; err != nil {
+		e := fmt.Errorf("query images error, %v", err)
+		logger.Error(e)
+		return nil, e
+	}
+
+	return &detail, nil
+}
