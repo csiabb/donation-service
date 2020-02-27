@@ -20,7 +20,7 @@ type QueryOrganizationsRequest struct {
 
 // OrganizationInformationItem defines the struct of organization item
 type OrganizationsItems struct {
-	ID                  string          `json:"id"`                   // funds id
+	ID                  string          `json:"id"`                   // donation stat id
 	UID                 string          `json:"uid"`                  // user id of the one who donate
 	URL                 string          `json:"url"`                  // organization logo
 	NickName            string          `json:"nick_name"`            // nick name
@@ -38,5 +38,5 @@ type QueryOrganizationsResp struct {
 	StartTime int64                 `json:"start_time"` // start time
 	EndTime   int64                 `json:"end_time"`   // end time
 	Total     int64                 `json:"total"`      // total number of query result
-	Results   []*OrganizationsItems `json:"results"`    // funds items
+	Results   []*OrganizationsItems `json:"results"`    // orgs items
 }
