@@ -20,8 +20,9 @@ BUILD=`date +%FT%T%z`
 BUILDPATH=build
 BUILDBINPATH=${BUILDPATH}/bin
 
-PACKAGES=`go list ./... | grep -v /sampleconfig/ | grep -v /scripts/`
-VETPACKAGES=`go list ./... | grep -v /sampleconfig/ | grep -v /scripts/`
+PACKAGES=`go list ./...`
+VETPACKAGES=`go list ./...`
+LINTPACKAGES=`go list ./...`
 GOFILES=`find . -name "*.go"`
 
 default:
@@ -32,6 +33,7 @@ list:
 	@echo ${PACKAGES}
 	@echo ${VETPACKAGES}
 	@echo ${GOFILES}
+	@echo ${LINTPACKAGES}
 
 fmt:
 	@gofmt -s -w ${GOFILES}
@@ -53,10 +55,13 @@ test:
 vet:
 	@go vet $(VETPACKAGES)
 
+lint:
+	@golint $(LINTPACKAGES)
+
 docker: default
 	@docker build -t csiabb/donation-service:$(VERSION) -f dockerfile/Dockerfile ./
 
 clean:
 	@rm -rf ${BUILDPATH}
 
-.PHONY: default fmt fmt-check mod test vet docker clean
+.PHONY: default fmt fmt-check mod test vet lint docker clean

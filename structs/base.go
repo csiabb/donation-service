@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 package structs
 
-// QueryByPageParam defines the struct of query by page params
+// QueryParams defines the struct of query by page params
 type QueryParams struct {
 	PageNum   int   // page num
 	PageLimit int   // page limit
