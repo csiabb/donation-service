@@ -55,3 +55,30 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 	logger.Info("response query organizations success.")
 	return
 }
+
+// QueryOrganizationInformation defines the request of query organization information
+func (h *RestHandler) QueryOrganizationInformation(c *gin.Context) {
+	logger.Infof("Got query organizations information request")
+
+	req := &structs.QueryOrganizationInformationRequest{}
+	if err := c.BindJSON(req); err != nil {
+		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
+		return
+	}
+	logger.Debugf("request params, %v", req)
+
+	item, err := h.srvcContext.DBStorage.QueryOrganizationInformation(req.UID)
+	if err != nil {
+		e := fmt.Errorf("query organizations information error : %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(item))
+
+	logger.Info("response query organizations information success.")
+	return
+}

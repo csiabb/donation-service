@@ -40,3 +40,22 @@ type QueryOrganizationsResp struct {
 	Total     int64                 `json:"total"`      // total number of query result
 	Results   []*OrganizationsItems `json:"results"`    // orgs items
 }
+
+// QueryOrganizationInformationRequest defines the request of query organization information
+type QueryOrganizationInformationRequest struct {
+	UID string `json:"uid"` // user id of the one who donate
+}
+
+// OrganizationInformationItem defines the struct of organization information item
+type OrganizationInformationItem struct {
+	UID         string `json:"uid"`           // user id of the one who donate
+	URL         string `json:"url"`           // image url
+	NickName    string `json:"nick_name"`     // nick name
+	Country     string `json:"country"`       // country
+	Province    string `json:"province"`      // province
+	City        string `json:"city"`          // city
+	District    string `json:"district"`      // district
+	Address     string `json:"address"`       // detail address
+	Phone       string `json:"phone"`         // phone num
+	BankCardNum string `json:"bank_card_num"` // bank card num
+}
