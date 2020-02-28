@@ -12,10 +12,10 @@ import (
 
 // QueryOrganizationsRequest defines the request of query organizations
 type QueryOrganizationsRequest struct {
-	PageNum   int   `json:"page_num"`   // page num
-	PageLimit int   `json:"page_limit"` // page limit
-	StartTime int64 `json:"start_time"` // start time
-	EndTime   int64 `json:"end_time"`   // end time
+	PageNum   int   `form:"page_num"`   // page num
+	PageLimit int   `form:"page_limit"` // page limit
+	StartTime int64 `form:"start_time"` // start time
+	EndTime   int64 `form:"end_time"`   // end time
 }
 
 // OrganizationsItems defines the struct of organization item

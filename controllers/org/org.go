@@ -21,7 +21,7 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 	logger.Infof("Got query organizations request")
 
 	req := &structs.QueryOrganizationsRequest{}
-	if err := c.BindJSON(req); err != nil {
+	if err := c.BindQuery(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
