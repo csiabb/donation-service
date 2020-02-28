@@ -29,4 +29,8 @@ type IDBBackend interface {
 	QuerySupplies(uid, userType, pubType string, params *structs.QueryParams) ([]*PubSupplies, error)
 	QuerySuppliesDetail(id string) (*SuppliesDetail, error)
 	QueryPubByUserType(userType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
+
+	// org
+	CreateOrganizations(*DonationStat) error
+	QueryOrganizations(params *structs.QueryParams) ([]*structs.OrganizationsItems, error)
 }

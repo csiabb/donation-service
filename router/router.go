@@ -12,10 +12,11 @@ import (
 
 	"github.com/csiabb/donation-service/common/log"
 	srvctx "github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/controllers/org"
 	"github.com/csiabb/donation-service/controllers/pub"
+	"github.com/csiabb/donation-service/controllers/version"
 	"github.com/csiabb/donation-service/middleware"
 
-	"github.com/csiabb/donation-service/controllers/version"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,10 +28,10 @@ const (
 var (
 	logger = log.MustGetLogger("router")
 
-	//main url prefix
+	// main url prefix
 	apiPrefix = fmt.Sprintf("api/%s", APIVersion)
 
-	//checkAPI
+	// checkAPI
 	checkVersionURL = "version"
 )
 
@@ -42,6 +43,9 @@ const (
 	urlPubSuppliesQuery   = "pub/supplies/query"
 	urlPubSuppliesDetail  = "pub/supplies/detail"
 	urlPubList            = "pub/list"
+
+	// org
+	urlOrgsQuery = "orgs/query"
 )
 
 // Router service router
@@ -49,6 +53,7 @@ type Router struct {
 	context        *srvctx.Context
 	versionHandler *version.RestHandler
 	pubHandler     *pub.RestHandler
+	orgHandler     *org.RestHandler
 }
 
 // InitRouter init router
@@ -70,6 +75,12 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 	r.pubHandler, err = pub.NewRestHandler(r.context)
 	if err != nil {
 		logger.Errorf("Failed to create pub rest http handler instance, %+v", err)
+		return err
+	}
+
+	r.orgHandler, err = org.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create organization rest http handler instance, %+v", err)
 		return err
 	}
 
@@ -99,6 +110,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 		apiPrefix.GET(urlPubSuppliesQuery, r.pubHandler.QuerySupplies)
 		apiPrefix.GET(urlPubSuppliesDetail, r.pubHandler.QuerySuppliesDetail)
 		apiPrefix.GET(urlPubList, r.pubHandler.PubUserList)
+
+		// org
+		apiPrefix.GET(urlOrgsQuery, r.orgHandler.QueryOrganizations)
 	}
 	return router
 }
