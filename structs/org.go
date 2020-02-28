@@ -8,6 +8,7 @@ package structs
 
 import (
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 // QueryOrganizationsRequest defines the request of query organizations
@@ -29,6 +30,12 @@ type OrganizationsItems struct {
 	DistributedFunds    decimal.Decimal `json:"distributed_funds"`    // distributing  funds
 	DistributedSupplies int64           `json:"distributed_supplies"` // distributing supplies
 	CreatedAt           int64           `json:"created_at"`           // create time
+	Time                time.Time       `json:"-"`                    // time
+}
+
+// ConvertTime defines the covert of created_at
+func (ois *OrganizationsItems) ConvertTime() {
+	ois.CreatedAt = ois.Time.Unix()
 }
 
 // QueryOrganizationsResp defines the response of organizations
@@ -39,4 +46,23 @@ type QueryOrganizationsResp struct {
 	EndTime   int64                 `json:"end_time"`   // end time
 	Total     int64                 `json:"total"`      // total number of query result
 	Results   []*OrganizationsItems `json:"results"`    // orgs items
+}
+
+// QueryOrganizationDetailRequest defines the request of query organization information
+type QueryOrganizationDetailRequest struct {
+	UID string `form:"uid"` // user id of the one who donate
+}
+
+// OrganizationDetailItem defines the struct of organization detail item
+type OrganizationDetailItem struct {
+	UID         string `json:"uid"`           // user id of the one who donate
+	URL         string `json:"url"`           // image url
+	NickName    string `json:"nick_name"`     // nick name
+	Country     string `json:"country"`       // country
+	Province    string `json:"province"`      // province
+	City        string `json:"city"`          // city
+	District    string `json:"district"`      // district
+	Address     string `json:"address"`       // detail address
+	Phone       string `json:"phone"`         // phone num
+	BankCardNum string `json:"bank_card_num"` // bank card num
 }

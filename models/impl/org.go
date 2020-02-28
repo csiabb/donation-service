@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	sqlQueryDonationStatAndAccountInfo = "select donation_stat.id, donation_stat.uid, donation_stat.received_funds, donation_stat.received_supplies, donation_stat.distributed_funds, donation_stat.distributed_supplies, donation_stat.created_at, account.nick_name, image.url from donation_stat full join account on donation_stat.uid = account.id full join image on image.related_id = donation_stat.uid where image.type= ? and  donation_stat.created_at >= ? and donation_stat.created_at <= ? order by  donation_stat.created_at limit ? offset ?"
+	sqlQueryDonationStatAndAccountInfo       = "select temp.id, temp.uid, temp.received_funds, temp.received_supplies, temp.distributed_funds, temp.distributed_supplies, temp.time, temp.nick_name , image.url FROM (select donation_stat.id, donation_stat.uid, donation_stat.received_funds, donation_stat.received_supplies, donation_stat.distributed_funds, donation_stat.distributed_supplies, donation_stat.created_at as time, account.nick_name  from donation_stat full join account on donation_stat.uid = account.id  where    donation_stat.created_at >= ? and donation_stat.created_at <= ?) as temp  LEFT JOIN image ON image.related_id = temp.uid and image.type = ?  order by temp.time  limit ? offset ?"
+	sqlQueryDetailDonationStatAndAccountInfo = "select temp.nick_name, temp.uid, temp.phone, temp.bank_card_num, temp.country, temp.district, temp.province, temp.city, temp.address,image.url FROM (select account.nick_name, account.id as uid, account.phone, account.bank_card_num, address.country, address.district, address.province, address.city, address.address from account LEFT JOIN address ON address.uid = account.id) as temp  LEFT JOIN image ON image.related_id = temp.uid and image.type = ? WHERE temp.uid = ?"
 )
 
 // CreateOrganizations implement create the donation statistics of organization interface
@@ -42,22 +43,22 @@ func (b *DbBackendImpl) QueryOrganizations(params *structs.QueryParams) ([]*stru
 		params.PageLimit = rest.PageLimit
 	}
 
-	if params.StartTime < 0 || params.EndTime < 0 {
-		return nil, fmt.Errorf("the time value is less than 0")
-	}
-
 	if params.StartTime > 0 && params.EndTime > 0 {
 		if params.EndTime < params.StartTime {
 			return nil, fmt.Errorf("end time can not less than start time")
 		}
+	} else {
+		now := time.Now()
+		params.EndTime = now.Unix()
+		params.StartTime = params.EndTime - rest.TenDayBySecond
 	}
 
 	var out []*structs.OrganizationsItems
 	offset := (params.PageNum - 1) * params.PageLimit
 
 	where := b.GetConn().Model(&structs.OrganizationsItems{})
-	if err := where.Raw(sqlQueryDonationStatAndAccountInfo, "org", time.Unix(params.StartTime, 0),
-		time.Unix(params.EndTime, 0), params.PageLimit, offset).Scan(&out).Error; err != nil {
+	if err := where.Raw(sqlQueryDonationStatAndAccountInfo, time.Unix(params.StartTime, 0),
+		time.Unix(params.EndTime, 0), "org", params.PageLimit, offset).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
 			logger.Error(e)
@@ -68,5 +69,28 @@ func (b *DbBackendImpl) QueryOrganizations(params *structs.QueryParams) ([]*stru
 		return nil, err
 	}
 
+	params.Total = int64(len(out))
 	return out, nil
+}
+
+// QueryOrganizationInformation implement query detail the donation statistics of organization interface
+func (b *DbBackendImpl) QueryOrganizationDetail(uid string) (*structs.OrganizationDetailItem, error) {
+	if 0 == len(uid) {
+		return nil, fmt.Errorf("param is nil")
+	}
+
+	var out structs.OrganizationDetailItem
+	where := b.GetConn().Model(&structs.OrganizationDetailItem{})
+	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, "org", uid).Scan(&out).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			e := fmt.Errorf("record not found")
+			logger.Error(e)
+			return nil, e
+		}
+
+		logger.Errorf("query organizations detail record error: %v", err)
+		return nil, err
+	}
+
+	return &out, nil
 }
