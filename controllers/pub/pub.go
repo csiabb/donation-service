@@ -58,7 +58,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 
 	err := h.srvcContext.DBStorage.CreateFunds(funds)
 	if err != nil {
-		e := fmt.Errorf("create funds error : %s", err.Error())
+		e := fmt.Errorf("create funds error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 	}
@@ -91,7 +91,7 @@ func (h *RestHandler) QueryFunds(c *gin.Context) {
 
 	result, err := h.srvcContext.DBStorage.QueryFunds(req.UID, req.UserType, req.PubType, params)
 	if err != nil {
-		e := fmt.Errorf("query funds error : %s", err.Error())
+		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
@@ -128,6 +128,90 @@ func (h *RestHandler) QueryFunds(c *gin.Context) {
 	return
 }
 
+// QueryFundsDetail defines the detail information of funds
+func (h *RestHandler) QueryFundsDetail(c *gin.Context) {
+	logger.Info("got query funds detail request")
+
+	req := &structs.FundsDetailRequest{}
+	var err error
+	if err = c.BindQuery(req); err != nil {
+		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
+		return
+	}
+	logger.Debugf("request params %v", req)
+
+	f, err := h.srvcContext.DBStorage.QueryFundsDetail(req.FundsID)
+	if err != nil {
+		e := fmt.Errorf("query funds detail error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	funds := structs.QueryFundsItems{
+		ID:          f.Funds.ID,
+		UID:         f.Funds.UID,
+		UserType:    f.Funds.UserType,
+		AidUID:      f.Funds.AidUID,
+		TargetUID:   f.Funds.TargetUID,
+		PubType:     f.Funds.PubType,
+		PayType:     f.Funds.PubType,
+		Amount:      f.Funds.Amount.String(),
+		TxID:        f.Funds.TxID,
+		Remark:      f.Funds.Remark,
+		BlockType:   f.Funds.BlockType,
+		BlockHeight: f.Funds.BlockHeight,
+		BlockTime:   f.Funds.BlockTime,
+		CreatedAt:   f.Funds.CreatedAt.Unix(),
+	}
+
+	bAddr := structs.PubAddress{
+		ID:       f.BillingAddr.ID,
+		Type:     f.BillingAddr.Type,
+		Country:  f.BillingAddr.Country,
+		Province: f.BillingAddr.Province,
+		City:     f.BillingAddr.City,
+		District: f.BillingAddr.District,
+		Address:  f.BillingAddr.Address,
+		ZipCode:  f.BillingAddr.ZipCode,
+	}
+
+	sAddr := structs.PubAddress{
+		ID:       f.ShippingAddr.ID,
+		Type:     f.ShippingAddr.Type,
+		Country:  f.ShippingAddr.Country,
+		Province: f.ShippingAddr.Province,
+		City:     f.ShippingAddr.City,
+		District: f.ShippingAddr.District,
+		Address:  f.ShippingAddr.Address,
+		ZipCode:  f.ShippingAddr.ZipCode,
+	}
+
+	images := make([]*structs.PubProofImage, 0)
+	for _, v := range f.ProofImages {
+		images = append(images, &structs.PubProofImage{
+			ID:     v.ID,
+			Type:   v.Type,
+			URL:    v.URL,
+			Hash:   v.Hash,
+			Format: v.Format,
+		})
+	}
+
+	result := structs.PubFundsDetail{
+		PubFunds:        funds,
+		BillingAddress:  bAddr,
+		ShippingAddress: sAddr,
+		ProofImages:     images,
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&result))
+	logger.Info("response query funds detail success.")
+	return
+}
+
 // ReceiveSupplies defines the request of received supplies
 func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	logger.Info("got receive supplies request")
@@ -155,7 +239,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 
 	err := h.srvcContext.DBStorage.CreateSupplies(supplies)
 	if err != nil {
-		e := fmt.Errorf("create supplies error : %s", err.Error())
+		e := fmt.Errorf("create supplies error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
@@ -188,7 +272,7 @@ func (h *RestHandler) QuerySupplies(c *gin.Context) {
 
 	result, err := h.srvcContext.DBStorage.QuerySupplies(req.UID, req.UserType, req.PubType, params)
 	if err != nil {
-		e := fmt.Errorf("query funds error : %s", err.Error())
+		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
@@ -227,6 +311,91 @@ func (h *RestHandler) QuerySupplies(c *gin.Context) {
 	return
 }
 
+// QuerySuppliesDetail defines the detail information of supplies
+func (h *RestHandler) QuerySuppliesDetail(c *gin.Context) {
+	logger.Info("got query supplies detail request")
+
+	req := &structs.SuppliesDetailRequest{}
+	var err error
+	if err = c.BindQuery(req); err != nil {
+		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
+		return
+	}
+	logger.Debugf("request params %v", req)
+
+	s, err := h.srvcContext.DBStorage.QuerySuppliesDetail(req.SuppliesID)
+	if err != nil {
+		e := fmt.Errorf("query supplies detail error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	supplies := structs.QuerySuppliesItems{
+		ID:          s.Supplies.ID,
+		UID:         s.Supplies.UID,
+		UserType:    s.Supplies.UserType,
+		AidUID:      s.Supplies.AidUID,
+		TargetUID:   s.Supplies.TargetUID,
+		PubType:     s.Supplies.PubType,
+		Name:        s.Supplies.Name,
+		Number:      s.Supplies.Number,
+		Unit:        s.Supplies.Unit,
+		TxID:        s.Supplies.TxID,
+		Remark:      s.Supplies.Remark,
+		BlockType:   s.Supplies.BlockType,
+		BlockHeight: s.Supplies.BlockHeight,
+		BlockTime:   s.Supplies.BlockTime,
+		CreatedAt:   s.Supplies.CreatedAt.Unix(),
+	}
+
+	bAddr := structs.PubAddress{
+		ID:       s.BillingAddr.ID,
+		Type:     s.BillingAddr.Type,
+		Country:  s.BillingAddr.Country,
+		Province: s.BillingAddr.Province,
+		City:     s.BillingAddr.City,
+		District: s.BillingAddr.District,
+		Address:  s.BillingAddr.Address,
+		ZipCode:  s.BillingAddr.ZipCode,
+	}
+
+	sAddr := structs.PubAddress{
+		ID:       s.ShippingAddr.ID,
+		Type:     s.ShippingAddr.Type,
+		Country:  s.ShippingAddr.Country,
+		Province: s.ShippingAddr.Province,
+		City:     s.ShippingAddr.City,
+		District: s.ShippingAddr.District,
+		Address:  s.ShippingAddr.Address,
+		ZipCode:  s.ShippingAddr.ZipCode,
+	}
+
+	images := make([]*structs.PubProofImage, 0)
+	for _, v := range s.ProofImages {
+		images = append(images, &structs.PubProofImage{
+			ID:     v.ID,
+			Type:   v.Type,
+			URL:    v.URL,
+			Hash:   v.Hash,
+			Format: v.Format,
+		})
+	}
+
+	result := structs.PubSuppliesDetail{
+		PubSupplies:     supplies,
+		BillingAddress:  bAddr,
+		ShippingAddress: sAddr,
+		ProofImages:     images,
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&result))
+	logger.Info("response query supplies detail success.")
+	return
+}
+
 // PubUserList defines the publicity information of user
 func (h *RestHandler) PubUserList(c *gin.Context) {
 	logger.Info("got publicity person list request")
@@ -250,7 +419,7 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 
 	result, err := h.srvcContext.DBStorage.QueryPubByUserType(req.UserType, params)
 	if err != nil {
-		e := fmt.Errorf("query funds error : %s", err.Error())
+		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return

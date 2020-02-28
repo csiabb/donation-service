@@ -62,6 +62,11 @@ type QueryFundsItems struct {
 	CreatedAt   int64  `json:"create_at"`    // create time
 }
 
+// FundsDetailRequest defines the request of query detail funds
+type FundsDetailRequest struct {
+	FundsID string `form:"funds_id"` // id of funds
+}
+
 // ReceiveSuppliesRequest defines the struct of received supplies
 type ReceiveSuppliesRequest struct {
 	UID       string `json:"uid"`                           // user id
@@ -115,6 +120,11 @@ type QuerySuppliesItems struct {
 	CreatedAt   int64  `json:"create_at"`    // create time
 }
 
+// SuppliesDetailRequest defines the request of query detail supplies
+type SuppliesDetailRequest struct {
+	SuppliesID string `form:"supplies_id"` // id of funds
+}
+
 // PubUserRequest defines the request of publicity information
 type PubUserRequest struct {
 	UserType  string `form:"user_type" binding:"required"` // user type
@@ -159,4 +169,41 @@ type PubUserItem struct {
 // ConvertTime defines the covert of created_at
 func (pui *PubUserItem) ConvertTime() {
 	pui.CreatedAt = pui.Time.Unix()
+}
+
+// PubFundsDetail defines the detail information of publicity funds
+type PubFundsDetail struct {
+	PubFunds        QueryFundsItems  `json:"pub_funds"`     // publicity funds
+	BillingAddress  PubAddress       `json:"billing_addr"`  // billing address
+	ShippingAddress PubAddress       `json:"shipping_addr"` // shipping address
+	ProofImages     []*PubProofImage `json:"proof_images"`  // the proof of donation
+}
+
+// PubSuppliesDetail defines the detail information of publicity supplies
+type PubSuppliesDetail struct {
+	PubSupplies     QuerySuppliesItems `json:"pub_supplies"`  // publicity supplies
+	BillingAddress  PubAddress         `json:"billing_addr"`  // billing address
+	ShippingAddress PubAddress         `json:"shipping_addr"` // shipping address
+	ProofImages     []*PubProofImage   `json:"proof_images"`  // the proof of donation
+}
+
+// PubAddress defines the shipping address of publicity funds detail information
+type PubAddress struct {
+	ID       string `json:"id"`       // address id
+	Type     string `json:"type"`     // address type
+	Country  string `json:"country"`  // country
+	Province string `json:"province"` // province
+	City     string `json:"city"`     // city
+	District string `json:"district"` // district
+	Address  string `json:"address"`  // detail address
+	ZipCode  string `json:"zip_code"` // zip code
+}
+
+// PubProofImage defines the proof image of publicity funds detail information
+type PubProofImage struct {
+	ID     string `json:"id"`     // image id
+	Type   string `json:"type"`   // user type
+	URL    string `json:"url"`    // image url
+	Hash   string `json:"hash"`   // image hash
+	Format string `json:"format"` // image file format
 }
