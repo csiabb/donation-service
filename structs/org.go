@@ -7,8 +7,9 @@ SPDX-License-Identifier: Apache-2.0
 package structs
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 // QueryOrganizationsRequest defines the request of query organizations
@@ -49,7 +50,7 @@ type QueryOrganizationsResp struct {
 }
 
 // QueryOrganizationDetailRequest defines the request of query organization information
-type QueryOrganizationDetailRequest struct {
+type QueryOrgDetailRequest struct {
 	UID string `form:"uid"` // user id of the one who donate
 }
 

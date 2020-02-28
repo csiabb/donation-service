@@ -64,7 +64,7 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 func (h *RestHandler) QueryOrganizationDetail(c *gin.Context) {
 	logger.Infof("Got query organizations detail request")
 
-	req := &structs.QueryOrganizationDetailRequest{}
+	req := &structs.QueryOrgDetailRequest{}
 	if err := c.BindQuery(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
