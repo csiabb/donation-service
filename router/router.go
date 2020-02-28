@@ -38,8 +38,10 @@ var (
 const (
 	urlPubFundsReceive    = "pub/funds/receive"
 	urlPubFundsQuery      = "pub/funds/query"
+	urlPubFundsDetail     = "pub/funds/detail"
 	urlPubSuppliesReceive = "pub/supplies/receive"
 	urlPubSuppliesQuery   = "pub/supplies/query"
+	urlPubSuppliesDetail  = "pub/supplies/detail"
 	urlPubList            = "pub/list"
 
 	// org
@@ -104,8 +106,10 @@ func (r *Router) SetupRouter() *gin.Engine {
 		// publicity
 		apiPrefix.POST(urlPubFundsReceive, r.pubHandler.ReceiveFunds)
 		apiPrefix.GET(urlPubFundsQuery, r.pubHandler.QueryFunds)
+		apiPrefix.GET(urlPubFundsDetail, r.pubHandler.QueryFundsDetail)
 		apiPrefix.POST(urlPubSuppliesReceive, r.pubHandler.ReceiveSupplies)
 		apiPrefix.GET(urlPubSuppliesQuery, r.pubHandler.QuerySupplies)
+		apiPrefix.GET(urlPubSuppliesDetail, r.pubHandler.QuerySuppliesDetail)
 		apiPrefix.GET(urlPubList, r.pubHandler.PubUserList)
 
 		// org

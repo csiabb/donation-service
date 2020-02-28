@@ -160,3 +160,19 @@ type Cover struct {
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time `sql:"index"`
 }
+
+// FundsDetail defines the detail of funds
+type FundsDetail struct {
+	Funds        PubFunds
+	BillingAddr  Address
+	ShippingAddr Address
+	ProofImages  []*Image
+}
+
+// SuppliesDetail defines the detail of supplies
+type SuppliesDetail struct {
+	Supplies     PubSupplies
+	BillingAddr  Address
+	ShippingAddr Address
+	ProofImages  []*Image
+}
