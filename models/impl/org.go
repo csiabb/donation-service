@@ -73,7 +73,7 @@ func (b *DbBackendImpl) QueryOrganizations(params *structs.QueryParams) ([]*stru
 	return out, nil
 }
 
-// QueryOrganizationInformation implement query detail the donation statistics of organization interface
+// QueryOrganizationDetail implement query detail the donation statistics of organization interface
 func (b *DbBackendImpl) QueryOrganizationDetail(uid string) (*structs.OrganizationDetailItem, error) {
 	if 0 == len(uid) {
 		return nil, fmt.Errorf("param is nil")

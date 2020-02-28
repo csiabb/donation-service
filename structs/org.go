@@ -49,7 +49,7 @@ type QueryOrganizationsResp struct {
 	Results   []*OrganizationsItems `json:"results"`    // orgs items
 }
 
-// QueryOrganizationDetailRequest defines the request of query organization information
+// QueryOrgDetailRequest defines the request of query organization information
 type QueryOrgDetailRequest struct {
 	UID string `form:"uid"` // user id of the one who donate
 }
