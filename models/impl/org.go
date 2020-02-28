@@ -65,7 +65,7 @@ func (b *DbBackendImpl) QueryOrganizations(params *structs.QueryParams) ([]*stru
 			return nil, e
 		}
 
-		logger.Errorf("query organizations records error: %v", err)
+		logger.Errorf("query organizations records error , %v", err)
 		return nil, err
 	}
 
@@ -88,7 +88,7 @@ func (b *DbBackendImpl) QueryOrganizationDetail(uid string) (*structs.Organizati
 			return nil, e
 		}
 
-		logger.Errorf("query organizations detail record error: %v", err)
+		logger.Errorf("query organizations detail record error , %v", err)
 		return nil, err
 	}
 

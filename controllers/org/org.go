@@ -38,7 +38,7 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 
 	donationStats, err := h.srvcContext.DBStorage.QueryOrganizations(params)
 	if err != nil {
-		e := fmt.Errorf("query organizations error : %s", err.Error())
+		e := fmt.Errorf("query organizations error , %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
@@ -60,7 +60,7 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 	return
 }
 
-// QueryOrganizationInformation defines the request of query organization detail
+// QueryOrganizationDetail defines the request of query organization detail
 func (h *RestHandler) QueryOrganizationDetail(c *gin.Context) {
 	logger.Infof("Got query organizations detail request")
 
@@ -75,7 +75,7 @@ func (h *RestHandler) QueryOrganizationDetail(c *gin.Context) {
 
 	item, err := h.srvcContext.DBStorage.QueryOrganizationDetail(req.UID)
 	if err != nil {
-		e := fmt.Errorf("query organizations detail error : %s", err.Error())
+		e := fmt.Errorf("query organizations detail error , %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
