@@ -38,10 +38,14 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 
 	donationStats, err := h.srvcContext.DBStorage.QueryOrganizations(params)
 	if err != nil {
-		e := fmt.Errorf("query organizations error : %s", err.Error())
+		e := fmt.Errorf("query organizations error , %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
+	}
+
+	for i := 0; i < len(donationStats); i++ {
+		donationStats[i].ConvertTime()
 	}
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.QueryOrganizationsResp{
@@ -53,5 +57,32 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 		Results:   donationStats,
 	}))
 	logger.Info("response query organizations success.")
+	return
+}
+
+// QueryOrganizationDetail defines the request of query organization detail
+func (h *RestHandler) QueryOrganizationDetail(c *gin.Context) {
+	logger.Infof("Got query organizations detail request")
+
+	req := &structs.QueryOrgDetailRequest{}
+	if err := c.BindQuery(req); err != nil {
+		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
+		return
+	}
+	logger.Debugf("request params, %v", req)
+
+	item, err := h.srvcContext.DBStorage.QueryOrganizationDetail(req.UID)
+	if err != nil {
+		e := fmt.Errorf("query organizations detail error , %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(item))
+
+	logger.Info("response query organizations detail success.")
 	return
 }

@@ -45,7 +45,8 @@ const (
 	urlPubList            = "pub/list"
 
 	// org
-	urlOrgsQuery = "orgs/query"
+	urlOrgsQuery     = "orgs/query"
+	urlOrgsInfoQuery = "orgs/detail/query"
 )
 
 // Router service router
@@ -113,6 +114,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 
 		// org
 		apiPrefix.GET(urlOrgsQuery, r.orgHandler.QueryOrganizations)
+		apiPrefix.GET(urlOrgsInfoQuery, r.orgHandler.QueryOrganizationDetail)
 	}
 	return router
 }
