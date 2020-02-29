@@ -12,7 +12,7 @@ import (
 
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/common/utils"
-	"github.com/csiabb/donation-service/models"
+	"github.com/csiabb/donation-service/models/storage"
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/jinzhu/gorm"
@@ -23,7 +23,7 @@ const (
 )
 
 // CreateFunds implement receive funds interface
-func (b *DbBackendImpl) CreateFunds(data *models.PubFunds) error {
+func (b *DbBackendImpl) CreateFunds(data *storage.PubFunds) error {
 	if nil == data {
 		return fmt.Errorf("param is nil")
 	}
@@ -33,7 +33,7 @@ func (b *DbBackendImpl) CreateFunds(data *models.PubFunds) error {
 }
 
 // QueryFunds implement query funds interface
-func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *structs.QueryParams) ([]*models.PubFunds, error) {
+func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *structs.QueryParams) ([]*storage.PubFunds, error) {
 	if params.PageNum < 1 {
 		params.PageNum = rest.PageNum
 	}
@@ -42,7 +42,7 @@ func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *struct
 		params.PageLimit = rest.PageLimit
 	}
 
-	where := b.GetConn().Model(&models.PubFunds{})
+	where := b.GetConn().Model(&storage.PubFunds{})
 
 	if uid != "" {
 		where = where.Where("uid = ?", uid)
@@ -65,7 +65,7 @@ func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *struct
 		where = where.Where("pub_type = ?", pubType)
 	}
 
-	var out []*models.PubFunds
+	var out []*storage.PubFunds
 	offset := (params.PageNum - 1) * params.PageLimit
 
 	if err := where.Offset(offset).Limit(params.PageLimit).Find(&out).Count(&params.Total).Order("created_at desc").Error; err != nil {
@@ -83,7 +83,7 @@ func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *struct
 }
 
 // CreateSupplies defines the created supplies
-func (b *DbBackendImpl) CreateSupplies(data *models.PubSupplies) error {
+func (b *DbBackendImpl) CreateSupplies(data *storage.PubSupplies) error {
 	if nil == data {
 		return fmt.Errorf("param is nil")
 	}
@@ -93,7 +93,7 @@ func (b *DbBackendImpl) CreateSupplies(data *models.PubSupplies) error {
 }
 
 // QuerySupplies defines the query supplies
-func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *structs.QueryParams) ([]*models.PubSupplies, error) {
+func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *structs.QueryParams) ([]*storage.PubSupplies, error) {
 	if params.PageNum < 1 {
 		params.PageNum = rest.PageNum
 	}
@@ -102,7 +102,7 @@ func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *str
 		params.PageLimit = rest.PageLimit
 	}
 
-	where := b.GetConn().Model(&models.PubFunds{})
+	where := b.GetConn().Model(&storage.PubFunds{})
 
 	if uid != "" {
 		where = where.Where("uid = ?", uid)
@@ -125,7 +125,7 @@ func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *str
 		where = where.Where("pub_type = ?", pubType)
 	}
 
-	var out []*models.PubSupplies
+	var out []*storage.PubSupplies
 	offset := (params.PageNum - 1) * params.PageLimit
 
 	if err := where.Offset(offset).Limit(params.PageLimit).Find(&out).Count(&params.Total).Order("created_at desc").Error; err != nil {
@@ -151,7 +151,7 @@ func (b *DbBackendImpl) QueryPubByUserType(userType string, params *structs.Quer
 	} else {
 		now := time.Now()
 		params.EndTime = now.Unix()
-		params.StartTime = params.EndTime - rest.TenDayBySecond
+		params.StartTime = params.EndTime - rest.TenDaysBySecond
 	}
 
 	offset := (params.PageNum - 1) * params.PageLimit
@@ -173,21 +173,21 @@ func (b *DbBackendImpl) QueryPubByUserType(userType string, params *structs.Quer
 }
 
 // QueryFundsDetail defines query publicity funds detail
-func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error) {
+func (b *DbBackendImpl) QueryFundsDetail(id string) (*storage.FundsDetail, error) {
 	if id == "" {
 		e := fmt.Errorf("id can not be \\'\\'")
 		logger.Error(e)
 		return nil, e
 	}
 
-	detail := models.FundsDetail{}
-	if err := b.GetConn().Where(&models.PubFunds{ID: id}).First(&detail.Funds).Error; err != nil {
+	detail := storage.FundsDetail{}
+	if err := b.GetConn().Where(&storage.PubFunds{ID: id}).First(&detail.Funds).Error; err != nil {
 		e := fmt.Errorf("query funds error, %v", err)
 		logger.Error(e)
 		return nil, e
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&storage.Address{UID: detail.Funds.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("billing address records not found")
 			logger.Debug(e)
@@ -198,7 +198,7 @@ func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error)
 		}
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&storage.Address{UID: detail.Funds.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("shipping address records not found")
 			logger.Debug(e)
@@ -209,7 +209,7 @@ func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error)
 		}
 	}
 
-	if err := b.GetConn().Where(&models.Image{RelatedID: id, Type: rest.ImageProof}).Find(&detail.ProofImages).Error; err != nil {
+	if err := b.GetConn().Where(&storage.Image{RelatedID: id, Type: rest.ImageProof}).Find(&detail.ProofImages).Error; err != nil {
 		e := fmt.Errorf("query images error, %v", err)
 		logger.Error(e)
 		return nil, e
@@ -219,21 +219,21 @@ func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error)
 }
 
 // QuerySuppliesDetail defines query publicity funds detail
-func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, error) {
+func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*storage.SuppliesDetail, error) {
 	if id == "" {
 		e := fmt.Errorf("id can not be \\'\\'")
 		logger.Error(e)
 		return nil, e
 	}
 
-	detail := models.SuppliesDetail{}
-	if err := b.GetConn().Where(&models.PubSupplies{ID: id}).First(&detail.Supplies).Error; err != nil {
+	detail := storage.SuppliesDetail{}
+	if err := b.GetConn().Where(&storage.PubSupplies{ID: id}).First(&detail.Supplies).Error; err != nil {
 		e := fmt.Errorf("query supplies error, %v", err)
 		logger.Error(e)
 		return nil, e
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&storage.Address{UID: detail.Supplies.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("billing address records not found")
 			logger.Debug(e)
@@ -244,7 +244,7 @@ func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, 
 		}
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&storage.Address{UID: detail.Supplies.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("shipping address records not found")
 			logger.Debug(e)
@@ -255,7 +255,7 @@ func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, 
 		}
 	}
 
-	if err := b.GetConn().Where(&models.Image{RelatedID: id, Type: rest.ImageProof}).Find(&detail.ProofImages).Error; err != nil {
+	if err := b.GetConn().Where(&storage.Image{RelatedID: id, Type: rest.ImageProof}).Find(&detail.ProofImages).Error; err != nil {
 		e := fmt.Errorf("query images error, %v", err)
 		logger.Error(e)
 		return nil, e

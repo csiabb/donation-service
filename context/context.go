@@ -11,8 +11,8 @@ import (
 
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/config"
-	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/impl"
+	"github.com/csiabb/donation-service/models/storage"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 // Context the context of service
 type Context struct {
 	Config    *config.SrvcCfg
-	DBStorage models.IDBBackend
+	DBStorage storage.IDBBackend
 }
 
 // GetServerContext ...

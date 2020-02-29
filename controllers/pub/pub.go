@@ -11,7 +11,7 @@ import (
 	"net/http"
 
 	"github.com/csiabb/donation-service/common/rest"
-	"github.com/csiabb/donation-service/models"
+	"github.com/csiabb/donation-service/models/storage"
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
@@ -45,7 +45,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		return
 	}
 
-	funds := &models.PubFunds{
+	funds := &storage.PubFunds{
 		UID:       req.UID,
 		UserType:  req.UserType,
 		AidUID:    req.AidUID,
@@ -225,7 +225,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	}
 	logger.Debugf("request params, %v", req)
 
-	supplies := &models.PubSupplies{
+	supplies := &storage.PubSupplies{
 		UID:       req.UID,
 		UserType:  req.UserType,
 		AidUID:    req.AidUID,

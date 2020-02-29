@@ -1,16 +1,18 @@
 /*
-Copyright ArxanChain Ltd. 2020 All Rights Reserved.
+ * Copyright ArxanChain Ltd. 2020 All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-SPDX-License-Identifier: Apache-2.0
-*/
-
-package models
+package storage
 
 import (
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/jinzhu/gorm"
 )
+
+//go:generate mockgen -destination=backend_mock.go -package=models github.com/csiabb/donation-service/models IDBBackend
 
 // IDBBackend database operate interface
 type IDBBackend interface {

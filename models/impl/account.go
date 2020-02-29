@@ -9,11 +9,11 @@ package impl
 import (
 	"fmt"
 
-	"github.com/csiabb/donation-service/models"
+	"github.com/csiabb/donation-service/models/storage"
 )
 
 // CreateAccount implement create account interface
-func (b *DbBackendImpl) CreateAccount(data *models.Account) error {
+func (b *DbBackendImpl) CreateAccount(data *storage.Account) error {
 	if nil == data {
 		return fmt.Errorf("param is nil")
 	}

@@ -31,9 +31,9 @@ const (
 
 // query page default value
 const (
-	PageLimit      = 10                // default page limit
-	PageNum        = 1                 // default page number
-	TenDayBySecond = 10 * 24 * 60 * 60 // seconds of ten days
+	PageLimit       = 10                // default page limit
+	PageNum         = 1                 // default page number
+	TenDaysBySecond = 10 * 24 * 60 * 60 // seconds of ten days
 )
 
 // the type of addresses
