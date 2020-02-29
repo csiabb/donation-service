@@ -36,7 +36,7 @@ type OrganizationsItems struct {
 
 // ConvertTime defines the covert of created_at
 func (ois *OrganizationsItems) ConvertTime() {
-	ois.CreatedAt = ois.Time.Unix()
+	ois.CreatedAt = ois.Time.UTC().Unix()
 }
 
 // QueryOrganizationsResp defines the response of organizations
