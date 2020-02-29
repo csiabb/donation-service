@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	sqlQueryDonationStatAndAccountInfo       = "select temp.id, temp.uid, temp.received_funds, temp.received_supplies, temp.distributed_funds, temp.distributed_supplies, temp.time, temp.nick_name, image.url from (select donation_stat.id, donation_stat.uid, donation_stat.received_funds, donation_stat.received_supplies, donation_stat.distributed_funds, donation_stat.distributed_supplies, donation_stat.created_at as time, account.nick_name from donation_stat full join account on donation_stat.uid = account.id where donation_stat.created_at >= ? and donation_stat.created_at <= ?) as temp left join image on image.related_id = temp.uid and image.type = ? order by temp.time limit ? offset ?"
-	sqlQueryDetailDonationStatAndAccountInfo = "select temp.nick_name, temp.uid, temp.phone, temp.bank_card_num, temp.country, temp.district, temp.province, temp.city, temp.address,image.url from (select account.nick_name, account.id as uid, account.phone, account.bank_card_num, address.country, address.district, address.province, address.city, address.address from account left join address on address.uid = account.id) as temp left join image on image.related_id = temp.uid and image.type = ? where temp.uid = ?"
+	sqlQueryDonationStatAndAccountInfo       = "select temp.id, temp.uid, temp.received_funds, temp.received_supplies, temp.distributed_funds, temp.distributed_supplies, temp.time, temp.nick_name, image.url from (select donation_stat.id, donation_stat.uid, donation_stat.received_funds, donation_stat.received_supplies, donation_stat.distributed_funds, donation_stat.distributed_supplies, donation_stat.created_at as time, account.nick_name from donation_stat full join account on donation_stat.uid = account.id and account.type = ? where donation_stat.created_at >= ? and donation_stat.created_at <= ?) as temp left join image on image.related_id = temp.uid and image.type = ? order by temp.time limit ? offset ?"
+	sqlQueryDetailDonationStatAndAccountInfo = "select temp.nick_name, temp.uid, temp.phone, temp.bank_card_num, temp.country, temp.district, temp.province, temp.city, temp.address,image.url from (select account.nick_name, account.id as uid, account.phone, account.bank_card_num, address.country, address.district, address.province, address.city, address.address from account left join address on address.uid = account.id where account.type = ?) as temp left join image on image.related_id = temp.uid and image.type = ? where temp.uid = ?"
 )
 
 // CreateOrganizations implement create the donation statistics of organization interface
@@ -57,7 +57,7 @@ func (b *DbBackendImpl) QueryOrganizations(params *structs.QueryParams) ([]*stru
 	offset := (params.PageNum - 1) * params.PageLimit
 
 	where := b.GetConn().Model(&structs.OrganizationsItems{})
-	if err := where.Raw(sqlQueryDonationStatAndAccountInfo, time.Unix(params.StartTime, 0),
+	if err := where.Raw(sqlQueryDonationStatAndAccountInfo, rest.UserTypeOrg, time.Unix(params.StartTime, 0),
 		time.Unix(params.EndTime, 0), rest.UserTypeOrg, params.PageLimit, offset).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
@@ -81,7 +81,7 @@ func (b *DbBackendImpl) QueryOrganizationDetail(uid string) (*structs.Organizati
 
 	var out structs.OrganizationDetailItem
 	where := b.GetConn().Model(&structs.OrganizationDetailItem{})
-	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.UserTypeOrg, uid).Scan(&out).Error; err != nil {
+	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.UserTypeOrg, rest.UserTypeOrg, uid).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("record not found")
 			logger.Error(e)
