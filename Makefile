@@ -14,7 +14,7 @@
 # 
 
 BINARY=donation-service
-VERSION=0.1.0
+VERSION=0.1.5
 BUILD=`date +%FT%T%z`
 
 BUILDPATH=build
@@ -59,7 +59,8 @@ lint:
 	@golint $(LINTPACKAGES)
 
 docker: default
-	@docker build -t csiabb/donation-service:$(VERSION) -f dockerfile/Dockerfile ./
+	@docker build -t csiabb/donation-service -f dockerfile/Dockerfile ./
+	@docker tag csiabb/donation-service:latest csiabb/donation-service:$(VERSION)
 
 clean:
 	@rm -rf ${BUILDPATH}
