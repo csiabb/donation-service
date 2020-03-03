@@ -63,18 +63,18 @@ func (mr *MockIDBBackendMockRecorder) CreateFunds(arg0 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFunds", reflect.TypeOf((*MockIDBBackend)(nil).CreateFunds), arg0)
 }
 
-// CreateOrganizations mocks base method
-func (m *MockIDBBackend) CreateOrganizations(arg0 *models.DonationStat) error {
+// CreateOrganization mocks base method
+func (m *MockIDBBackend) CreateOrganization(arg0 *models.DonationStat) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateOrganizations", arg0)
+	ret := m.ctrl.Call(m, "CreateOrganization", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateOrganizations indicates an expected call of CreateOrganizations
-func (mr *MockIDBBackendMockRecorder) CreateOrganizations(arg0 interface{}) *gomock.Call {
+func (mr *MockIDBBackendMockRecorder) CreateOrganization(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrganizations", reflect.TypeOf((*MockIDBBackend)(nil).CreateOrganizations), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrganization", reflect.TypeOf((*MockIDBBackend)(nil).CreateOrganization), arg0)
 }
 
 // CreateSupplies mocks base method
@@ -159,34 +159,34 @@ func (mr *MockIDBBackendMockRecorder) QueryFundsDetail(arg0 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryFundsDetail", reflect.TypeOf((*MockIDBBackend)(nil).QueryFundsDetail), arg0)
 }
 
-// QueryOrganizationDetail mocks base method
-func (m *MockIDBBackend) QueryOrganizationDetail(arg0 string) (*structs.OrganizationDetailItem, error) {
+// QueryOrgCharitiesDetail mocks base method
+func (m *MockIDBBackend) QueryOrgCharitiesDetail(arg0 string) (*structs.OrgCharitiesDetailItem, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "QueryOrganizationDetail", arg0)
-	ret0, _ := ret[0].(*structs.OrganizationDetailItem)
+	ret := m.ctrl.Call(m, "QueryOrgCharitiesDetail", arg0)
+	ret0, _ := ret[0].(*structs.OrgCharitiesDetailItem)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// QueryOrganizationDetail indicates an expected call of QueryOrganizationDetail
-func (mr *MockIDBBackendMockRecorder) QueryOrganizationDetail(arg0 interface{}) *gomock.Call {
+// QueryOrgCharitiesDetail indicates an expected call of QueryOrgCharitiesDetail
+func (mr *MockIDBBackendMockRecorder) QueryOrgCharitiesDetail(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryOrganizationDetail", reflect.TypeOf((*MockIDBBackend)(nil).QueryOrganizationDetail), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryOrgCharitiesDetail", reflect.TypeOf((*MockIDBBackend)(nil).QueryOrgCharitiesDetail), arg0)
 }
 
-// QueryOrganizations mocks base method
-func (m *MockIDBBackend) QueryOrganizations(arg0 *structs.QueryParams) ([]*structs.OrganizationsItems, error) {
+// QueryOrgCharities mocks base method
+func (m *MockIDBBackend) QueryOrgCharities(arg0 *structs.QueryParams) ([]*structs.OrgCharitiesItems, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "QueryOrganizations", arg0)
-	ret0, _ := ret[0].([]*structs.OrganizationsItems)
+	ret := m.ctrl.Call(m, "QueryOrgCharities", arg0)
+	ret0, _ := ret[0].([]*structs.OrgCharitiesItems)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // QueryOrganizations indicates an expected call of QueryOrganizations
-func (mr *MockIDBBackendMockRecorder) QueryOrganizations(arg0 interface{}) *gomock.Call {
+func (mr *MockIDBBackendMockRecorder) QueryOrgCharities(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryOrganizations", reflect.TypeOf((*MockIDBBackend)(nil).QueryOrganizations), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryOrgCharities", reflect.TypeOf((*MockIDBBackend)(nil).QueryOrgCharities), arg0)
 }
 
 // QueryPubByUserType mocks base method

@@ -33,7 +33,7 @@ type IDBBackend interface {
 	QueryPubByUserType(userType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
 
 	// org
-	CreateOrganizations(*DonationStat) error
-	QueryOrganizations(params *structs.QueryParams) ([]*structs.OrganizationsItems, error)
-	QueryOrganizationDetail(uid string) (*structs.OrganizationDetailItem, error)
+	CreateOrganization(*DonationStat) error
+	QueryOrgCharities(params *structs.QueryParams) ([]*structs.OrgCharitiesItems, error)
+	QueryOrgCharitiesDetail(uid string) (*structs.OrgCharitiesDetailItem, error)
 }
