@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	sqlQueryPublicityByUserType = "select * from (select id, uid, user_type, aid_uid, target_uid, pub_type, pay_type, amount, null, null, null, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_funds where user_type = ? and created_at >= ? and created_at <= ? union all select id, uid, user_type, aid_uid, target_uid, pub_type, null, null, name, number, unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_supplies where user_type = ? and created_at >= ? and created_at <= ?) as temp order by temp.time limit ? offset ?"
+	sqlQueryPublicityByUserType = "select * from (select id, 'funds' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, pay_type, amount, null as name, null as number, null as unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_funds where user_type = ? and pub_type = ? and created_at >= ? and created_at <= ? union all select id, 'supplies' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, null as pay_type, null as amount, name, number, unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_supplies where user_type = ? and pub_type = ? and created_at >= ? and created_at <= ?) as temp order by temp.time limit ? offset ?"
+	sqlQueryPublicityByCharity  = "select * from (select id, 'funds' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, pay_type, amount, null as name, null as number, null as unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_funds where target_uid = ? and pub_type = ? and created_at >= ? and created_at <= ? union all select id, 'supplies' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, null as pay_type, null as amount, name, number, unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_supplies where target_uid = ? and pub_type = ? and created_at >= ? and created_at <= ?) as temp order by temp.time limit ? offset ?"
 )
 
 // CreateFunds implement receive funds interface
@@ -33,7 +34,7 @@ func (b *DbBackendImpl) CreateFunds(data *models.PubFunds) error {
 }
 
 // QueryFunds implement query funds interface
-func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *structs.QueryParams) ([]*models.PubFunds, error) {
+func (b *DbBackendImpl) QueryFunds(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*models.PubFunds, error) {
 	if params.PageNum < 1 {
 		params.PageNum = rest.PageNum
 	}
@@ -42,19 +43,22 @@ func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *struct
 		params.PageLimit = rest.PageLimit
 	}
 
-	where := b.GetConn().Model(&models.PubFunds{})
-
-	if uid != "" {
-		where = where.Where("uid = ?", uid)
-	}
-
 	if params.StartTime > 0 && params.EndTime > 0 {
 		if params.EndTime < params.StartTime {
 			return nil, fmt.Errorf("end time can not less than start time")
 		}
+	} else {
+		now := time.Now()
+		params.EndTime = now.Unix()
+		params.StartTime = params.EndTime - rest.TenDayBySecond
+	}
 
-		where = where.Where("created_at >= ?", params.StartTime)
-		where = where.Where("created_at <= ?", params.EndTime)
+	where := b.GetConn().Model(&models.PubFunds{})
+	where = where.Where("created_at >= ?", time.Unix(params.StartTime, 0))
+	where = where.Where("created_at <= ?", time.Unix(params.EndTime, 0))
+
+	if uid != "" {
+		where = where.Where("uid = ?", uid)
 	}
 
 	if userType != "" {
@@ -63,6 +67,10 @@ func (b *DbBackendImpl) QueryFunds(uid, userType, pubType string, params *struct
 
 	if pubType != "" {
 		where = where.Where("pub_type = ?", pubType)
+	}
+
+	if targetUID != "" {
+		where = where.Where("target_uid = ?", targetUID)
 	}
 
 	var out []*models.PubFunds
@@ -93,7 +101,7 @@ func (b *DbBackendImpl) CreateSupplies(data *models.PubSupplies) error {
 }
 
 // QuerySupplies defines the query supplies
-func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *structs.QueryParams) ([]*models.PubSupplies, error) {
+func (b *DbBackendImpl) QuerySupplies(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*models.PubSupplies, error) {
 	if params.PageNum < 1 {
 		params.PageNum = rest.PageNum
 	}
@@ -102,19 +110,22 @@ func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *str
 		params.PageLimit = rest.PageLimit
 	}
 
-	where := b.GetConn().Model(&models.PubFunds{})
-
-	if uid != "" {
-		where = where.Where("uid = ?", uid)
-	}
-
 	if params.StartTime > 0 && params.EndTime > 0 {
 		if params.EndTime < params.StartTime {
 			return nil, fmt.Errorf("end time can not less than start time")
 		}
+	} else {
+		now := time.Now()
+		params.EndTime = now.Unix()
+		params.StartTime = params.EndTime - rest.TenDayBySecond
+	}
 
-		where = where.Where("created_at >= ?", params.StartTime)
-		where = where.Where("created_at <= ?", params.EndTime)
+	where := b.GetConn().Model(&models.PubFunds{})
+	where = where.Where("created_at >= ?", time.Unix(params.StartTime, 0))
+	where = where.Where("created_at <= ?", time.Unix(params.EndTime, 0))
+
+	if uid != "" {
+		where = where.Where("uid = ?", uid)
 	}
 
 	if userType != "" {
@@ -123,6 +134,10 @@ func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *str
 
 	if pubType != "" {
 		where = where.Where("pub_type = ?", pubType)
+	}
+
+	if targetUID != "" {
+		where = where.Where("target_uid = ?", targetUID)
 	}
 
 	var out []*models.PubSupplies
@@ -143,7 +158,7 @@ func (b *DbBackendImpl) QuerySupplies(uid, userType, pubType string, params *str
 }
 
 // QueryPubByUserType defines the query of publicity by user type
-func (b *DbBackendImpl) QueryPubByUserType(userType string, params *structs.QueryParams) ([]*structs.PubUserItem, error) {
+func (b *DbBackendImpl) QueryPubByUserType(userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error) {
 	if params.StartTime > 0 && params.EndTime > 0 {
 		if params.EndTime < params.StartTime {
 			return nil, fmt.Errorf("end time can not less than start time")
@@ -156,7 +171,22 @@ func (b *DbBackendImpl) QueryPubByUserType(userType string, params *structs.Quer
 
 	offset := (params.PageNum - 1) * params.PageLimit
 	var out []*structs.PubUserItem
-	err := b.GetConn().Raw(sqlQueryPublicityByUserType, userType, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), userType, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), params.PageLimit, offset).Scan(&out).Error
+	var err error
+
+	if pubType == "" {
+		return nil, fmt.Errorf("pub type can not be \\'\\'")
+	}
+
+	if userType == "" && targetUID == "" {
+		return nil, fmt.Errorf("user type and target id can not be \\'\\' the same time")
+	}
+
+	if userType != "" {
+		err = b.GetConn().Raw(sqlQueryPublicityByUserType, userType, pubType, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), userType, pubType, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), params.PageLimit, offset).Scan(&out).Error
+	} else if targetUID != "" {
+		err = b.GetConn().Raw(sqlQueryPublicityByCharity, targetUID, pubType, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), targetUID, pubType, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), params.PageLimit, offset).Scan(&out).Error
+	}
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")

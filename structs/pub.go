@@ -26,6 +26,7 @@ type ReceiveFundsRequest struct {
 // QueryFundsRequest defines the request of query funds
 type QueryFundsRequest struct {
 	UID       string `form:"uid"`        // user id of the one who donate
+	TargetUID string `form:"target_uid"` // user id of charity
 	UserType  string `form:"user_type"`  // user type
 	PubType   string `form:"pub_type"`   // publicity type
 	PageNum   int    `form:"page_num"`   // page num
@@ -46,20 +47,25 @@ type QueryFundsResp struct {
 
 // QueryFundsItems defines the struct of funds item
 type QueryFundsItems struct {
-	ID          string `json:"id"`           // funds id
-	UID         string `json:"uid"`          // user id
-	UserType    string `json:"user_type"`    // user type
-	AidUID      string `json:"aid_uid"`      // aid user id
-	TargetUID   string `json:"target_uid"`   // user id of charity
-	PubType     string `json:"pub_type"`     // the type of publicity
-	PayType     string `json:"pay_type"`     // pay type
-	Amount      string `json:"amount"`       // the amount of publicity funds
-	TxID        string `json:"tx_id"`        // block chain tx id
-	Remark      string `json:"remark"`       // remark
-	BlockType   string `json:"block_type"`   // block type
-	BlockHeight int64  `json:"block_height"` // block height
-	BlockTime   int64  `json:"block_time"`   // block time
-	CreatedAt   int64  `json:"create_at"`    // create time
+	ID                string `json:"id"`                   // funds id
+	UID               string `json:"uid"`                  // user id
+	DonorName         string `json:"donor_name"`           // user name of the one who donate
+	UserType          string `json:"user_type"`            // user type
+	AidUID            string `json:"aid_uid"`              // aid user id
+	AidName           string `json:"aid_name"`             // user name of the one who accept donation
+	AidBankCardNum    string `json:"aid_bank_card_num"`    // aid bank card number
+	TargetUID         string `json:"target_uid"`           // user id of charity
+	TargetName        string `json:"target_name"`          // user name of the one who receive donation
+	TargetBankCardNum string `json:"target_bank_card_num"` // target bank card number
+	PubType           string `json:"pub_type"`             // the type of publicity
+	PayType           string `json:"pay_type"`             // pay type
+	Amount            string `json:"amount"`               // the amount of publicity funds
+	TxID              string `json:"tx_id"`                // block chain tx id
+	Remark            string `json:"remark"`               // remark
+	BlockType         string `json:"block_type"`           // block type
+	BlockHeight       int64  `json:"block_height"`         // block height
+	BlockTime         int64  `json:"block_time"`           // block time
+	CreatedAt         int64  `json:"created_at"`           // created time
 }
 
 // FundsDetailRequest defines the request of query detail funds
@@ -82,13 +88,14 @@ type ReceiveSuppliesRequest struct {
 
 // QuerySuppliesRequest defines the request of supplies
 type QuerySuppliesRequest struct {
-	UID       string `form:"uid" binding:"required"` // user id of the one who donate
-	UserType  string `form:"user_type"`              // user type
-	PubType   string `form:"pub_type"`               // publicity type
-	PageNum   int    `form:"page_num"`               // page num
-	PageLimit int    `form:"page_limit"`             // page limit
-	StartTime int64  `form:"start_time"`             // start time
-	EndTime   int64  `form:"end_time"`               // end time
+	UID       string `form:"uid"`        // user id of the one who donate
+	TargetUID string `form:"target_uid"` // user id of charity
+	UserType  string `form:"user_type"`  // user type
+	PubType   string `form:"pub_type"`   // publicity type
+	PageNum   int    `form:"page_num"`   // page num
+	PageLimit int    `form:"page_limit"` // page limit
+	StartTime int64  `form:"start_time"` // start time
+	EndTime   int64  `form:"end_time"`   // end time
 }
 
 // QuerySuppliesResp defines the response of supplies
@@ -103,11 +110,15 @@ type QuerySuppliesResp struct {
 
 // QuerySuppliesItems defines the struct of supplies item
 type QuerySuppliesItems struct {
-	ID          string `json:"id"`           // funds id
+	ID          string `json:"id"`           // supplies id
+	WayBillNum  string `json:"way_bill_num"` // supplies way bill number
 	UID         string `json:"uid"`          // user id
+	DonorName   string `json:"donor_name"`   // user name of the one who donate
 	UserType    string `json:"user_type"`    // user type
 	AidUID      string `json:"aid_uid"`      // aid user id
+	AidName     string `json:"aid_name"`     // user name of the one who accept donation
 	TargetUID   string `json:"target_uid"`   // user id of charity
+	TargetName  string `json:"target_name"`  // user name of the one who receive donation
 	PubType     string `json:"pub_type"`     // the type of publicity
 	Name        string `json:"name"`         // name
 	Number      int64  `json:"number"`       // number
@@ -117,7 +128,7 @@ type QuerySuppliesItems struct {
 	BlockType   string `json:"block_type"`   // block type
 	BlockHeight int64  `json:"block_height"` // block height
 	BlockTime   int64  `json:"block_time"`   // block time
-	CreatedAt   int64  `json:"create_at"`    // create time
+	CreatedAt   int64  `json:"created_at"`   // created time
 }
 
 // SuppliesDetailRequest defines the request of query detail supplies
@@ -127,11 +138,13 @@ type SuppliesDetailRequest struct {
 
 // PubUserRequest defines the request of publicity information
 type PubUserRequest struct {
-	UserType  string `form:"user_type" binding:"required"` // user type
-	PageNum   int    `form:"page_num"`                     // page num
-	PageLimit int    `form:"page_limit"`                   // page limit
-	StartTime int64  `form:"start_time"`                   // start time
-	EndTime   int64  `form:"end_time"`                     // end time
+	UserType  string `form:"user_type"`                   // user type
+	TargetUID string `form:"target_uid"`                  // user id of charity
+	PubType   string `form:"pub_type" binding:"required"` // publicity type
+	PageNum   int    `form:"page_num"`                    // page num
+	PageLimit int    `form:"page_limit"`                  // page limit
+	StartTime int64  `form:"start_time"`                  // start time
+	EndTime   int64  `form:"end_time"`                    // end time
 }
 
 // PubUserResp defines the response of publicity information
@@ -147,10 +160,14 @@ type PubUserResp struct {
 // PubUserItem defines the item of publicity information
 type PubUserItem struct {
 	ID          string    `json:"id"`           // funds id
+	Type        string    `json:"type"`         // publicity type
 	UID         string    `json:"uid"`          // user id
+	DonorName   string    `json:"donor_name"`   // user name of the one who donate
 	UserType    string    `json:"user_type"`    // user type
 	AidUID      string    `json:"aid_uid"`      // aid user id
+	AidName     string    `json:"aid_name"`     // user name of the one who accept donation
 	TargetUID   string    `json:"target_uid"`   // user id of charity
+	TargetName  string    `json:"target_name"`  // user name of the one who receive donation
 	PubType     string    `json:"pub_type"`     // the type of publicity
 	PayType     string    `json:"pay_type"`     // pay type of funds
 	Amount      string    `json:"amount"`       // the amount of funds
@@ -162,7 +179,7 @@ type PubUserItem struct {
 	BlockType   string    `json:"block_type"`   // block type
 	BlockHeight int64     `json:"block_height"` // block height
 	BlockTime   int64     `json:"block_time"`   // block time
-	CreatedAt   int64     `json:"create_at"`    // create time
+	CreatedAt   int64     `json:"created_at"`   // created time
 	Time        time.Time `json:"-"`            // time
 }
 
