@@ -1,8 +1,8 @@
 /*
-Copyright ArxanChain Ltd. 2020 All Rights Reserved.
-
-SPDX-License-Identifier: Apache-2.0
-*/
+ * Copyright ArxanChain Ltd. 2020 All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 package models
 
@@ -26,7 +26,7 @@ type Account struct {
 	TaxID          string `gorm:"type:varchar(128)"`             // tax id
 	ShippingAddrID string `gorm:"type:varchar(256)"`             // shipping address id
 	Did            string `gorm:"type:varchar(64)"`              // did
-	Desc           string `gorm:"type:text"`                     // description
+	Remark         string `gorm:"type:text"`                     // description
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      *time.Time `sql:"index"`
