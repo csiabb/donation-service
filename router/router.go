@@ -45,7 +45,7 @@ const (
 	urlPubList            = "pub/list"
 
 	// org
-	urlOrgCharitiesQuery  = "org/charities/query"
+	urlOrgCharitiesQuery  = "org/charities"
 	urlOrgCharitiesDetail = "org/charities/detail"
 )
 
