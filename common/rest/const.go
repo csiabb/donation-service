@@ -8,9 +8,10 @@ package rest
 
 // user type
 const (
-	UserTypeNormal = "normal" // normal user
-	UserTypeOrg    = "org"    // organization
-	UserTypeAdmin  = "admin"  // admin
+	UserTypeNormal     = "normal"  // normal user
+	UserTypeOrg        = "org"     // organization
+	UserTypeAdmin      = "admin"   // admin
+	UserTypeOrgCharity = "charity" // charity
 )
 
 // publicity type
