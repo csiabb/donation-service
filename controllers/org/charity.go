@@ -16,7 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// QueryOrganizations defines the request of query organization charities list
+// QueryOrgCharities defines the request of query organization charities list
 func (h *RestHandler) QueryOrgCharities(c *gin.Context) {
 	logger.Infof("Got query organizations request")
 
@@ -60,7 +60,7 @@ func (h *RestHandler) QueryOrgCharities(c *gin.Context) {
 	return
 }
 
-// QueryOrganizationDetail defines the request of query organization detail
+// QueryOrgCharityDetail defines the request of query organization detail
 func (h *RestHandler) QueryOrgCharityDetail(c *gin.Context) {
 	logger.Infof("Got query organizations detail request")
 
