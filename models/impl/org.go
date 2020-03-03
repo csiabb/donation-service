@@ -72,14 +72,14 @@ func (b *DbBackendImpl) QueryOrgCharities(params *structs.QueryParams) ([]*struc
 	return out, nil
 }
 
-// QueryOrgCharityDetail implement query detail the donation statistics of organization charity interface
-func (b *DbBackendImpl) QueryOrgCharityDetail(uid string) (*structs.OrgCharityDetailItem, error) {
+// QueryOrgCharitiesDetail implement query detail the donation statistics of charities interface
+func (b *DbBackendImpl) QueryOrgCharitiesDetail(uid string) (*structs.OrgCharitiesDetailItem, error) {
 	if 0 == len(uid) {
 		return nil, fmt.Errorf("param is nil")
 	}
 
-	var out structs.OrgCharityDetailItem
-	where := b.GetConn().Model(&structs.OrgCharityDetailItem{})
+	var out structs.OrgCharitiesDetailItem
+	where := b.GetConn().Model(&structs.OrgCharitiesDetailItem{})
 	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.AddrTypeReg, rest.UserTypeOrgCharity, rest.UserTypeOrgCharity, uid).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("record not found")

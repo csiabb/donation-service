@@ -35,5 +35,5 @@ type IDBBackend interface {
 	// org
 	CreateOrganization(*DonationStat) error
 	QueryOrgCharities(params *structs.QueryParams) ([]*structs.OrgCharitiesItems, error)
-	QueryOrgCharityDetail(uid string) (*structs.OrgCharityDetailItem, error)
+	QueryOrgCharitiesDetail(uid string) (*structs.OrgCharitiesDetailItem, error)
 }

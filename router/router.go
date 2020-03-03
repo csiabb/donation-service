@@ -45,8 +45,8 @@ const (
 	urlPubList            = "pub/list"
 
 	// org
-	urlOrgCharitiesQuery = "org/charities/query"
-	urlOrgCharityDetail  = "org/charity/detail"
+	urlOrgCharitiesQuery  = "org/charities/query"
+	urlOrgCharitiesDetail = "org/charities/detail"
 )
 
 // Router service router
@@ -114,7 +114,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 
 		// org
 		apiPrefix.GET(urlOrgCharitiesQuery, r.orgHandler.QueryOrgCharities)
-		apiPrefix.GET(urlOrgCharityDetail, r.orgHandler.QueryOrgCharityDetail)
+		apiPrefix.GET(urlOrgCharitiesDetail, r.orgHandler.QueryOrgCharitiesDetail)
 	}
 	return router
 }

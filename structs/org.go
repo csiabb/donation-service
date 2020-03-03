@@ -49,13 +49,13 @@ type QueryOrgCharitiesResp struct {
 	Results   []*OrgCharitiesItems `json:"results"`    // orgs items
 }
 
-// QueryOrgCharityDetailRequest defines the request of query organization information
-type QueryOrgCharityDetailRequest struct {
+// OrgCharitiesDetailRequest defines the request of query charities detail
+type OrgCharitiesDetailRequest struct {
 	UID string `form:"uid"` // user id of the one who donate
 }
 
-// OrgCharityDetailItem defines the struct of organization detail item
-type OrgCharityDetailItem struct {
+// OrgCharitiesDetailItem defines the struct of charities detail item
+type OrgCharitiesDetailItem struct {
 	UID         string `json:"uid"`           // user id of the one who donate
 	URL         string `json:"url"`           // image url
 	NickName    string `json:"nick_name"`     // nick name
