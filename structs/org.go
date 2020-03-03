@@ -12,16 +12,16 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// QueryOrganizationsRequest defines the request of query organizations
-type QueryOrganizationsRequest struct {
+// QueryOrgCharitiesRequest defines the request of query organizations
+type QueryOrgCharitiesRequest struct {
 	PageNum   int   `form:"page_num"`   // page num
 	PageLimit int   `form:"page_limit"` // page limit
 	StartTime int64 `form:"start_time"` // start time
 	EndTime   int64 `form:"end_time"`   // end time
 }
 
-// OrganizationsItems defines the struct of organization item
-type OrganizationsItems struct {
+// OrgCharitiesItems defines the struct of organization item
+type OrgCharitiesItems struct {
 	ID                  string          `json:"id"`                   // donation stat id
 	UID                 string          `json:"uid"`                  // user id of the one who donate
 	URL                 string          `json:"url"`                  // organization logo
@@ -35,27 +35,27 @@ type OrganizationsItems struct {
 }
 
 // ConvertTime defines the covert of created_at
-func (ois *OrganizationsItems) ConvertTime() {
+func (ois *OrgCharitiesItems) ConvertTime() {
 	ois.CreatedAt = ois.Time.UTC().Unix()
 }
 
-// QueryOrganizationsResp defines the response of organizations
-type QueryOrganizationsResp struct {
-	PageNum   int                   `json:"page_num"`   // page num
-	PageLimit int                   `json:"page_limit"` // page limit
-	StartTime int64                 `json:"start_time"` // start time
-	EndTime   int64                 `json:"end_time"`   // end time
-	Total     int64                 `json:"total"`      // total number of query result
-	Results   []*OrganizationsItems `json:"results"`    // orgs items
+// QueryOrgCharitiesResp defines the response of organizations
+type QueryOrgCharitiesResp struct {
+	PageNum   int                  `json:"page_num"`   // page num
+	PageLimit int                  `json:"page_limit"` // page limit
+	StartTime int64                `json:"start_time"` // start time
+	EndTime   int64                `json:"end_time"`   // end time
+	Total     int64                `json:"total"`      // total number of query result
+	Results   []*OrgCharitiesItems `json:"results"`    // orgs items
 }
 
-// QueryOrgDetailRequest defines the request of query organization information
-type QueryOrgDetailRequest struct {
+// QueryOrgCharityDetailRequest defines the request of query organization information
+type QueryOrgCharityDetailRequest struct {
 	UID string `form:"uid"` // user id of the one who donate
 }
 
-// OrganizationDetailItem defines the struct of organization detail item
-type OrganizationDetailItem struct {
+// OrgCharityDetailItem defines the struct of organization detail item
+type OrgCharityDetailItem struct {
 	UID         string `json:"uid"`           // user id of the one who donate
 	URL         string `json:"url"`           // image url
 	NickName    string `json:"nick_name"`     // nick name
@@ -66,4 +66,5 @@ type OrganizationDetailItem struct {
 	Address     string `json:"address"`       // detail address
 	Phone       string `json:"phone"`         // phone num
 	BankCardNum string `json:"bank_card_num"` // bank card num
+	Remark      string `json:"remark"`        // remark
 }

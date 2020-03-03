@@ -16,11 +16,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// QueryOrganizations defines the request of query organizations list
-func (h *RestHandler) QueryOrganizations(c *gin.Context) {
+// QueryOrganizations defines the request of query organization charities list
+func (h *RestHandler) QueryOrgCharities(c *gin.Context) {
 	logger.Infof("Got query organizations request")
 
-	req := &structs.QueryOrganizationsRequest{}
+	req := &structs.QueryOrgCharitiesRequest{}
 	if err := c.BindQuery(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
@@ -36,7 +36,7 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 		EndTime:   req.EndTime,
 	}
 
-	donationStats, err := h.srvcContext.DBStorage.QueryOrganizations(params)
+	donationStats, err := h.srvcContext.DBStorage.QueryOrgCharities(params)
 	if err != nil {
 		e := fmt.Errorf("query organizations error , %s", err.Error())
 		logger.Error(e)
@@ -48,7 +48,7 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 		donationStats[i].ConvertTime()
 	}
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.QueryOrganizationsResp{
+	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.QueryOrgCharitiesResp{
 		Total:     params.Total,
 		PageNum:   params.PageNum,
 		PageLimit: params.PageLimit,
@@ -61,10 +61,10 @@ func (h *RestHandler) QueryOrganizations(c *gin.Context) {
 }
 
 // QueryOrganizationDetail defines the request of query organization detail
-func (h *RestHandler) QueryOrganizationDetail(c *gin.Context) {
+func (h *RestHandler) QueryOrgCharityDetail(c *gin.Context) {
 	logger.Infof("Got query organizations detail request")
 
-	req := &structs.QueryOrgDetailRequest{}
+	req := &structs.QueryOrgCharityDetailRequest{}
 	if err := c.BindQuery(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
@@ -73,7 +73,7 @@ func (h *RestHandler) QueryOrganizationDetail(c *gin.Context) {
 	}
 	logger.Debugf("request params, %v", req)
 
-	item, err := h.srvcContext.DBStorage.QueryOrganizationDetail(req.UID)
+	item, err := h.srvcContext.DBStorage.QueryOrgCharityDetail(req.UID)
 	if err != nil {
 		e := fmt.Errorf("query organizations detail error , %s", err.Error())
 		logger.Error(e)
