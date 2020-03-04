@@ -68,3 +68,14 @@ type OrgCharitiesDetailItem struct {
 	BankCardNum string `json:"bank_card_num"` // bank card num
 	Remark      string `json:"remark"`        // remark
 }
+
+// OrgCharitiesDetailResp defines the response of charities detail
+type OrgCharitiesDetailResp struct {
+	UID         string `json:"uid"`           // user id of the one who donate
+	URL         string `json:"url"`           // image url
+	NickName    string `json:"nick_name"`     // nick name
+	Address     string `json:"address"`       // detail address
+	Phone       string `json:"phone"`         // phone num
+	BankCardNum string `json:"bank_card_num"` // bank card num
+	Remark      string `json:"remark"`        // remark
+}

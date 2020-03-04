@@ -81,7 +81,15 @@ func (h *RestHandler) QueryOrgCharitiesDetail(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(item))
+	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.OrgCharitiesDetailResp{
+		UID:         item.UID,
+		URL:         item.URL,
+		NickName:    item.NickName,
+		Address:     item.Province + item.City + item.District + item.Address,
+		Phone:       item.Phone,
+		BankCardNum: item.BankCardNum,
+		Remark:      item.Remark,
+	}))
 
 	logger.Info("response query charities detail success.")
 	return
