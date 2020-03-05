@@ -50,7 +50,7 @@ mod:
 	@go mod tidy
 
 test:
-	@go test -cpu=1,2,4 -v -tags integration ./...
+	@go test -cover -v -tags integration ./...
 
 vet:
 	@go vet $(VETPACKAGES)
