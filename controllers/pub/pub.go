@@ -74,7 +74,7 @@ func (h *RestHandler) QueryFunds(c *gin.Context) {
 
 	req := &structs.QueryFundsRequest{}
 	var err error
-	if err = c.BindQuery(req); err != nil {
+	if err = c.Bind(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
@@ -89,7 +89,7 @@ func (h *RestHandler) QueryFunds(c *gin.Context) {
 		EndTime:   req.EndTime,
 	}
 
-	result, err := h.srvcContext.DBStorage.QueryFunds(req.UID, req.UserType, req.PubType, params)
+	result, err := h.srvcContext.DBStorage.QueryFunds(req.UID, req.TargetUID, req.UserType, req.PubType, params)
 	if err != nil {
 		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)
@@ -102,8 +102,12 @@ func (h *RestHandler) QueryFunds(c *gin.Context) {
 		payload = append(payload, &structs.QueryFundsItems{
 			ID:          v.ID,
 			UID:         v.UID,
+			DonorName:   v.DonorName,
+			UserType:    v.UserType,
 			AidUID:      v.AidUID,
+			AidName:     v.AidName,
 			TargetUID:   v.TargetUID,
+			TargetName:  v.TargetName,
 			PubType:     v.PubType,
 			PayType:     v.PayType,
 			Amount:      v.Amount.String(),
@@ -134,7 +138,7 @@ func (h *RestHandler) QueryFundsDetail(c *gin.Context) {
 
 	req := &structs.FundsDetailRequest{}
 	var err error
-	if err = c.BindQuery(req); err != nil {
+	if err = c.Bind(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
@@ -151,20 +155,25 @@ func (h *RestHandler) QueryFundsDetail(c *gin.Context) {
 	}
 
 	funds := structs.QueryFundsItems{
-		ID:          f.Funds.ID,
-		UID:         f.Funds.UID,
-		UserType:    f.Funds.UserType,
-		AidUID:      f.Funds.AidUID,
-		TargetUID:   f.Funds.TargetUID,
-		PubType:     f.Funds.PubType,
-		PayType:     f.Funds.PubType,
-		Amount:      f.Funds.Amount.String(),
-		TxID:        f.Funds.TxID,
-		Remark:      f.Funds.Remark,
-		BlockType:   f.Funds.BlockType,
-		BlockHeight: f.Funds.BlockHeight,
-		BlockTime:   f.Funds.BlockTime,
-		CreatedAt:   f.Funds.CreatedAt.Unix(),
+		ID:                f.Funds.ID,
+		UID:               f.Funds.UID,
+		DonorName:         f.Funds.DonorName,
+		UserType:          f.Funds.UserType,
+		AidUID:            f.Funds.AidUID,
+		AidName:           f.Funds.AidName,
+		AidBankCardNum:    f.Funds.AidBankCardNum,
+		TargetUID:         f.Funds.TargetUID,
+		TargetName:        f.Funds.TargetName,
+		TargetBankCardNum: f.Funds.TargetBankCardNum,
+		PubType:           f.Funds.PubType,
+		PayType:           f.Funds.PayType,
+		Amount:            f.Funds.Amount.String(),
+		TxID:              f.Funds.TxID,
+		Remark:            f.Funds.Remark,
+		BlockType:         f.Funds.BlockType,
+		BlockHeight:       f.Funds.BlockHeight,
+		BlockTime:         f.Funds.BlockTime,
+		CreatedAt:         f.Funds.CreatedAt.Unix(),
 	}
 
 	bAddr := structs.PubAddress{
@@ -253,9 +262,9 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 func (h *RestHandler) QuerySupplies(c *gin.Context) {
 	logger.Info("got query supplies request")
 
-	req := &structs.QueryFundsRequest{}
+	req := &structs.QuerySuppliesRequest{}
 	var err error
-	if err = c.BindQuery(req); err != nil {
+	if err = c.Bind(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
@@ -270,7 +279,7 @@ func (h *RestHandler) QuerySupplies(c *gin.Context) {
 		EndTime:   req.EndTime,
 	}
 
-	result, err := h.srvcContext.DBStorage.QuerySupplies(req.UID, req.UserType, req.PubType, params)
+	result, err := h.srvcContext.DBStorage.QuerySupplies(req.UID, req.TargetUID, req.UserType, req.PubType, params)
 	if err != nil {
 		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)
@@ -283,8 +292,10 @@ func (h *RestHandler) QuerySupplies(c *gin.Context) {
 		payload = append(payload, &structs.QuerySuppliesItems{
 			ID:          v.ID,
 			UID:         v.UID,
+			DonorName:   v.DonorName,
 			UserType:    v.UserType,
 			AidUID:      v.AidUID,
+			AidName:     v.AidName,
 			TargetUID:   v.TargetUID,
 			PubType:     v.PubType,
 			Name:        v.Name,
@@ -317,7 +328,7 @@ func (h *RestHandler) QuerySuppliesDetail(c *gin.Context) {
 
 	req := &structs.SuppliesDetailRequest{}
 	var err error
-	if err = c.BindQuery(req); err != nil {
+	if err = c.Bind(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
@@ -335,10 +346,14 @@ func (h *RestHandler) QuerySuppliesDetail(c *gin.Context) {
 
 	supplies := structs.QuerySuppliesItems{
 		ID:          s.Supplies.ID,
+		WayBillNum:  s.Supplies.WayBillNum,
 		UID:         s.Supplies.UID,
+		DonorName:   s.Supplies.DonorName,
 		UserType:    s.Supplies.UserType,
 		AidUID:      s.Supplies.AidUID,
+		AidName:     s.Supplies.AidName,
 		TargetUID:   s.Supplies.TargetUID,
+		TargetName:  s.Supplies.TargetName,
 		PubType:     s.Supplies.PubType,
 		Name:        s.Supplies.Name,
 		Number:      s.Supplies.Number,
@@ -402,7 +417,7 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 
 	req := &structs.PubUserRequest{}
 	var err error
-	if err = c.BindQuery(req); err != nil {
+	if err = c.Bind(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
@@ -417,7 +432,7 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 		EndTime:   req.EndTime,
 	}
 
-	result, err := h.srvcContext.DBStorage.QueryPubByUserType(req.UserType, params)
+	result, err := h.srvcContext.DBStorage.QueryPubByUserType(req.UserType, req.TargetUID, req.PubType, params)
 	if err != nil {
 		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)

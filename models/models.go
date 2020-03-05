@@ -100,7 +100,7 @@ type Image struct {
 	ID        string `gorm:"type:varchar(256);primary_key"` // image id
 	RelatedID string `gorm:"type:varchar(256);not null"`    // the related id
 	Type      string `gorm:"type:varchar(64)"`              // user type
-	URL       string `gorm:"type:varchar(256)"`             // image url
+	URL       string `gorm:"type:varchar(512)"`             // image url
 	Hash      string `gorm:"type:varchar(256)"`             // image file path
 	Format    string `gorm:"type:varchar(64)"`              // image file format
 	CreatedAt time.Time
@@ -110,31 +110,40 @@ type Image struct {
 
 // PubFunds defines the publicity funds
 type PubFunds struct {
-	ID          string          `gorm:"type:varchar(256);primary_key"` // funds id
-	UID         string          `gorm:"type:varchar(256)"`             // user id
-	UserType    string          `gorm:"type:varchar(16)"`              // user type
-	AidUID      string          `gorm:"type:varchar(256)"`             // aid user id
-	TargetUID   string          `gorm:"type:varchar(256)"`             // user id of charity
-	PubType     string          `gorm:"type:varchar(16)"`              // the type of publicity
-	PayType     string          `gorm:"type:varchar(16)"`              // pay type
-	Amount      decimal.Decimal `gorm:"type:decimal(30,4)"`            // the amount of publicity funds
-	TxID        string          `gorm:"type:varchar(256)"`             // block chain tx id
-	Remark      string          `gorm:"size:1024"`                     // remark
-	BlockType   string          `gorm:"type:varchar(32)"`              // block type
-	BlockHeight int64           // block height
-	BlockTime   int64           // block time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   *time.Time `sql:"index"`
+	ID                string          `gorm:"type:varchar(256);primary_key"` // funds id
+	UID               string          `gorm:"type:varchar(256)"`             // user id
+	DonorName         string          `gorm:"type:varchar(256)"`             // user name of the one who donate
+	UserType          string          `gorm:"type:varchar(16)"`              // user type
+	AidUID            string          `gorm:"type:varchar(256)"`             // aid user id
+	AidName           string          `gorm:"type:varchar(256)"`             // user name of the one who accept donation
+	AidBankCardNum    string          `gorm:"type:varchar(64)"`              // bank card number of aid user
+	TargetUID         string          `gorm:"type:varchar(256)"`             // user id of charity
+	TargetName        string          `gorm:"type:varchar(256)"`             // user name of the one who receive donation
+	TargetBankCardNum string          `gorm:"type:varchar(64)"`              // bank card number of charity
+	PubType           string          `gorm:"type:varchar(16)"`              // the type of publicity
+	PayType           string          `gorm:"type:varchar(16)"`              // pay type
+	Amount            decimal.Decimal `gorm:"type:decimal(30,4)"`            // the amount of publicity funds
+	TxID              string          `gorm:"type:varchar(256)"`             // block chain tx id
+	Remark            string          `gorm:"size:1024"`                     // remark
+	BlockType         string          `gorm:"type:varchar(32)"`              // block type
+	BlockHeight       int64           // block height
+	BlockTime         int64           // block time
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	DeletedAt         *time.Time `sql:"index"`
 }
 
 // PubSupplies defines the publicity supplies
 type PubSupplies struct {
 	ID          string `gorm:"type:varchar(256);primary_key"` // supply id
+	WayBillNum  string `gorm:"type:varchar(256)"`             // way bill num
 	UID         string `gorm:"type:varchar(256)"`             // user id
+	DonorName   string `gorm:"type:varchar(256)"`             // user name of the one who donate
 	UserType    string `gorm:"type:varchar(16)"`              // user type
 	AidUID      string `gorm:"type:varchar(256)"`             // aid user id
+	AidName     string `gorm:"type:varchar(256)"`             // user name of the one who accept donation
 	TargetUID   string `gorm:"type:varchar(256)"`             // user id of charity
+	TargetName  string `gorm:"type:varchar(256)"`             // user name of the one who receive donation
 	PubType     string `gorm:"type:varchar(16)"`              // the type of publicity
 	Name        string `gorm:"type:varchar(512)"`             // name
 	Number      int64  // number

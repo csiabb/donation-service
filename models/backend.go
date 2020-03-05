@@ -25,12 +25,12 @@ type IDBBackend interface {
 
 	// publicity
 	CreateFunds(*PubFunds) error
-	QueryFunds(uid, userType, pubType string, params *structs.QueryParams) ([]*PubFunds, error)
+	QueryFunds(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubFunds, error)
 	QueryFundsDetail(id string) (*FundsDetail, error)
 	CreateSupplies(supplies *PubSupplies) error
-	QuerySupplies(uid, userType, pubType string, params *structs.QueryParams) ([]*PubSupplies, error)
+	QuerySupplies(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubSupplies, error)
 	QuerySuppliesDetail(id string) (*SuppliesDetail, error)
-	QueryPubByUserType(userType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
+	QueryPubByUserType(userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
 
 	// org
 	CreateOrganization(*DonationStat) error

@@ -71,7 +71,7 @@ func TestQueryFunds(t *testing.T) {
 	mockCtl, handler, mockBackend, w, c := Init(t)
 	defer mockCtl.Finish()
 
-	mockBackend.EXPECT().QueryFunds(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.PubFunds{
+	mockBackend.EXPECT().QueryFunds(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.PubFunds{
 		{
 			ID:          "id",
 			UID:         "uid_test",
@@ -108,22 +108,27 @@ func TestQueryFundsDetail(t *testing.T) {
 	// mock db
 	mockBackend.EXPECT().QueryFundsDetail(gomock.Any()).Return(&models.FundsDetail{
 		Funds: models.PubFunds{
-			ID:          "funds_id",
-			UID:         "uid_test",
-			UserType:    "normal",
-			AidUID:      "aid_uid",
-			TargetUID:   "target_uid",
-			PubType:     "pub_type",
-			PayType:     "pay_type",
-			Amount:      decimal.NewFromInt(20),
-			TxID:        "",
-			Remark:      "remark test",
-			BlockType:   "",
-			BlockHeight: 0,
-			BlockTime:   0,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Time{},
-			DeletedAt:   nil,
+			ID:                "funds_id",
+			UID:               "uid_test",
+			DonorName:         "donor_name_test",
+			UserType:          "normal",
+			AidUID:            "aid_uid",
+			AidName:           "aid_name_test",
+			AidBankCardNum:    "2233-9933-2232-2323",
+			TargetUID:         "target_uid",
+			TargetName:        "target_name_test",
+			TargetBankCardNum: "2233-9933-2232-9233",
+			PubType:           "pub_type",
+			PayType:           "pay_type",
+			Amount:            decimal.NewFromInt(20),
+			TxID:              "",
+			Remark:            "remark test",
+			BlockType:         "",
+			BlockHeight:       0,
+			BlockTime:         0,
+			CreatedAt:         time.Now(),
+			UpdatedAt:         time.Time{},
+			DeletedAt:         nil,
 		},
 		BillingAddr: models.Address{
 			ID:        "address_billing_id",
