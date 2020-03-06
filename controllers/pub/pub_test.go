@@ -19,6 +19,7 @@ import (
 	"github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/mock_backend"
+	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
@@ -67,6 +68,32 @@ func TestReceiveFunds(t *testing.T) {
 	CommRespCheck(t, w)
 }
 
+func TestReceiveSupplies(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	// post body
+	body := bytes.NewBufferString("{" +
+		"\"uid\":\"uid_test\", " +
+		"\"aid_uid\":\"\", " +
+		"\"user_type\":\"normal\", " +
+		"\"target_uid\":\"target_uid_test\", " +
+		"\"pub_type\":\"donate\", " +
+		"\"name\":\"3M 一次性口罩\", " +
+		"\"number\":1000, " +
+		"\"unit\":\"个\", " +
+		"\"remark\":\"this is a remark message\"" +
+		"}")
+
+	mockBackend.EXPECT().CreateSupplies(gomock.Any()).Return(nil)
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodPost, "/api/v1/pub/supplies", body)
+	c.Request.Header.Add("Content-Type", "application/json")
+	handler.ReceiveSupplies(c)
+	CommRespCheck(t, w)
+}
+
 func TestQueryFunds(t *testing.T) {
 	mockCtl, handler, mockBackend, w, c := Init(t)
 	defer mockCtl.Finish()
@@ -78,8 +105,8 @@ func TestQueryFunds(t *testing.T) {
 			UserType:    "normal",
 			AidUID:      "aid_uid",
 			TargetUID:   "target_uid",
-			PubType:     "pub_type",
-			PayType:     "pay_type",
+			PubType:     "donate",
+			PayType:     "wechat",
 			Amount:      decimal.NewFromInt(20),
 			TxID:        "",
 			Remark:      "this is a remark",
@@ -92,12 +119,47 @@ func TestQueryFunds(t *testing.T) {
 		},
 	}, nil)
 
-	url := "/api/v1/pub/funds/query?uid=&user_type=normal&start_time=0&end_time=0&page_num=1&page_limit=10"
+	url := "/api/v1/pub/funds?uid=&user_type=normal&start_time=0&end_time=0&page_num=1&page_limit=10"
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
 	c.Request.Header.Add("Accept", "application/json")
 	handler.QueryFunds(c)
+	CommRespCheck(t, w)
+}
+
+func TestQuerySupplies(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	mockBackend.EXPECT().QuerySupplies(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.PubSupplies{
+		{
+			ID:          "id",
+			UID:         "uid_test",
+			UserType:    "normal",
+			AidUID:      "aid_uid",
+			TargetUID:   "target_uid",
+			PubType:     "donate",
+			Name:        "3M 一次性口罩",
+			Number:      100,
+			Unit:        "个",
+			TxID:        "",
+			Remark:      "this is a remark",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			DeletedAt:   nil,
+		},
+	}, nil)
+
+	url := "/api/v1/pub/supplies?uid=&target_uid=&user_type=normal&pub_type=&start_time=0&end_time=0&page_num=1&page_limit=10"
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.QuerySupplies(c)
 	CommRespCheck(t, w)
 }
 
@@ -118,8 +180,8 @@ func TestQueryFundsDetail(t *testing.T) {
 			TargetUID:         "target_uid",
 			TargetName:        "target_name_test",
 			TargetBankCardNum: "2233-9933-2232-9233",
-			PubType:           "pub_type",
-			PayType:           "pay_type",
+			PubType:           "donate",
+			PayType:           "wechat",
 			Amount:            decimal.NewFromInt(20),
 			TxID:              "",
 			Remark:            "remark test",
@@ -174,9 +236,149 @@ func TestQueryFundsDetail(t *testing.T) {
 	}, nil)
 
 	// mock request
-	c.Request, _ = http.NewRequest(http.MethodGet, "/api/v1/pub/funds/detail?uid=uid_test", nil)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/api/v1/pub/funds/detail?funds_id=uid_test", nil)
 	c.Request.Header.Add("Accept", "application/json")
 	handler.QueryFundsDetail(c)
+	CommRespCheck(t, w)
+}
+
+func TestQuerySuppliesDetail(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	// mock db
+	mockBackend.EXPECT().QuerySuppliesDetail(gomock.Any()).Return(&models.SuppliesDetail{
+		Supplies: models.PubSupplies{
+			ID:          "funds_id",
+			UID:         "uid_test",
+			DonorName:   "donor_name_test",
+			UserType:    "normal",
+			AidUID:      "aid_uid",
+			AidName:     "aid_name_test",
+			TargetUID:   "target_uid",
+			TargetName:  "target_name_test",
+			PubType:     "donate",
+			Name:        "3M 一次性口罩",
+			Number:      200,
+			Unit:        "箱",
+			TxID:        "",
+			Remark:      "remark test",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Time{},
+			DeletedAt:   nil,
+		},
+		BillingAddr: models.Address{
+			ID:        "address_billing_id",
+			UID:       "uid_test",
+			Type:      "billing",
+			Country:   "cn",
+			Province:  "jiangsu",
+			City:      "xuzhou",
+			District:  "huabei",
+			Address:   "xihuanlu50",
+			ZipCode:   "221411",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: nil,
+		},
+		ShippingAddr: models.Address{
+			ID:        "address_shipping_id",
+			UID:       "uid_test",
+			Type:      "shipping",
+			Country:   "cn",
+			Province:  "beijing",
+			City:      "beijing",
+			District:  "huabei",
+			Address:   "tiananmen",
+			ZipCode:   "100000",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: nil,
+		},
+		ProofImages: []*models.Image{
+			{
+				ID:        "image_id",
+				RelatedID: "funds_id",
+				Type:      "proof",
+				URL:       "www.baidu.com",
+				Hash:      "aabbcc",
+				Format:    "png",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				DeletedAt: nil,
+			},
+		},
+	}, nil)
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodGet, "/api/v1/pub/supplies/detail?supplies_id=uid_test", nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.QuerySuppliesDetail(c)
+	CommRespCheck(t, w)
+}
+
+func TestPubUserListList(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	mockBackend.EXPECT().QueryPubByUserType(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*structs.PubUserItem{
+		{
+			ID:          "id_test",
+			Type:        "funds",
+			UID:         "donor_uid",
+			DonorName:   "donor_name",
+			UserType:    "normal",
+			AidUID:      "aid_uid_test",
+			AidName:     "aid_name",
+			TargetUID:   "target_uid_test",
+			TargetName:  "target_name",
+			PubType:     "donate",
+			PayType:     "wechat",
+			Amount:      "1000.00",
+			Name:        "",
+			Number:      0,
+			Unit:        "",
+			TxID:        "",
+			Remark:      "",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   0,
+			Time:        time.Now(),
+		},
+		{
+			ID:          "id_test_2",
+			Type:        "supplies",
+			UID:         "donor_uid_2",
+			DonorName:   "donor_name_2",
+			UserType:    "normal",
+			AidUID:      "aid_uid_test_2",
+			AidName:     "aid_name_2",
+			TargetUID:   "target_uid_test",
+			TargetName:  "target_name_2",
+			PubType:     "donate",
+			PayType:     "",
+			Amount:      "",
+			Name:        "3M 一次性口罩",
+			Number:      3000,
+			Unit:        "个",
+			TxID:        "",
+			Remark:      "",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   0,
+			Time:        time.Now(),
+		},
+	}, nil)
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodGet, "/api/v1/pub/list?user_type=normal&target_uid=target_uid_test&pub_type=donate&page_num=1&page_limit=10", nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.PubUserList(c)
 	CommRespCheck(t, w)
 }
 
