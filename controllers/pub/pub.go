@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/csiabb/donation-service/common/rest"
+	"github.com/csiabb/donation-service/common/utils"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/structs"
 
@@ -46,22 +47,47 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 	}
 
 	funds := &models.PubFunds{
-		UID:       req.UID,
-		UserType:  req.UserType,
-		AidUID:    req.AidUID,
-		TargetUID: req.TargetUID,
-		PubType:   req.PubType,
-		PayType:   req.PayType,
-		Amount:    req.Amount,
-		Remark:    req.Remark,
+		UID:               req.UID,
+		DonorName:         req.DonorName,
+		UserType:          req.UserType,
+		TargetUID:         req.TargetUID,
+		TargetName:        req.TargetName,
+		TargetBankCardNum: req.TargetBankCardNum,
+		PubType:           req.PubType,
+		PayType:           req.PayType,
+		Amount:            req.Amount,
+		Remark:            req.Remark,
 	}
 
-	err := h.srvcContext.DBStorage.CreateFunds(funds)
+	tx := h.srvcContext.DBStorage.GetDBTransaction()
+	err := h.srvcContext.DBStorage.CreateFunds(tx, funds)
 	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
 		e := fmt.Errorf("create funds error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 	}
+
+	images := make([]*models.Image, 0)
+	for _, v := range req.PubProofImage {
+		images = append(images, &models.Image{
+			ID:        utils.GenerateUUID(),
+			RelatedID: funds.ID,
+			Type:      rest.ImageProof,
+			URL:       v.URL,
+			Hash:      v.Hash,
+			Format:    v.Format,
+		})
+	}
+
+	err = h.srvcContext.DBStorage.CreateImages(tx, images)
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("create images error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+	}
+	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(nil))
 	logger.Infof("response receive funds success.")
