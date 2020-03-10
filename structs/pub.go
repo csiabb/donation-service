@@ -13,14 +13,17 @@ import (
 
 // ReceiveFundsRequest defines the request of receiving funds
 type ReceiveFundsRequest struct {
-	UID       string          `json:"uid" binding:"required"`        // user id of the one who donate
-	UserType  string          `json:"user_type"`                     // user type
-	AidUID    string          `json:"aid_uid"`                       // user id of the one who aided
-	TargetUID string          `json:"target_uid" binding:"required"` // user id of charity
-	PubType   string          `json:"pub_type" binding:"required"`   // publicity type
-	PayType   string          `json:"pay_type"`                      // pay type
-	Amount    decimal.Decimal `json:"amount" binding:"required"`     // pay amount
-	Remark    string          `json:"remark"`                        // remark text
+	UID               string           `json:"uid" binding:"required"`                  // user id of the one who donate
+	DonorName         string           `json:"donor_name" binding:"required"`           // user name of the one who donate
+	UserType          string           `json:"user_type" binding:"required"`            // user type
+	TargetUID         string           `json:"target_uid" binding:"required"`           // user id of charity
+	TargetName        string           `json:"target_name" binding:"required"`          // user name of the one who receive donation
+	TargetBankCardNum string           `json:"target_bank_card_num" binding:"required"` // target bank card number
+	PubType           string           `json:"pub_type" binding:"required"`             // publicity type
+	PayType           string           `json:"pay_type"`                                // pay type
+	Amount            decimal.Decimal  `json:"amount" binding:"required"`               // pay amount
+	Remark            string           `json:"remark"`                                  // remark text
+	PubProofImage     []*PubProofImage `json:"proof_images" binding:"required"`         // images of proof
 }
 
 // QueryFundsRequest defines the request of query funds

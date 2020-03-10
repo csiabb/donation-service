@@ -24,13 +24,30 @@ const (
 )
 
 // CreateFunds implement receive funds interface
-func (b *DbBackendImpl) CreateFunds(data *models.PubFunds) error {
+func (b *DbBackendImpl) CreateFunds(tx *gorm.DB, data *models.PubFunds) error {
 	if nil == data {
 		return fmt.Errorf("param is nil")
 	}
 
 	data.ID = utils.GenerateUUID()
-	return b.GetConn().Create(data).Error
+	err := tx.Create(data).Error
+	return err
+}
+
+// CreateImages implement create images interface
+func (b *DbBackendImpl) CreateImages(tx *gorm.DB, data []*models.Image) error {
+	if nil == data {
+		return fmt.Errorf("param is nil")
+	}
+
+	for _, v := range data {
+		err := tx.Create(v).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // QueryFunds implement query funds interface
