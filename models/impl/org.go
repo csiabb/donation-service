@@ -57,7 +57,7 @@ func (b *DbBackendImpl) QueryOrgCharities(params *structs.QueryParams) ([]*struc
 	offset := (params.PageNum - 1) * params.PageLimit
 	where := b.GetConn().Model(&structs.OrgCharitiesItems{})
 	if err := where.Raw(sqlQueryDonationStatAndAccountInfo, rest.UserTypeOrgCharity, time.Unix(params.StartTime, 0),
-		time.Unix(params.EndTime, 0), rest.UserTypeOrgCharity, params.PageLimit, offset).Scan(&out).Error; err != nil {
+		time.Unix(params.EndTime, 0), rest.ImageAvatar, params.PageLimit, offset).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
 			logger.Error(e)
@@ -80,7 +80,7 @@ func (b *DbBackendImpl) QueryOrgCharitiesDetail(uid string) (*structs.OrgChariti
 
 	var out structs.OrgCharitiesDetailItem
 	where := b.GetConn().Model(&structs.OrgCharitiesDetailItem{})
-	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.AddrTypeReg, rest.UserTypeOrgCharity, rest.UserTypeOrgCharity, uid).Scan(&out).Error; err != nil {
+	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.AddrTypeReg, rest.UserTypeOrgCharity, rest.ImageAvatar, uid).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("record not found")
 			logger.Error(e)
