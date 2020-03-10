@@ -39,8 +39,9 @@ const (
 
 // the type of addresses
 const (
-	AddrTypeReg      = "reg"      // user register address
-	AddrTypeShipping = "shipping" // user shipping address
+	AddrReg      = "reg"      // user register address
+	AddrShipping = "shipping" // user shipping address
+	AddrBilling  = "billing"  // user billing address
 )
 
 // the type of image

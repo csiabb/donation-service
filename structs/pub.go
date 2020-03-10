@@ -13,17 +13,17 @@ import (
 
 // ReceiveFundsRequest defines the request of receiving funds
 type ReceiveFundsRequest struct {
-	UID               string           `json:"uid" binding:"required"`                  // user id of the one who donate
-	DonorName         string           `json:"donor_name" binding:"required"`           // user name of the one who donate
-	UserType          string           `json:"user_type" binding:"required"`            // user type
-	TargetUID         string           `json:"target_uid" binding:"required"`           // user id of charity
-	TargetName        string           `json:"target_name" binding:"required"`          // user name of the one who receive donation
-	TargetBankCardNum string           `json:"target_bank_card_num" binding:"required"` // target bank card number
-	PubType           string           `json:"pub_type" binding:"required"`             // publicity type
-	PayType           string           `json:"pay_type"`                                // pay type
-	Amount            decimal.Decimal  `json:"amount" binding:"required"`               // pay amount
-	Remark            string           `json:"remark"`                                  // remark text
-	PubProofImage     []*PubProofImage `json:"proof_images" binding:"required"`         // images of proof
+	UID               string                  `json:"uid" binding:"required"`                  // user id of the one who donate
+	DonorName         string                  `json:"donor_name" binding:"required"`           // user name of the one who donate
+	UserType          string                  `json:"user_type" binding:"required"`            // user type
+	TargetUID         string                  `json:"target_uid" binding:"required"`           // user id of charity
+	TargetName        string                  `json:"target_name" binding:"required"`          // user name of the one who receive donation
+	TargetBankCardNum string                  `json:"target_bank_card_num" binding:"required"` // target bank card number
+	PubType           string                  `json:"pub_type" binding:"required"`             // publicity type
+	PayType           string                  `json:"pay_type"`                                // pay type
+	Amount            decimal.Decimal         `json:"amount" binding:"required"`               // pay amount
+	Remark            string                  `json:"remark"`                                  // remark text
+	PubProofImage     []*PubProofImageRequest `json:"proof_images" binding:"required"`         // images of proof
 }
 
 // QueryFundsRequest defines the request of query funds
@@ -78,15 +78,25 @@ type FundsDetailRequest struct {
 
 // ReceiveSuppliesRequest defines the struct of received supplies
 type ReceiveSuppliesRequest struct {
-	UID       string `json:"uid"`                           // user id
-	UserType  string `json:"user_type"`                     // user type
-	AidUID    string `json:"aid_uid"`                       // aid user id
-	TargetUID string `json:"target_uid" binding:"required"` // user id of charity
-	PubType   string `json:"pub_type" binding:"required"`   // the type of publicity
-	Name      string `json:"name" binding:"required"`       // name
-	Number    int64  `json:"number" binding:"required"`     // number
-	Unit      string `json:"unit" binding:"required"`       // unit
-	Remark    string `json:"remark"`                        // remark
+	UID             string                  `json:"uid"`                              // user id
+	DonorName       string                  `json:"donor_name"`                       // user name of the one who donate
+	UserType        string                  `json:"user_type"`                        // user type
+	TargetUID       string                  `json:"target_uid" binding:"required"`    // user id of charity
+	TargetName      string                  `json:"target_name"`                      // user name of the one who receive donation
+	PubType         string                  `json:"pub_type" binding:"required"`      // the type of publicity
+	SuppliesItem    []*SuppliesItem         `json:"supplies_item" binding:"required"` // the supplies item
+	Remark          string                  `json:"remark"`                           // remark
+	WayBillNum      string                  `json:"way_bill_num"`                     // supplies way bill number
+	BillingAddress  PubAddress              `json:"billing_addr"`                     // billing address
+	ShippingAddress PubAddress              `json:"shipping_addr"`                    // donation shipping address
+	PubProofImage   []*PubProofImageRequest `json:"proof_images" binding:"required"`  // images of proof
+}
+
+// SuppliesItem defines the struct item of received supplies
+type SuppliesItem struct {
+	Name   string `json:"name" binding:"required"`   // name
+	Number int64  `json:"number" binding:"required"` // number
+	Unit   string `json:"unit" binding:"required"`   // unit
 }
 
 // QuerySuppliesRequest defines the request of supplies
@@ -193,18 +203,18 @@ func (pui *PubUserItem) ConvertTime() {
 
 // PubFundsDetail defines the detail information of publicity funds
 type PubFundsDetail struct {
-	PubFunds        QueryFundsItems  `json:"pub_funds"`     // publicity funds
-	BillingAddress  PubAddress       `json:"billing_addr"`  // billing address
-	ShippingAddress PubAddress       `json:"shipping_addr"` // shipping address
-	ProofImages     []*PubProofImage `json:"proof_images"`  // the proof of donation
+	PubFunds        QueryFundsItems      `json:"pub_funds"`     // publicity funds
+	BillingAddress  PubAddress           `json:"billing_addr"`  // billing address
+	ShippingAddress PubAddress           `json:"shipping_addr"` // shipping address
+	ProofImages     []*PubProofImageResp `json:"proof_images"`  // the proof of donation
 }
 
 // PubSuppliesDetail defines the detail information of publicity supplies
 type PubSuppliesDetail struct {
-	PubSupplies     QuerySuppliesItems `json:"pub_supplies"`  // publicity supplies
-	BillingAddress  PubAddress         `json:"billing_addr"`  // billing address
-	ShippingAddress PubAddress         `json:"shipping_addr"` // shipping address
-	ProofImages     []*PubProofImage   `json:"proof_images"`  // the proof of donation
+	PubSupplies     QuerySuppliesItems   `json:"pub_supplies"`  // publicity supplies
+	BillingAddress  PubAddress           `json:"billing_addr"`  // billing address
+	ShippingAddress PubAddress           `json:"shipping_addr"` // shipping address
+	ProofImages     []*PubProofImageResp `json:"proof_images"`  // the proof of donation
 }
 
 // PubAddress defines the shipping address of publicity funds detail information
@@ -219,11 +229,20 @@ type PubAddress struct {
 	ZipCode  string `json:"zip_code"` // zip code
 }
 
-// PubProofImage defines the proof image of publicity funds detail information
-type PubProofImage struct {
+// PubProofImageRequest defines the request proof image of publicity detail information
+type PubProofImageRequest struct {
+	Type   string `json:"type" binding:"required"`  // user type
+	URL    string `json:"url" binding:"required"`   // image url
+	Index  string `json:"index" binding:"required"` // image index
+	Format string `json:"format"`                   // image file format
+}
+
+// PubProofImageResp defines the proof image of publicity detail information
+type PubProofImageResp struct {
 	ID     string `json:"id"`     // image id
 	Type   string `json:"type"`   // user type
 	URL    string `json:"url"`    // image url
 	Hash   string `json:"hash"`   // image hash
+	Index  string `json:"index"`  // image index
 	Format string `json:"format"` // image file format
 }

@@ -27,11 +27,12 @@ type IDBBackend interface {
 	CreateFunds(*gorm.DB, *PubFunds) error
 	QueryFunds(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubFunds, error)
 	QueryFundsDetail(id string) (*FundsDetail, error)
-	CreateSupplies(supplies *PubSupplies) error
+	CreateSupplies(*gorm.DB, []*PubSupplies) error
 	QuerySupplies(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubSupplies, error)
 	QuerySuppliesDetail(id string) (*SuppliesDetail, error)
 	QueryPubByUserType(userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
 	CreateImages(tx *gorm.DB, data []*Image) error
+	CreateAddresses(tx *gorm.DB, data []*Address) error
 
 	// org
 	CreateOrganization(*DonationStat) error

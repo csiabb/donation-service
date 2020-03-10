@@ -160,6 +160,7 @@ func TestQueryFundsDetail(t *testing.T) {
 				Type:      "proof",
 				URL:       "www.baidu.com",
 				Hash:      "aabbcc",
+				Index:     "adkadkadk",
 				Format:    "png",
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
