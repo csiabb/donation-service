@@ -46,3 +46,15 @@ Database:
     SSLMode: disable # verify-full
     MaxIdleConns: 5
     MaxConns: 30
+
+################################################################################
+#
+# ALiYun Configuration
+# - aliyun to store image donation data
+#
+################################################################################
+ALiYun:
+    Endpoint: oss-cn-beijing.aliyuncs.com
+    AccessKeyId: test
+    AccessKeySecret: test
+    NewsFeedImage: donation-oss

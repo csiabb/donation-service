@@ -27,12 +27,21 @@ type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
 	Database      database.DBConnectCfg
+	ALiYun        ALiYunCfg
 }
 
 // ServerGeneralCfg general configure of service
 type ServerGeneralCfg struct {
 	Host string
 	Port int
+}
+
+// ALiYunCfg ALiYun configure of service
+type ALiYunCfg struct {
+	Endpoint        string
+	AccessKeyId     string
+	AccessKeySecret string
+	NewsFeedImage   string
 }
 
 // GetServiceCfg returns the configurations for the service
