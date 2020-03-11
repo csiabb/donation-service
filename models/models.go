@@ -15,6 +15,7 @@ import (
 // Account defines the common information of user
 type Account struct {
 	ID             string `gorm:"type:varchar(256);primary_key"` // user id
+	Access         string `gorm:"type:varchar(256)"`             // user name
 	Password       string `gorm:"type:varchar(256)"`             // password
 	NickName       string `gorm:"type:varchar(64)"`              // nick name
 	Type           string `gorm:"type:varchar(16)"`              // user type
@@ -27,6 +28,9 @@ type Account struct {
 	ShippingAddrID string `gorm:"type:varchar(256)"`             // shipping address id
 	Did            string `gorm:"type:varchar(64)"`              // did
 	Remark         string `gorm:"type:text"`                     // description
+	OpenID         string `gorm:"type:varchar(256)"`             // open id of wechat app
+	UnionID        string `gorm:"type:varchar(256)"`             // id of wechat app
+	AppID          string `gorm:"type:varchar(256)"`             // app id
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      *time.Time `sql:"index"`

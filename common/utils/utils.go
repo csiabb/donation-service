@@ -10,7 +10,33 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"regexp"
 )
+
+const (
+	phoneReg = `^(13[0-9]|14[579]|16[2567]|15[01235-9]|1[78][0-9])\d{8}$`
+)
+
+// CheckPhone return phone is valid
+func CheckPhone(phone string) bool {
+	reg := regexp.MustCompile(phoneReg)
+	return reg.MatchString(phone)
+}
+
+// CheckPassword check password length and illegal characters
+func CheckPassword(pwd string) bool {
+	//长度8-16位,必须包含大小写字母和数字
+	if len(pwd) < 8 || len(pwd) > 16 {
+		return false
+	}
+	r1 := regexp.MustCompile("[a-z]")
+	r2 := regexp.MustCompile("[A-Z]")
+	r3 := regexp.MustCompile("[0-9]")
+	if r1.MatchString(pwd) && r2.MatchString(pwd) && r3.MatchString(pwd) {
+		return true
+	}
+	return false
+}
 
 // GenerateUUID returns a UUID based on RFC 4122
 func GenerateUUID() string {

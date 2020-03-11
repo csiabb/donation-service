@@ -35,6 +35,21 @@ func (m *MockIDBBackend) EXPECT() *MockIDBBackendMockRecorder {
 	return m.recorder
 }
 
+// CheckAccount mocks base method
+func (m *MockIDBBackend) CheckAccount(arg0, arg1 string) (*models.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckAccount", arg0, arg1)
+	ret0, _ := ret[0].(*models.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckAccount indicates an expected call of CheckAccount
+func (mr *MockIDBBackendMockRecorder) CheckAccount(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAccount", reflect.TypeOf((*MockIDBBackend)(nil).CheckAccount), arg0, arg1)
+}
+
 // CreateAccount mocks base method
 func (m *MockIDBBackend) CreateAccount(arg0 *models.Account) error {
 	m.ctrl.T.Helper()

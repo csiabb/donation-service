@@ -13,6 +13,7 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	srvctx "github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/controllers/image"
+	"github.com/csiabb/donation-service/controllers/acc"
 	"github.com/csiabb/donation-service/controllers/org"
 	"github.com/csiabb/donation-service/controllers/pub"
 	"github.com/csiabb/donation-service/controllers/version"
@@ -37,6 +38,10 @@ var (
 )
 
 const (
+	// acc
+	urlAccLogin = "acc/login"
+
+	// pub
 	urlPubFunds          = "pub/funds"
 	urlPubFundsDetail    = "pub/funds/detail"
 	urlPubSupplies       = "pub/supplies"
@@ -58,6 +63,7 @@ type Router struct {
 	pubHandler     *pub.RestHandler
 	orgHandler     *org.RestHandler
 	imageHandler   *image.RestHandler
+	accHandler     *acc.RestHandler
 }
 
 // InitRouter init router
@@ -94,6 +100,12 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 		return err
 	}
 
+	r.accHandler, err = acc.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create account rest http handler instance, %+v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -111,6 +123,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 	{
 		// log reponse and request
 		apiPrefix.Use(middleware.RequestResponseLogger())
+
+		// account
+		apiPrefix.POST(urlAccLogin, r.accHandler.Login)
 
 		// publicity
 		apiPrefix.POST(urlPubFunds, r.pubHandler.ReceiveFunds)

@@ -6,6 +6,13 @@ SPDX-License-Identifier: Apache-2.0
 
 package rest
 
+// user source
+const (
+	SourceWechat = "wx"
+	SourceApp    = "app"
+	SourceWeb    = "web"
+)
+
 // user type
 const (
 	UserTypeNormal     = "normal"  // normal user
