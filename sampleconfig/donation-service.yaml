@@ -54,7 +54,7 @@ Database:
 #
 ################################################################################
 ALiYun:
-    Endpoint: oss-cn-beijing.aliyuncs.com
+    Endpoint: https://oss-cn-beijing.aliyuncs.com
     AccessKeyID: test
     AccessKeySecret: test
-    NewsFeedImage: donation-oss
+    BucketName: donation-oss

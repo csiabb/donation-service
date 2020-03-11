@@ -41,7 +41,7 @@ type ALiYunCfg struct {
 	Endpoint        string
 	AccessKeyID     string
 	AccessKeySecret string
-	NewsFeedImage   string
+	BucketName      string
 }
 
 // GetServiceCfg returns the configurations for the service
