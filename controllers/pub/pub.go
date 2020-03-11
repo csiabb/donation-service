@@ -537,9 +537,9 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 	var fundsNum, SuppliesNum int64
 	for _, v := range result {
 		v.ConvertTime()
-		if v.Type == "funds" {
+		if v.Type == rest.DonatedTypeFunds {
 			fundsNum++
-		} else if v.Type == "supplies" {
+		} else if v.Type == rest.DonatedTypeSupplies {
 			SuppliesNum++
 		}
 	}
