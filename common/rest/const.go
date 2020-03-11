@@ -51,3 +51,9 @@ const (
 	ImageIDCardHead = "head"   // front image of id card
 	ImageIDCardBack = "back"   // back image of id card
 )
+
+// the type of items donated
+const (
+	DonatedTypeFunds    = "funds"
+	DonatedTypeSupplies = "supplies"
+)

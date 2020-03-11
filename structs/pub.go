@@ -7,8 +7,11 @@ SPDX-License-Identifier: Apache-2.0
 package structs
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/csiabb/donation-service/common/rest"
+
+	"github.com/shopspring/decimal"
 )
 
 // ReceiveFundsRequest defines the request of receiving funds
@@ -162,12 +165,14 @@ type PubUserRequest struct {
 
 // PubUserResp defines the response of publicity information
 type PubUserResp struct {
-	PageNum   int            `json:"page_num"`   // page num
-	PageLimit int            `json:"page_limit"` // page limit
-	StartTime int64          `json:"start_time"` // start time
-	EndTime   int64          `json:"end_time"`   // end time
-	Total     int64          `json:"total"`      // total number of query result
-	Results   []*PubUserItem `json:"results"`    // funds items
+	PageNum     int            `json:"page_num"`     // page num
+	PageLimit   int            `json:"page_limit"`   // page limit
+	StartTime   int64          `json:"start_time"`   // start time
+	EndTime     int64          `json:"end_time"`     // end time
+	Total       int64          `json:"total"`        // total number of query result
+	SuppliesNum int64          `json:"supplies_num"` // total number of query supplies
+	FundsNum    int64          `json:"funds_num"`    // total number of query funds
+	Results     []*PubUserItem `json:"results"`      // funds items
 }
 
 // PubUserItem defines the item of publicity information
@@ -199,6 +204,15 @@ type PubUserItem struct {
 // ConvertTime defines the covert of created_at
 func (pui *PubUserItem) ConvertTime() {
 	pui.CreatedAt = pui.Time.Unix()
+}
+
+// Count defines the number of items donated
+func (pui *PubUserItem) Count(fundsNum, suppliesNum *int64) {
+	if pui.Type == rest.DonatedTypeFunds {
+		*fundsNum++
+	} else if pui.Type == rest.DonatedTypeSupplies {
+		*suppliesNum++
+	}
 }
 
 // PubFundsDetail defines the detail information of publicity funds

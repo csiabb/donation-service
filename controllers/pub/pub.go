@@ -534,18 +534,23 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 		return
 	}
 
+	var fundsNum, suppliesNum int64
 	for _, v := range result {
 		v.ConvertTime()
+		v.Count(&fundsNum, &suppliesNum)
 	}
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.PubUserResp{
-		Total:     params.Total,
-		PageNum:   params.PageNum,
-		PageLimit: params.PageLimit,
-		StartTime: params.StartTime,
-		EndTime:   params.EndTime,
-		Results:   result,
+		Total:       params.Total,
+		PageNum:     params.PageNum,
+		PageLimit:   params.PageLimit,
+		StartTime:   params.StartTime,
+		EndTime:     params.EndTime,
+		SuppliesNum: suppliesNum,
+		FundsNum:    fundsNum,
+		Results:     result,
 	}))
+
 	logger.Info("response query records success.")
 	return
 }
