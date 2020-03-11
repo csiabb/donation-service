@@ -108,13 +108,35 @@ func (b *DbBackendImpl) QueryFunds(uid, targetUID, userType, pubType string, par
 }
 
 // CreateSupplies defines the created supplies
-func (b *DbBackendImpl) CreateSupplies(data *models.PubSupplies) error {
+func (b *DbBackendImpl) CreateSupplies(tx *gorm.DB, data []*models.PubSupplies) error {
 	if nil == data {
 		return fmt.Errorf("param is nil")
 	}
 
-	data.ID = utils.GenerateUUID()
-	return b.GetConn().Create(data).Error
+	for _, v := range data {
+		err := tx.Create(v).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// CreateAddresses implement create addresses
+func (b *DbBackendImpl) CreateAddresses(tx *gorm.DB, data []*models.Address) error {
+	if nil == data {
+		return fmt.Errorf("param is nil")
+	}
+
+	for _, v := range data {
+		err := tx.Create(v).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // QuerySupplies defines the query supplies
@@ -234,7 +256,7 @@ func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error)
 		return nil, e
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.UID, Type: rest.AddrShipping}).First(&detail.BillingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("billing address records not found")
 			logger.Debug(e)
@@ -245,7 +267,7 @@ func (b *DbBackendImpl) QueryFundsDetail(id string) (*models.FundsDetail, error)
 		}
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&models.Address{UID: detail.Funds.TargetUID, Type: rest.AddrShipping}).First(&detail.ShippingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("shipping address records not found")
 			logger.Debug(e)
@@ -280,7 +302,7 @@ func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, 
 		return nil, e
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.UID, Type: rest.AddrTypeShipping}).First(&detail.BillingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.UID, Type: rest.AddrShipping}).First(&detail.BillingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("billing address records not found")
 			logger.Debug(e)
@@ -291,7 +313,7 @@ func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, 
 		}
 	}
 
-	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.TargetUID, Type: rest.AddrTypeShipping}).First(&detail.ShippingAddr).Error; err != nil {
+	if err := b.GetConn().Where(&models.Address{UID: detail.Supplies.TargetUID, Type: rest.AddrShipping}).First(&detail.ShippingAddr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("shipping address records not found")
 			logger.Debug(e)

@@ -75,7 +75,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 			RelatedID: funds.ID,
 			Type:      rest.ImageProof,
 			URL:       v.URL,
-			Hash:      v.Hash,
+			Index:     v.Index,
 			Format:    v.Format,
 		})
 	}
@@ -224,13 +224,14 @@ func (h *RestHandler) QueryFundsDetail(c *gin.Context) {
 		ZipCode:  f.ShippingAddr.ZipCode,
 	}
 
-	images := make([]*structs.PubProofImage, 0)
+	images := make([]*structs.PubProofImageResp, 0)
 	for _, v := range f.ProofImages {
-		images = append(images, &structs.PubProofImage{
+		images = append(images, &structs.PubProofImageResp{
 			ID:     v.ID,
 			Type:   v.Type,
 			URL:    v.URL,
 			Hash:   v.Hash,
+			Index:  v.Index,
 			Format: v.Format,
 		})
 	}
@@ -260,25 +261,92 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	}
 	logger.Debugf("request params, %v", req)
 
-	supplies := &models.PubSupplies{
-		UID:       req.UID,
-		UserType:  req.UserType,
-		AidUID:    req.AidUID,
-		TargetUID: req.TargetUID,
-		PubType:   req.PubType,
-		Name:      req.Name,
-		Number:    req.Number,
-		Unit:      req.Unit,
-		Remark:    req.Remark,
+	ps := make([]*models.PubSupplies, 0)
+	addrs := make([]*models.Address, 0)
+	images := make([]*models.Image, 0)
+
+	for _, v := range req.SuppliesItem {
+		suppliesID := utils.GenerateUUID()
+		ps = append(ps, &models.PubSupplies{
+			ID:         suppliesID,
+			WayBillNum: req.WayBillNum,
+			UID:        req.UID,
+			DonorName:  req.DonorName,
+			UserType:   req.UserType,
+			TargetUID:  req.TargetUID,
+			TargetName: req.TargetName,
+			PubType:    req.PubType,
+			Name:       v.Name,
+			Number:     v.Number,
+			Unit:       v.Unit,
+			Remark:     req.Remark,
+		})
+
+		addrs = append(addrs, &models.Address{
+			ID:        utils.GenerateUUID(),
+			UID:       req.UID,
+			RelatedID: suppliesID,
+			Type:      rest.AddrBilling,
+			Country:   req.BillingAddress.Country,
+			Province:  req.BillingAddress.Province,
+			City:      req.BillingAddress.City,
+			District:  req.BillingAddress.District,
+			Address:   req.BillingAddress.Address,
+			ZipCode:   req.BillingAddress.ZipCode,
+		})
+
+		addrs = append(addrs, &models.Address{
+			ID:        utils.GenerateUUID(),
+			UID:       req.UID,
+			RelatedID: suppliesID,
+			Type:      rest.AddrShipping,
+			Country:   req.ShippingAddress.Country,
+			Province:  req.ShippingAddress.Province,
+			City:      req.ShippingAddress.City,
+			District:  req.ShippingAddress.District,
+			Address:   req.ShippingAddress.Address,
+			ZipCode:   req.ShippingAddress.ZipCode,
+		})
+
+		for _, v := range req.PubProofImage {
+			images = append(images, &models.Image{
+				ID:        utils.GenerateUUID(),
+				RelatedID: suppliesID,
+				Type:      rest.ImageProof,
+				URL:       v.URL,
+				Index:     v.Index,
+				Format:    v.Format,
+			})
+		}
 	}
 
-	err := h.srvcContext.DBStorage.CreateSupplies(supplies)
+	tx := h.srvcContext.DBStorage.GetDBTransaction()
+	err := h.srvcContext.DBStorage.CreateSupplies(tx, ps)
 	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
 		e := fmt.Errorf("create supplies error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
 	}
+
+	err = h.srvcContext.DBStorage.CreateAddresses(tx, addrs)
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("create addresses error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	err = h.srvcContext.DBStorage.CreateImages(tx, images)
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("create images error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+	}
+	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(nil))
 	logger.Info("response create supplies success.")
@@ -414,9 +482,9 @@ func (h *RestHandler) QuerySuppliesDetail(c *gin.Context) {
 		ZipCode:  s.ShippingAddr.ZipCode,
 	}
 
-	images := make([]*structs.PubProofImage, 0)
+	images := make([]*structs.PubProofImageResp, 0)
 	for _, v := range s.ProofImages {
-		images = append(images, &structs.PubProofImage{
+		images = append(images, &structs.PubProofImageResp{
 			ID:     v.ID,
 			Type:   v.Type,
 			URL:    v.URL,

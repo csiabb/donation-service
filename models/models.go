@@ -36,6 +36,7 @@ type Account struct {
 type Address struct {
 	ID        string `gorm:"type:varchar(256);primary_key"` // address id
 	UID       string `gorm:"type:varchar(256);not null"`    // user id
+	RelatedID string `gorm:"type:varchar(256)"`             // related id
 	Type      string `gorm:"type:varchar(16)"`              // address type
 	Country   string `gorm:"type:varchar(32)"`              // country
 	Province  string `gorm:"type:varchar(32)"`              // province
@@ -101,7 +102,8 @@ type Image struct {
 	RelatedID string `gorm:"type:varchar(256);not null"`    // the related id
 	Type      string `gorm:"type:varchar(64)"`              // image type
 	URL       string `gorm:"type:varchar(512)"`             // image url
-	Hash      string `gorm:"type:varchar(256)"`             // image file path
+	Hash      string `gorm:"type:varchar(256)"`             // image hash
+	Index     string `gorm:"type:varchar(256)"`             // image index
 	Format    string `gorm:"type:varchar(64)"`              // image file format
 	CreatedAt time.Time
 	UpdatedAt time.Time

@@ -80,7 +80,7 @@ func (b *DbBackendImpl) QueryOrgCharitiesDetail(uid string) (*structs.OrgChariti
 
 	var out structs.OrgCharitiesDetailItem
 	where := b.GetConn().Model(&structs.OrgCharitiesDetailItem{})
-	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.AddrTypeReg, rest.UserTypeOrgCharity, rest.UserTypeOrgCharity, uid).Scan(&out).Error; err != nil {
+	if err := where.Raw(sqlQueryDetailDonationStatAndAccountInfo, rest.AddrReg, rest.UserTypeOrgCharity, rest.UserTypeOrgCharity, uid).Scan(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("record not found")
 			logger.Error(e)
