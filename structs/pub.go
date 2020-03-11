@@ -7,9 +7,11 @@ SPDX-License-Identifier: Apache-2.0
 package structs
 
 import (
-	"github.com/csiabb/donation-service/common/rest"
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/csiabb/donation-service/common/rest"
+
+	"github.com/shopspring/decimal"
 )
 
 // ReceiveFundsRequest defines the request of receiving funds
