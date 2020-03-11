@@ -99,7 +99,7 @@ type OrgKyc struct {
 type Image struct {
 	ID        string `gorm:"type:varchar(256);primary_key"` // image id
 	RelatedID string `gorm:"type:varchar(256);not null"`    // the related id
-	Type      string `gorm:"type:varchar(64)"`              // user type
+	Type      string `gorm:"type:varchar(64)"`              // image type
 	URL       string `gorm:"type:varchar(512)"`             // image url
 	Hash      string `gorm:"type:varchar(256)"`             // image file path
 	Format    string `gorm:"type:varchar(64)"`              // image file format
