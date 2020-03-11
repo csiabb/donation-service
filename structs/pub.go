@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package structs
 
 import (
+	"github.com/csiabb/donation-service/common/rest"
 	"github.com/shopspring/decimal"
 	"time"
 )
@@ -201,6 +202,15 @@ type PubUserItem struct {
 // ConvertTime defines the covert of created_at
 func (pui *PubUserItem) ConvertTime() {
 	pui.CreatedAt = pui.Time.Unix()
+}
+
+// Count defines the number of items donated
+func (pui *PubUserItem) Count(fundsNum, suppliesNum *int64) {
+	if pui.Type == rest.DonatedTypeFunds {
+		*fundsNum++
+	} else if pui.Type == rest.DonatedTypeSupplies {
+		*suppliesNum++
+	}
 }
 
 // PubFundsDetail defines the detail information of publicity funds

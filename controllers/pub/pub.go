@@ -534,14 +534,10 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 		return
 	}
 
-	var fundsNum, SuppliesNum int64
+	var fundsNum, suppliesNum int64
 	for _, v := range result {
 		v.ConvertTime()
-		if v.Type == rest.DonatedTypeFunds {
-			fundsNum++
-		} else if v.Type == rest.DonatedTypeSupplies {
-			SuppliesNum++
-		}
+		v.Count(&fundsNum, &suppliesNum)
 	}
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.PubUserResp{
@@ -550,7 +546,7 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 		PageLimit:   params.PageLimit,
 		StartTime:   params.StartTime,
 		EndTime:     params.EndTime,
-		SuppliesNum: SuppliesNum,
+		SuppliesNum: suppliesNum,
 		FundsNum:    fundsNum,
 		Results:     result,
 	}))
