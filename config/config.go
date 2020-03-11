@@ -39,7 +39,7 @@ type ServerGeneralCfg struct {
 // ALiYunCfg ALiYun configure of service
 type ALiYunCfg struct {
 	Endpoint        string
-	AccessKeyId     string
+	AccessKeyID     string
 	AccessKeySecret string
 	NewsFeedImage   string
 }
