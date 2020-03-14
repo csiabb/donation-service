@@ -9,12 +9,6 @@ package image
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/csiabb/donation-service/common/rest"
-	"github.com/csiabb/donation-service/config"
-	"github.com/csiabb/donation-service/context"
-	"github.com/csiabb/donation-service/models/mock_backend"
-	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -23,6 +17,14 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/csiabb/donation-service/common/rest"
+	"github.com/csiabb/donation-service/config"
+	"github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/models/mock_backend"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
 )
 
 func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDBBackend, *httptest.ResponseRecorder, *gin.Context) {
