@@ -9,6 +9,9 @@ package image
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/csiabb/donation-service/common/rest"
+	"github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/models/mock_backend"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -18,30 +21,18 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/csiabb/donation-service/common/rest"
-	"github.com/csiabb/donation-service/config"
-	"github.com/csiabb/donation-service/context"
-	"github.com/csiabb/donation-service/models/mock_backend"
-
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 )
 
-func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDBBackend, *httptest.ResponseRecorder, *gin.Context) {
+func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIALiYunBackend, *httptest.ResponseRecorder, *gin.Context) {
 	mockCtl := gomock.NewController(t)
-	mockBackend := mock_backend.NewMockIDBBackend(mockCtl)
+	mockBackend := mock_backend.NewMockIALiYunBackend(mockCtl)
 
 	// init mock handler
 	handler := RestHandler{}
 	handler.srvcContext = &context.Context{}
-	handler.srvcContext.DBStorage = mockBackend
-	handler.srvcContext.Config = &config.SrvcCfg{ALiYun: config.ALiYunCfg{
-		Endpoint:        "https://oss-cn-beijing.aliyuncs.com",
-		AccessKeyID:     "test",
-		AccessKeySecret: "test",
-		BucketName:      "donation-oss",
-	}}
-
+	handler.srvcContext.ALiYunServices = mockBackend
 	// init test mode gin
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
@@ -52,7 +43,7 @@ func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDB
 
 // TestRestHandler_Upload test the upload of image
 func TestRestHandler_Upload(t *testing.T) {
-	mockCtl, handler, _, w, c := Init(t)
+	mockCtl, handler, mockBackend, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	imgFile, _ := os.Open("../../build/bin/bg.png")
@@ -64,6 +55,8 @@ func TestRestHandler_Upload(t *testing.T) {
 	part, _ := writer.CreateFormFile("image_file", filepath.Base("../../build/bin/bg.png"))
 	io.Copy(part, imgFile)
 	writer.Close()
+
+	mockBackend.EXPECT().UploadObject(gomock.Any(), gomock.Any()).Return(nil)
 
 	c.Request, _ = http.NewRequest(http.MethodPost, "/api/v1/image/upload", body)
 	c.Request.Header.Add("Content-Type", writer.FormDataContentType())

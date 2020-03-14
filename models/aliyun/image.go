@@ -4,28 +4,26 @@ Copyright Lingzhu Ltd. 2020 All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package utils
+package aliyun
 
 import (
 	"io"
-
-	"github.com/csiabb/donation-service/config"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
 // UploadObject implement image upload interface
-func UploadObject(name string, content io.Reader, aLiYunCfg config.ALiYunCfg) (err error) {
+func (ai *ALiYunBackendImpl) UploadObject(name string, content io.Reader) (err error) {
 	options := []oss.Option{
 		oss.ObjectACL(oss.ACLPublicRead),
 	}
 
-	client, err := oss.New(aLiYunCfg.Endpoint, aLiYunCfg.AccessKeyID, aLiYunCfg.AccessKeySecret)
+	client, err := oss.New(ai.ALiYunConfig.Endpoint, ai.ALiYunConfig.AccessKeyID, ai.ALiYunConfig.AccessKeySecret)
 	if err != nil {
 		return err
 	}
 
-	bucket, err := client.Bucket(aLiYunCfg.BucketName)
+	bucket, err := client.Bucket(ai.ALiYunConfig.BucketName)
 	if err != nil {
 		return err
 	}

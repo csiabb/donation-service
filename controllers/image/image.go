@@ -32,7 +32,8 @@ func (h *RestHandler) Upload(c *gin.Context) {
 	logger.Debugf("request params %v", fileRec)
 
 	imageFileTag := utils.GenerateUUID()
-	if err = utils.UploadObject(imageFileTag+".png", fileRec, h.srvcContext.Config.ALiYun); err != nil {
+
+	if err = h.srvcContext.ALiYunServices.UploadObject(imageFileTag+".png", fileRec); err != nil {
 		e := fmt.Errorf("image upload error : %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))

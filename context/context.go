@@ -8,10 +8,10 @@ package context
 
 import (
 	"fmt"
-
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/models"
+	"github.com/csiabb/donation-service/models/aliyun"
 	"github.com/csiabb/donation-service/models/impl"
 )
 
@@ -22,8 +22,9 @@ var (
 
 // Context the context of service
 type Context struct {
-	Config    *config.SrvcCfg
-	DBStorage models.IDBBackend
+	Config         *config.SrvcCfg
+	DBStorage      models.IDBBackend
+	ALiYunServices models.IALiYunBackend
 }
 
 // GetServerContext ...
@@ -49,6 +50,12 @@ func (c *Context) Init() error {
 		return err
 	}
 
+	err = c.initALiYunServices()
+	if nil != err {
+		logger.Errorf("Initalize aliyun services faild, %v", err)
+		return err
+	}
+
 	logger.Infof("initalize context success.")
 
 	return nil
@@ -64,6 +71,17 @@ func (c *Context) initStorage() error {
 	c.DBStorage, err = impl.NewDBBackend(&c.Config.Database)
 	if nil != err {
 		logger.Errorf("New database backend error, %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Context) initALiYunServices() error {
+	var err error
+	c.ALiYunServices, err = aliyun.NewALiYunBackend(&c.Config.ALiYun)
+	if nil != err {
+		logger.Errorf("New aliyun services error, %v", err)
 		return err
 	}
 
