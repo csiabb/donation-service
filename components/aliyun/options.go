@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 package aliyun
 
-// ALiYunCfg ALiYun configure of service
-type ALiYunCfg struct {
+// Config ALiYun configure of service
+type Config struct {
 	Endpoint        string
 	AccessKeyID     string
 	AccessKeySecret string

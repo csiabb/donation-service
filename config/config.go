@@ -28,7 +28,7 @@ type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
 	Database      database.DBConnectCfg
-	ALiYun        aliyun.ALiYunCfg
+	ALiYun        aliyun.Config
 }
 
 // ServerGeneralCfg general configure of service

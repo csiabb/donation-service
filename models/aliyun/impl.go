@@ -15,14 +15,14 @@ var (
 	logger = log.MustGetLogger("models/aliyun")
 )
 
-// ALiYunBackendImpl ...
-type ALiYunBackendImpl struct {
-	a.ALiYunClient
+// BackendImpl ...
+type BackendImpl struct {
+	a.Client
 }
 
 // NewALiYunBackend ...
-func NewALiYunBackend(cfg *a.ALiYunCfg) (*ALiYunBackendImpl, error) {
+func NewALiYunBackend(cfg *a.Config) (*BackendImpl, error) {
 	logger.Infof("creating aliyun service ...")
-	d := &ALiYunBackendImpl{ALiYunClient: a.ALiYunClient{ALiYunConfig: cfg}}
+	d := &BackendImpl{Client: a.Client{ALiYunConfig: cfg}}
 	return d, nil
 }

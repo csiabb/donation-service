@@ -13,7 +13,7 @@ import (
 )
 
 // UploadObject implement image upload interface
-func (ai *ALiYunBackendImpl) UploadObject(name string, content io.Reader) (err error) {
+func (ai *BackendImpl) UploadObject(name string, content io.Reader) (err error) {
 	options := []oss.Option{
 		oss.ObjectACL(oss.ACLPublicRead),
 	}

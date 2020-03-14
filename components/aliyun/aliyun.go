@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 package aliyun
 
-// ALiYunClient aliyun services client
-type ALiYunClient struct {
-	ALiYunConfig *ALiYunCfg
+// Client aliyun services client
+type Client struct {
+	ALiYunConfig *Config
 }
