@@ -20,6 +20,7 @@ import (
 
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
+	"github.com/skip2/go-qrcode"
 	"golang.org/x/image/math/fixed"
 )
 
@@ -37,9 +38,9 @@ type Client struct {
 
 // Init init bg image
 func (c *Client) Init() error {
-	imgFile, err := os.Open(c.ImageConfig.BlackGroundPath)
+	imgFile, err := os.Open(c.ImageConfig.BackgroundPath)
 	if err != nil {
-		logger.Errorf("failed to read bg path %s: %s", c.ImageConfig.BlackGroundPath, err)
+		logger.Errorf("failed to read bg path %s: %s", c.ImageConfig.BackgroundPath, err)
 		return err
 	}
 	defer imgFile.Close()

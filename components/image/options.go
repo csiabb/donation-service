@@ -6,7 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 package image
 
+// Config image config
 type Config struct {
-	BlackGroundPath string
-	FontPath        string
+	BackgroundPath string
+	FontPath       string
 }
