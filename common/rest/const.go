@@ -60,7 +60,7 @@ const (
 	DonatedTypeSupplies = "supplies"
 )
 
-//
+// define the default HTTP header
 const (
 	ArxanChainHttp = "https://boxdev.arxanchain.com"
 )
@@ -71,14 +71,14 @@ const (
 	Home          = "home"
 )
 
-// define share default info
+// define default info of share
 const (
 	ShareTitle    = "众行公益链"
 	ShareIcon     = ""
 	ShareImageURL = ""
 )
 
-// image width and height
+// define length and width of donation image
 const (
 	Width     = 750
 	SubWidth  = 655
@@ -97,7 +97,7 @@ var (
 	Color3 = color.RGBA{R: 252, G: 235, B: 198, A: 255}
 )
 
-// image title
+// define title of donation
 var (
 	Title = []string{"捐赠者：", "接收者：", "捐助物资：", "区块链高度：", "存证唯一表示：", "上链时间："}
 )

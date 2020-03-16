@@ -36,7 +36,7 @@ type Client struct {
 	FontType    *truetype.Font
 }
 
-// Init init bg image
+// Init initializes a new background image
 func (c *Client) Init() error {
 	imgFile, err := os.Open(c.ImageConfig.BackgroundPath)
 	if err != nil {
@@ -83,7 +83,7 @@ func (c *Client) Init() error {
 	return nil
 }
 
-// CreateQrCode  create new qr code
+// CreateQrCode  create a new qr code
 func (c *Client) CreateQrCode(content string) (img image.Image, err error) {
 	var qrCode *qrcode.QRCode
 
@@ -102,7 +102,7 @@ func (c *Client) CreateQrCode(content string) (img image.Image, err error) {
 	return img, nil
 }
 
-// DrawText define draw text
+// DrawText define string drawing
 func (c *Client) DrawText(fontColor color.Color, str string, pt fixed.Point26_6, size float64) error {
 	c.Font.SetFontSize(size)
 	c.Font.SetSrc(image.NewUniform(fontColor))
@@ -110,7 +110,7 @@ func (c *Client) DrawText(fontColor color.Color, str string, pt fixed.Point26_6,
 	return err
 }
 
-// SlipString string returns
+// SlipString handles line breaks of strings
 func (c *Client) SlipString(content string, fontSize float64, textWidth int) []string {
 	runes := []rune(content)
 	opts := truetype.Options{

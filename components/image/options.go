@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 package image
 
-// Config image config
+// Config draw the configuration of block chain storage certificate
 type Config struct {
 	BackgroundPath string
 	FontPath       string
