@@ -12,6 +12,7 @@ import (
 
 	"github.com/csiabb/donation-service/common/log"
 	srvctx "github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/controllers/image"
 	"github.com/csiabb/donation-service/controllers/org"
 	"github.com/csiabb/donation-service/controllers/pub"
 	"github.com/csiabb/donation-service/controllers/version"
@@ -45,6 +46,9 @@ const (
 	// org
 	urlOrgCharities       = "org/charities"
 	urlOrgCharitiesDetail = "org/charities/detail"
+
+	// image
+	urlImageUpload = "image/upload"
 )
 
 // Router service router
@@ -53,6 +57,7 @@ type Router struct {
 	versionHandler *version.RestHandler
 	pubHandler     *pub.RestHandler
 	orgHandler     *org.RestHandler
+	imageHandler   *image.RestHandler
 }
 
 // InitRouter init router
@@ -80,6 +85,12 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 	r.orgHandler, err = org.NewRestHandler(r.context)
 	if err != nil {
 		logger.Errorf("Failed to create organization rest http handler instance, %+v", err)
+		return err
+	}
+
+	r.imageHandler, err = image.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create image rest http handler instance, %+v", err)
 		return err
 	}
 
@@ -113,6 +124,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 		// org
 		apiPrefix.GET(urlOrgCharities, r.orgHandler.QueryOrgCharities)
 		apiPrefix.GET(urlOrgCharitiesDetail, r.orgHandler.QueryOrgCharitiesDetail)
+
+		// image
+		apiPrefix.POST(urlImageUpload, r.imageHandler.Upload)
 	}
 	return router
 }

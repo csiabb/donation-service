@@ -8,6 +8,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/csiabb/donation-service/components/aliyun"
 
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/components/database"
@@ -27,21 +28,13 @@ type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
 	Database      database.DBConnectCfg
-	ALiYun        ALiYunCfg
+	ALiYun        aliyun.Config
 }
 
 // ServerGeneralCfg general configure of service
 type ServerGeneralCfg struct {
 	Host string
 	Port int
-}
-
-// ALiYunCfg ALiYun configure of service
-type ALiYunCfg struct {
-	Endpoint        string
-	AccessKeyID     string
-	AccessKeySecret string
-	BucketName      string
 }
 
 // GetServiceCfg returns the configurations for the service

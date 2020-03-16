@@ -3,6 +3,7 @@ module github.com/csiabb/donation-service
 go 1.12
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.0.7+incompatible
 	github.com/gin-gonic/gin v1.5.0
 	github.com/golang/mock v1.4.1
 	github.com/jinzhu/gorm v1.9.12
