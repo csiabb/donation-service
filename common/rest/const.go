@@ -62,7 +62,7 @@ const (
 
 // define the default HTTP header
 const (
-	ArxanChainHttp = "https://boxdev.arxanchain.com"
+	ArxanChainHTTP = "https://boxdev.arxanchain.com"
 )
 
 // the type of share

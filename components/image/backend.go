@@ -8,7 +8,7 @@ package image
 
 import "image"
 
-// IImageBackend
+// IImageBackend ...
 type IImageBackend interface {
 	Init() error
 	CreateDonationImage(content []string, isShare bool) (*image.NRGBA, error)
