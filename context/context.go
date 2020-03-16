@@ -9,9 +9,9 @@ package context
 import (
 	"fmt"
 	"github.com/csiabb/donation-service/common/log"
+	"github.com/csiabb/donation-service/components/aliyun"
 	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/models"
-	"github.com/csiabb/donation-service/models/aliyun"
 	"github.com/csiabb/donation-service/models/impl"
 )
 
@@ -24,7 +24,7 @@ var (
 type Context struct {
 	Config         *config.SrvcCfg
 	DBStorage      models.IDBBackend
-	ALiYunServices models.IALiYunBackend
+	ALiYunServices aliyun.IALiYunBackend
 }
 
 // GetServerContext ...

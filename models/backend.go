@@ -7,8 +7,6 @@
 package models
 
 import (
-	"io"
-
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/jinzhu/gorm"
@@ -40,9 +38,4 @@ type IDBBackend interface {
 	CreateOrganization(*DonationStat) error
 	QueryOrgCharities(params *structs.QueryParams) ([]*structs.OrgCharitiesItems, error)
 	QueryOrgCharitiesDetail(uid string) (*structs.OrgCharitiesDetailItem, error)
-}
-
-// IALiYunBackend aliyun services interface
-type IALiYunBackend interface {
-	UploadObject(name string, content io.Reader) error
 }

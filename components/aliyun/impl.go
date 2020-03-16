@@ -8,7 +8,6 @@ package aliyun
 
 import (
 	"github.com/csiabb/donation-service/common/log"
-	a "github.com/csiabb/donation-service/components/aliyun"
 )
 
 var (
@@ -17,12 +16,12 @@ var (
 
 // BackendImpl ...
 type BackendImpl struct {
-	a.Client
+	Client
 }
 
 // NewALiYunBackend ...
-func NewALiYunBackend(cfg *a.Config) (*BackendImpl, error) {
+func NewALiYunBackend(cfg *Config) (*BackendImpl, error) {
 	logger.Infof("creating aliyun service ...")
-	d := &BackendImpl{Client: a.Client{ALiYunConfig: cfg}}
+	d := &BackendImpl{Client: Client{ALiYunConfig: cfg}}
 	return d, nil
 }

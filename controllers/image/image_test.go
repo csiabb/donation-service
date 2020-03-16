@@ -19,8 +19,8 @@ import (
 	"testing"
 
 	"github.com/csiabb/donation-service/common/rest"
+	"github.com/csiabb/donation-service/components/aliyun/mock_backend"
 	"github.com/csiabb/donation-service/context"
-	"github.com/csiabb/donation-service/models/mock_backend"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
