@@ -66,6 +66,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		e := fmt.Errorf("create funds error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
 	}
 
 	images := make([]*models.Image, 0)
@@ -86,6 +87,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		e := fmt.Errorf("create images error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
 	}
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
@@ -345,6 +347,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 		e := fmt.Errorf("create images error, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
 	}
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
