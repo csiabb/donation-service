@@ -79,3 +79,12 @@ type PhoneNumber struct {
 	CountryCode     string    `json:"countryCode"`
 	Watermark       watermark `json:"watermark"`
 }
+
+// GetWXACodeRequest ...
+type GetWXACodeRequest struct {
+	Scene     string      `json:"scene"`
+	Width     int64       `json:"width"`
+	AutoColor bool        `json:"auto_color"`
+	LineColor interface{} `json:"line_color"`
+	IsHyaLine bool        `json:"is_hyaline"`
+}

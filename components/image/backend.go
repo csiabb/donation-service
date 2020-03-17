@@ -11,5 +11,5 @@ import "image"
 // IImageBackend ...
 type IImageBackend interface {
 	Init() error
-	CreateDonationImage(content []string, isShare bool) (*image.NRGBA, error)
+	CreateDonationImage(content []string, appID string, secret string, scene string, isShare bool) (*image.NRGBA, error)
 }

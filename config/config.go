@@ -26,11 +26,12 @@ var (
 
 // SrvcCfg  service configure
 type SrvcCfg struct {
-	ServerGeneral ServerGeneralCfg
-	Log           log.Config
-	Database      database.DBConnectCfg
-	WXCfg         wx.ClientCfg
-	ALiYun        aliyun.Config
+	ServerGeneral   ServerGeneralCfg
+	Log             log.Config
+	Database        database.DBConnectCfg
+	WXCfg           wx.ClientCfg
+	ALiYun          aliyun.Config
+	LocalFileSystem string
 }
 
 // ServerGeneralCfg general configure of service

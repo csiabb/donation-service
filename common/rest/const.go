@@ -67,11 +67,6 @@ const (
 	DonatedTypeSupplies = "supplies"
 )
 
-// define the default HTTP header
-const (
-	ArxanChainHTTP = "https://boxdev.arxanchain.com"
-)
-
 // the type of share
 const (
 	DonationProve = "donation_prove"
@@ -92,9 +87,10 @@ const (
 	SubHeight = 597
 )
 
-// define qr code size
+//  define information of qr
 const (
 	QrCodeSize = 120
+	QRContent  = "长按识别二维码"
 )
 
 // define type of color

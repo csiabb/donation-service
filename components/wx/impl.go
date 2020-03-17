@@ -12,6 +12,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
+	"image/png"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -19,10 +21,17 @@ import (
 	"github.com/csiabb/donation-service/components/wx/utils"
 	"github.com/csiabb/donation-service/structs"
 
+	"github.com/hunterhug/go_image/graphics"
 	"github.com/op/go-logging"
 )
 
 var logger = logging.MustGetLogger("wx")
+
+var (
+	newDx     = 120
+	width     = int64(280)
+	lineColor = map[string]string{"r": "201", "g": "112", "b": "3"}
+)
 
 const (
 	codeAPI        = "/sns/jscode2session"
@@ -30,6 +39,7 @@ const (
 	wxAddress      = "https://api.weixin.qq.com"
 	checkFingerURL = "%s/cgi-bin/soter/verify_signature?access_token=%s"
 	accessTokenURL = "%s/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s"
+	wxacodeURL     = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s"
 )
 
 // NewWXBackend returns a handle to the agent endpoints
@@ -185,4 +195,44 @@ func GetAccessToken(appID string, secret string) (string, error) {
 		return "", err
 	}
 	return body.AccessToken, nil
+}
+
+// GetWXACode ...
+func GetWXACode(token string, scene string) (image.Image, error) {
+	wxURL := fmt.Sprintf(wxacodeURL, token)
+	logger.Debugf("Get wx code url: %v", wxURL)
+	var req = &GetWXACodeRequest{
+		Scene:     scene,
+		Width:     width,
+		LineColor: lineColor,
+		IsHyaLine: true,
+	}
+
+	pushByte, err := json.Marshal(req)
+	body := bytes.NewBuffer(pushByte)
+
+	response, err := http.Post(wxURL, "application/json", body)
+	if err != nil {
+		logger.Errorf("Failed to do get wx qr code : %v", err)
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		logger.Errorf("Get response status is not ok")
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	qrCode, err := png.Decode(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// adjust the size
+	dst := image.NewRGBA(image.Rect(0, 0, newDx, newDx*qrCode.Bounds().Dy()/qrCode.Bounds().Dx()))
+	if err = graphics.Scale(dst, qrCode); err != nil {
+		return nil, err
+	}
+
+	return dst, nil
 }

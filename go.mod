@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.5.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/mock v1.4.1
+	github.com/hunterhug/go_image v0.0.0-20190710020854-8922226c5f4b
 	github.com/jinzhu/gorm v1.9.12
 	github.com/medivhzhan/weapp v1.5.1
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
