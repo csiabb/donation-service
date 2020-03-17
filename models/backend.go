@@ -21,6 +21,8 @@ type IDBBackend interface {
 	DBTransactionCommit(*gorm.DB)
 	DBTransactionRollback(*gorm.DB)
 
+	// account
+	CheckAccount(openID string) (*Account, error)
 	CreateAccount(*Account) error
 
 	// publicity

@@ -19,4 +19,13 @@ const (
 	DatabaseDisabled        = 1008 // database disabled
 	PermissionDenied        = 1009 // permission denied
 	InternalServerFailure   = 1012 // internal server failure
+	RepeatRegistration      = 1013 // repeat registration
+)
+
+// wechat error code
+const (
+	WXLoginFailed     = 2100 // server login failed
+	WXUnboundDID      = 2101 // wechat account not bind, not auth
+	WXAlreadyboundDID = 2102 // wechat account not bind, auth fine
+	WhitelistNotExist = 2103 // user not in white list
 )
