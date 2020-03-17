@@ -67,11 +67,6 @@ const (
 	DonatedTypeSupplies = "supplies"
 )
 
-// define the default HTTP header
-const (
-	ArxanChainHTTP = "https://boxdev.arxanchain.com"
-)
-
 // the type of share
 const (
 	DonationProve = "donation_prove"
