@@ -8,8 +8,10 @@ package context
 
 import (
 	"fmt"
+
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/components/aliyun"
+	"github.com/csiabb/donation-service/components/wx"
 	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/impl"
@@ -22,6 +24,7 @@ var (
 
 // Context the context of service
 type Context struct {
+	WXClient       wx.IWXClient
 	Config         *config.SrvcCfg
 	DBStorage      models.IDBBackend
 	ALiYunServices aliyun.IALiYunBackend
@@ -56,6 +59,12 @@ func (c *Context) Init() error {
 		return err
 	}
 
+	err = c.initWXBackend()
+	if nil != err {
+		logger.Errorf("Initalize wechat backend faild, %v", err)
+		return err
+	}
+
 	logger.Infof("initalize context success.")
 
 	return nil
@@ -71,6 +80,17 @@ func (c *Context) initStorage() error {
 	c.DBStorage, err = impl.NewDBBackend(&c.Config.Database)
 	if nil != err {
 		logger.Errorf("New database backend error, %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Context) initWXBackend() error {
+	var err error
+	c.WXClient, err = wx.NewWXBackend(&c.Config.WXCfg)
+	if err != nil {
+		logger.Errorf("Failed new wx client: %v", err)
 		return err
 	}
 

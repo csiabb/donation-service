@@ -58,3 +58,15 @@ ALiYun:
     AccessKeyID: test
     AccessKeySecret: test
     BucketName: donation-oss
+
+################################################################################
+#
+# wx configuration
+#
+################################################################################
+WXCfg:
+    Enabled: true
+    AppID: 123456
+    Secret: 123456
+    Name: zx
+    Env: debug

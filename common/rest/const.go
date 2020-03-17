@@ -8,6 +8,13 @@ package rest
 
 import "image/color"
 
+// user source
+const (
+	SourceWechat = "wx"
+	SourceApp    = "app"
+	SourceWeb    = "web"
+)
+
 // user type
 const (
 	UserTypeNormal     = "normal"  // normal user
