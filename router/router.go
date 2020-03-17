@@ -12,6 +12,8 @@ import (
 
 	"github.com/csiabb/donation-service/common/log"
 	srvctx "github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/controllers/acc"
+	"github.com/csiabb/donation-service/controllers/image"
 	"github.com/csiabb/donation-service/controllers/org"
 	"github.com/csiabb/donation-service/controllers/pub"
 	"github.com/csiabb/donation-service/controllers/version"
@@ -36,6 +38,10 @@ var (
 )
 
 const (
+	// acc
+	urlAccLoginWXApp = "acc/login/wxapp"
+
+	// pub
 	urlPubFunds          = "pub/funds"
 	urlPubFundsDetail    = "pub/funds/detail"
 	urlPubSupplies       = "pub/supplies"
@@ -45,6 +51,9 @@ const (
 	// org
 	urlOrgCharities       = "org/charities"
 	urlOrgCharitiesDetail = "org/charities/detail"
+
+	// image
+	urlImageUpload = "image/upload"
 )
 
 // Router service router
@@ -53,6 +62,8 @@ type Router struct {
 	versionHandler *version.RestHandler
 	pubHandler     *pub.RestHandler
 	orgHandler     *org.RestHandler
+	accHandler     *acc.RestHandler
+	imageHandler   *image.RestHandler
 }
 
 // InitRouter init router
@@ -83,6 +94,18 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 		return err
 	}
 
+	r.accHandler, err = acc.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create account rest http handler instance, %+v", err)
+		return err
+	}
+
+	r.imageHandler, err = image.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create image rest http handler instance, %+v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -101,6 +124,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 		// log reponse and request
 		apiPrefix.Use(middleware.RequestResponseLogger())
 
+		// account
+		apiPrefix.POST(urlAccLoginWXApp, r.accHandler.LoginWXApp)
+
 		// publicity
 		apiPrefix.POST(urlPubFunds, r.pubHandler.ReceiveFunds)
 		apiPrefix.GET(urlPubFunds, r.pubHandler.QueryFunds)
@@ -113,6 +139,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 		// org
 		apiPrefix.GET(urlOrgCharities, r.orgHandler.QueryOrgCharities)
 		apiPrefix.GET(urlOrgCharitiesDetail, r.orgHandler.QueryOrgCharitiesDetail)
+
+		// image
+		apiPrefix.POST(urlImageUpload, r.imageHandler.Upload)
 	}
 	return router
 }

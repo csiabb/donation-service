@@ -35,6 +35,21 @@ func (m *MockIDBBackend) EXPECT() *MockIDBBackendMockRecorder {
 	return m.recorder
 }
 
+// CheckAccount mocks base method
+func (m *MockIDBBackend) CheckAccount(arg0 string) (*models.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckAccount", arg0)
+	ret0, _ := ret[0].(*models.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckAccount indicates an expected call of CheckAccount
+func (mr *MockIDBBackendMockRecorder) CheckAccount(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAccount", reflect.TypeOf((*MockIDBBackend)(nil).CheckAccount), arg0)
+}
+
 // CreateAccount mocks base method
 func (m *MockIDBBackend) CreateAccount(arg0 *models.Account) error {
 	m.ctrl.T.Helper()
@@ -49,18 +64,46 @@ func (mr *MockIDBBackendMockRecorder) CreateAccount(arg0 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockIDBBackend)(nil).CreateAccount), arg0)
 }
 
-// CreateFunds mocks base method
-func (m *MockIDBBackend) CreateFunds(arg0 *models.PubFunds) error {
+// CreateAddresses mocks base method
+func (m *MockIDBBackend) CreateAddresses(arg0 *gorm.DB, arg1 []*models.Address) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateFunds", arg0)
+	ret := m.ctrl.Call(m, "CreateAddresses", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateAddresses indicates an expected call of CreateAddresses
+func (mr *MockIDBBackendMockRecorder) CreateAddresses(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAddresses", reflect.TypeOf((*MockIDBBackend)(nil).CreateAddresses), arg0, arg1)
+}
+
+// CreateFunds mocks base method
+func (m *MockIDBBackend) CreateFunds(arg0 *gorm.DB, arg1 *models.PubFunds) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFunds", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateFunds indicates an expected call of CreateFunds
-func (mr *MockIDBBackendMockRecorder) CreateFunds(arg0 interface{}) *gomock.Call {
+func (mr *MockIDBBackendMockRecorder) CreateFunds(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFunds", reflect.TypeOf((*MockIDBBackend)(nil).CreateFunds), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFunds", reflect.TypeOf((*MockIDBBackend)(nil).CreateFunds), arg0, arg1)
+}
+
+// CreateImages mocks base method
+func (m *MockIDBBackend) CreateImages(arg0 *gorm.DB, arg1 []*models.Image) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateImages", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateImages indicates an expected call of CreateImages
+func (mr *MockIDBBackendMockRecorder) CreateImages(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateImages", reflect.TypeOf((*MockIDBBackend)(nil).CreateImages), arg0, arg1)
 }
 
 // CreateOrganization mocks base method
@@ -78,17 +121,17 @@ func (mr *MockIDBBackendMockRecorder) CreateOrganization(arg0 interface{}) *gomo
 }
 
 // CreateSupplies mocks base method
-func (m *MockIDBBackend) CreateSupplies(arg0 *models.PubSupplies) error {
+func (m *MockIDBBackend) CreateSupplies(arg0 *gorm.DB, arg1 []*models.PubSupplies) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSupplies", arg0)
+	ret := m.ctrl.Call(m, "CreateSupplies", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateSupplies indicates an expected call of CreateSupplies
-func (mr *MockIDBBackendMockRecorder) CreateSupplies(arg0 interface{}) *gomock.Call {
+func (mr *MockIDBBackendMockRecorder) CreateSupplies(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSupplies", reflect.TypeOf((*MockIDBBackend)(nil).CreateSupplies), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSupplies", reflect.TypeOf((*MockIDBBackend)(nil).CreateSupplies), arg0, arg1)
 }
 
 // DBTransactionCommit mocks base method

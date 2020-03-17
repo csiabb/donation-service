@@ -23,6 +23,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 )
 
@@ -48,18 +49,12 @@ func TestReceiveFunds(t *testing.T) {
 	defer mockCtl.Finish()
 
 	// post body
-	body := bytes.NewBufferString("{" +
-		"\"uid\":\"uid_test\", " +
-		"\"aid_uid\":\"\", " +
-		"\"user_type\":\"normal\", " +
-		"\"target_uid\":\"target_uid_test\", " +
-		"\"pub_type\":\"donate\", " +
-		"\"pay_type\":\"wechat\", " +
-		"\"amount\":1000.000, " +
-		"\"remark\":\"this is a remark message\"" +
-		"}")
+	body := bytes.NewBufferString("{\n  \"uid\": \"uid_test\",\n  \"donor_name\": \"donor_name\",\n  \"user_type\": \"normal\",\n  \"target_uid\": \"target_uid_test\",\n  \"target_name\": \"target_name\",\n  \"target_bank_card_num\": \"1111-2222-3333-4444\",\n  \"pub_type\": \"donate\",\n  \"pay_type\": \"wechat\",\n  \"amount\": 100,\n  \"remark\": \"remark message\",\n  \"proof_images\": [\n    {\n      \"type\": \"proof\",\n      \"url\": \"www.baidu.com/aaa.png\",\n      \"hash\": \"laedjakahshsh\",\n      \"format\": \"png\"\n    }\n  ]\n}")
 
-	mockBackend.EXPECT().CreateFunds(gomock.Any()).Return(nil)
+	mockBackend.EXPECT().GetDBTransaction().Return(&gorm.DB{})
+	mockBackend.EXPECT().CreateFunds(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().CreateImages(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().DBTransactionCommit(gomock.Any())
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodPost, "/api/v1/pub/funds/receive", body)
@@ -227,6 +222,7 @@ func TestQueryFundsDetail(t *testing.T) {
 				Type:      "proof",
 				URL:       "www.baidu.com",
 				Hash:      "aabbcc",
+				Index:     "adkadkadk",
 				Format:    "png",
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),

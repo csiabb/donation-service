@@ -15,6 +15,7 @@ import (
 // Account defines the common information of user
 type Account struct {
 	ID             string `gorm:"type:varchar(256);primary_key"` // user id
+	Access         string `gorm:"type:varchar(256)"`             // user name
 	Password       string `gorm:"type:varchar(256)"`             // password
 	NickName       string `gorm:"type:varchar(64)"`              // nick name
 	Type           string `gorm:"type:varchar(16)"`              // user type
@@ -27,6 +28,9 @@ type Account struct {
 	ShippingAddrID string `gorm:"type:varchar(256)"`             // shipping address id
 	Did            string `gorm:"type:varchar(64)"`              // did
 	Remark         string `gorm:"type:text"`                     // description
+	OpenID         string `gorm:"type:varchar(256)"`             // open id of wechat app
+	UnionID        string `gorm:"type:varchar(256)"`             // id of wechat app
+	AppID          string `gorm:"type:varchar(256)"`             // app id
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      *time.Time `sql:"index"`
@@ -36,6 +40,7 @@ type Account struct {
 type Address struct {
 	ID        string `gorm:"type:varchar(256);primary_key"` // address id
 	UID       string `gorm:"type:varchar(256);not null"`    // user id
+	RelatedID string `gorm:"type:varchar(256)"`             // related id
 	Type      string `gorm:"type:varchar(16)"`              // address type
 	Country   string `gorm:"type:varchar(32)"`              // country
 	Province  string `gorm:"type:varchar(32)"`              // province
@@ -99,9 +104,10 @@ type OrgKyc struct {
 type Image struct {
 	ID        string `gorm:"type:varchar(256);primary_key"` // image id
 	RelatedID string `gorm:"type:varchar(256);not null"`    // the related id
-	Type      string `gorm:"type:varchar(64)"`              // user type
+	Type      string `gorm:"type:varchar(64)"`              // image type
 	URL       string `gorm:"type:varchar(512)"`             // image url
-	Hash      string `gorm:"type:varchar(256)"`             // image file path
+	Hash      string `gorm:"type:varchar(256)"`             // image hash
+	Index     string `gorm:"type:varchar(256)"`             // image index
 	Format    string `gorm:"type:varchar(64)"`              // image file format
 	CreatedAt time.Time
 	UpdatedAt time.Time

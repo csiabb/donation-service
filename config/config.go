@@ -10,7 +10,9 @@ import (
 	"fmt"
 
 	"github.com/csiabb/donation-service/common/log"
+	"github.com/csiabb/donation-service/components/aliyun"
 	"github.com/csiabb/donation-service/components/database"
+	"github.com/csiabb/donation-service/components/wx"
 )
 
 var (
@@ -27,6 +29,8 @@ type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
 	Database      database.DBConnectCfg
+	WXCfg         wx.ClientCfg
+	ALiYun        aliyun.Config
 }
 
 // ServerGeneralCfg general configure of service

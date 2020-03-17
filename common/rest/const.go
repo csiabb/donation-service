@@ -6,6 +6,13 @@ SPDX-License-Identifier: Apache-2.0
 
 package rest
 
+// user source
+const (
+	SourceWechat = "wx"
+	SourceApp    = "app"
+	SourceWeb    = "web"
+)
+
 // user type
 const (
 	UserTypeNormal     = "normal"  // normal user
@@ -39,8 +46,9 @@ const (
 
 // the type of addresses
 const (
-	AddrTypeReg      = "reg"      // user register address
-	AddrTypeShipping = "shipping" // user shipping address
+	AddrReg      = "reg"      // user register address
+	AddrShipping = "shipping" // user shipping address
+	AddrBilling  = "billing"  // user billing address
 )
 
 // the type of image
@@ -49,4 +57,10 @@ const (
 	ImageProof      = "proof"  // proof image of donation
 	ImageIDCardHead = "head"   // front image of id card
 	ImageIDCardBack = "back"   // back image of id card
+)
+
+// the type of items donated
+const (
+	DonatedTypeFunds    = "funds"
+	DonatedTypeSupplies = "supplies"
 )
