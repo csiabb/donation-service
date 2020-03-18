@@ -20,6 +20,7 @@ import (
 	"github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/mock_backend"
+	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
@@ -56,6 +57,52 @@ const (
     }
   ]
 }`
+
+	suppliesBodyJSON = `{
+  "uid": "uid_test",
+  "donor_name": "donor_name",
+  "user_type": "normal",
+  "target_uid": "target_uid_test",
+  "target_name": "target_name",
+  "pub_type": "donate",
+  "supplies_item": [
+    {
+      "name": "3M 一次性口罩",
+      "number": 2000,
+      "unit": "箱"
+    },
+    {
+      "name": "75%医用酒精",
+      "number": 300,
+      "unit": "瓶"
+    }
+  ],
+  "remark": "remark message",
+  "way_bill_num": "0202-1728-9393",
+  "billing_addr": {
+    "province": "江苏省",
+    "city": "新沂市",
+    "address": "轻工路西208号"
+  },
+  "shipping_addr": {
+    "city": "北京市",
+    "address": "昌平区西环里小区22号楼"
+  },
+  "proof_images": [
+    {
+      "type": "proof",
+      "url": "www.google.com/aaa.png",
+      "index": "laedjakahshsh",
+      "format": "png"
+    },
+    {
+      "type": "proof",
+      "url": "www.google.com/bbb.png",
+      "index": "shsh",
+      "format": "png"
+    }
+  ]
+}`
 )
 
 func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDBBackend, *httptest.ResponseRecorder, *gin.Context) {
@@ -79,9 +126,6 @@ func TestReceiveFundsSucceed(t *testing.T) {
 	mockCtl, handler, mockBackend, w, c := Init(t)
 	defer mockCtl.Finish()
 
-	// post body
-	body := bytes.NewBufferString(fundsBodyJSON)
-
 	db := &gorm.DB{}
 	mockBackend.EXPECT().GetDBTransaction().Return(db)
 	mockBackend.EXPECT().CreateFunds(gomock.Any(), gomock.Any()).Return(nil)
@@ -89,7 +133,7 @@ func TestReceiveFundsSucceed(t *testing.T) {
 	mockBackend.EXPECT().DBTransactionCommit(gomock.Any())
 
 	// mock request
-	c.Request, _ = http.NewRequest(http.MethodPost, urlPubFunds, body)
+	c.Request, _ = http.NewRequest(http.MethodPost, urlPubFunds, bytes.NewBufferString(fundsBodyJSON))
 	c.Request.Header.Add("Content-Type", "application/json")
 	handler.ReceiveFunds(c)
 	CommRespCheck(t, w)
@@ -301,6 +345,279 @@ func TestQueryFundsDetailDB(t *testing.T) {
 
 	if w.Code != http.StatusInternalServerError {
 		t.Error("query funds detail check failed")
+	}
+}
+
+func TestReceiveSuppliesSucceed(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	// mock db
+	db := &gorm.DB{}
+	mockBackend.EXPECT().GetDBTransaction().Return(db)
+	mockBackend.EXPECT().CreateSupplies(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().CreateAddresses(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().CreateImages(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().DBTransactionCommit(gomock.Any())
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodPost, urlPubSupplies, bytes.NewBufferString(suppliesBodyJSON))
+	c.Request.Header.Add("Content-Type", "application/json")
+	handler.ReceiveSupplies(c)
+	CommRespCheck(t, w)
+}
+
+func TestReceiveSuppliesParams(t *testing.T) {
+	mockCtl, handler, _, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodPost, urlPubSupplies, bytes.NewBufferString(`{
+  "uid": "uid_test",
+  "donor_name": "donor_name",
+  "user_type": "normal",
+  "target_uid": "target_uid_test",
+  "target_name": "target_name",
+  "pub_type": "donate"}`))
+
+	c.Request.Header.Add("Content-Type", "application/json")
+	handler.ReceiveSupplies(c)
+	_, err := ioutil.ReadAll(w.Body)
+
+	if err != nil {
+		t.Errorf("io read err, %v", err)
+	}
+
+	if w.Code != http.StatusBadRequest {
+		t.Error("receive supplies params check failed")
+	}
+}
+
+func TestReceiveSuppliesDB(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	// mock db
+	db := &gorm.DB{}
+	mockBackend.EXPECT().GetDBTransaction().Return(db)
+	mockBackend.EXPECT().CreateSupplies(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().CreateAddresses(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().CreateImages(gomock.Any(), gomock.Any()).Return(errors.New("create images failed"))
+	mockBackend.EXPECT().DBTransactionRollback(db)
+
+	// mock request
+	c.Request, _ = http.NewRequest(http.MethodPost, urlPubSupplies, bytes.NewBufferString(suppliesBodyJSON))
+	c.Request.Header.Add("Content-Type", "application/json")
+	handler.ReceiveSupplies(c)
+	_, err := ioutil.ReadAll(w.Body)
+
+	if err != nil {
+		t.Errorf("io read err, %v", err)
+	}
+
+	if w.Code != http.StatusInternalServerError {
+		t.Error("create supplies check failed")
+	}
+}
+
+func TestQuerySuppliesSucceed(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	mockBackend.EXPECT().QuerySupplies(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.PubSupplies{
+		{
+			ID:          "supplies_id",
+			WayBillNum:  "320045006492",
+			UID:         "uid_test",
+			DonorName:   "donor_name_test",
+			UserType:    "normal",
+			AidUID:      "",
+			AidName:     "",
+			TargetUID:   "target_uid_test",
+			TargetName:  "target_name_test",
+			PubType:     "donate",
+			Name:        "3M 一次性口罩",
+			Number:      200,
+			Unit:        "个",
+			TxID:        "",
+			Remark:      "",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   time.Now(),
+		},
+	}, nil)
+
+	url := urlPubSupplies + "uid=&target_uid=&pub_type=distribute&user_type=&start_time=0&end_time=0&page_num=1&page_limit=10"
+	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.QuerySupplies(c)
+	CommRespCheck(t, w)
+}
+
+func TestQuerySuppliesDetailSucceed(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	mockBackend.EXPECT().QuerySuppliesDetail(gomock.Any()).Return(&models.SuppliesDetail{
+		Supplies: models.PubSupplies{
+			ID:          "supplies_id_test",
+			WayBillNum:  "8292-2323-3232",
+			UID:         "uid_test",
+			DonorName:   "donor_name_test",
+			UserType:    "normal",
+			AidUID:      "",
+			AidName:     "",
+			TargetUID:   "target_uid_test",
+			TargetName:  "target_name_test",
+			PubType:     "donate",
+			Name:        "3M 一次性口罩",
+			Number:      2320,
+			Unit:        "个",
+			TxID:        "",
+			Remark:      "",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   time.Now(),
+		},
+		BillingAddr: models.Address{
+			ID:        "addr_id",
+			UID:       "uid_test",
+			RelatedID: "supplies_id_test",
+			Type:      "billing",
+			Country:   "中国",
+			Province:  "江苏",
+			City:      "徐州",
+			District:  "云龙",
+			Address:   "云龙湖小区32号",
+			ZipCode:   "221400",
+			CreatedAt: time.Now(),
+		},
+		ShippingAddr: models.Address{
+			ID:        "addr_id",
+			UID:       "uid_test",
+			RelatedID: "supplies_id_test",
+			Type:      "shipping",
+			Country:   "中国",
+			Province:  "",
+			City:      "北京",
+			District:  "昌平区",
+			Address:   "龙泽苑小区32号",
+			ZipCode:   "100000",
+			CreatedAt: time.Now(),
+		},
+		ProofImages: []*models.Image{
+			{
+				ID:        "image_id",
+				RelatedID: "supplies_id_test",
+				Type:      "proof",
+				URL:       "www.baidu.com/aaa.png",
+				Hash:      "aadkaaka",
+				Index:     "aabbcc",
+				Format:    "png",
+				CreatedAt: time.Now(),
+			},
+		},
+	}, nil)
+
+	c.Request, _ = http.NewRequest(http.MethodGet, urlPubSuppliesDetail+"?supplies_id=aaa", nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.QuerySuppliesDetail(c)
+	CommRespCheck(t, w)
+}
+
+func TestQuerySuppliesDetailParam(t *testing.T) {
+	mockCtl, handler, _, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	c.Request, _ = http.NewRequest(http.MethodGet, urlPubSuppliesDetail, nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.QuerySuppliesDetail(c)
+	_, err := ioutil.ReadAll(w.Body)
+
+	if err != nil {
+		t.Errorf("io read err, %v", err)
+	}
+
+	if w.Code != http.StatusBadRequest {
+		t.Error("query supplies detail param check failed")
+	}
+}
+
+func TestPubUserListSucceed(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	mockBackend.EXPECT().QueryPubByUserType(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*structs.PubUserItem{
+		{
+			ID:          "funds_test",
+			Type:        "funds",
+			UID:         "uit_test",
+			DonorName:   "donor_name_test",
+			UserType:    "normal",
+			AidUID:      "",
+			AidName:     "",
+			TargetUID:   "target_uid_test",
+			TargetName:  "target_name_test",
+			PubType:     "donate",
+			PayType:     "wechat",
+			Amount:      "2200",
+			Name:        "",
+			Number:      0,
+			Unit:        "",
+			TxID:        "",
+			Remark:      "remark test",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   time.Now().Unix(),
+		},
+	}, nil)
+
+	url := urlPubList + "?user_type=&target_uid=uid_charity_2&pub_type=distribute&start_time=0&end_time=0&page_num=1&page_limit=50"
+	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.PubUserList(c)
+	CommRespCheck(t, w)
+}
+
+func TestPubUserListParams(t *testing.T) {
+	mockCtl, handler, _, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	c.Request, _ = http.NewRequest(http.MethodGet, urlPubList, nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.PubUserList(c)
+	_, err := ioutil.ReadAll(w.Body)
+
+	if err != nil {
+		t.Errorf("io read err, %v", err)
+	}
+
+	if w.Code != http.StatusBadRequest {
+		t.Error("pub list param check failed")
+	}
+}
+
+func TestPubUserListDB(t *testing.T) {
+	mockCtl, handler, mockBackend, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	mockBackend.EXPECT().QueryPubByUserType(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("records not exist"))
+
+	url := urlPubList + "?user_type=&target_uid=uid_charity_2&pub_type=distribute&start_time=0&end_time=0&page_num=1&page_limit=50"
+	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
+	c.Request.Header.Add("Accept", "application/json")
+	handler.PubUserList(c)
+	_, err := ioutil.ReadAll(w.Body)
+
+	if err != nil {
+		t.Errorf("io read err, %v", err)
+	}
+
+	if w.Code != http.StatusInternalServerError {
+		t.Error("pub list db check failed")
 	}
 }
 
