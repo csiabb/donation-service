@@ -87,9 +87,10 @@ const (
 	SubHeight = 597
 )
 
-// define qr code size
+//  define information of qr
 const (
 	QrCodeSize = 120
+	QRContent  = "长按识别二维码"
 )
 
 // define type of color

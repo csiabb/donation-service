@@ -90,7 +90,7 @@ func (c *Client) CreateQrCode(content string) (img image.Image, err error) {
 	qrCode, err = qrcode.New(content, qrcode.Highest)
 
 	if err != nil {
-		return nil, errors.New("创建二维码失败")
+		return nil, errors.New("qr code creation failed")
 	}
 
 	qrCode.DisableBorder = true
@@ -163,7 +163,7 @@ func (c *Client) CreateDonationImage(content []string, isShare bool) (*image.NRG
 		var qrCodeImg image.Image
 		qrCodeImg, err = c.CreateQrCode("http://www.baidu.com")
 		draw.Draw(c.Bg, qrCodeImg.Bounds().Add(image.Pt(100, 710)), qrCodeImg, image.Point{X: 0, Y: 0}, draw.Over)
-		err = c.DrawText(rest.Color2, "长按识别二维码", freetype.Pt(235, 828), 22)
+		err = c.DrawText(rest.Color2, rest.QRContent, freetype.Pt(235, 828), 22)
 	}
 
 	return c.Bg, err
