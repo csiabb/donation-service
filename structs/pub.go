@@ -149,7 +149,7 @@ type QuerySuppliesItems struct {
 
 // SuppliesDetailRequest defines the request of query detail supplies
 type SuppliesDetailRequest struct {
-	SuppliesID string `form:"supplies_id"` // id of funds
+	SuppliesID string `form:"supplies_id" binding:"required"` // id of supplies
 }
 
 // PubUserRequest defines the request of publicity information

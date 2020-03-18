@@ -263,6 +263,13 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	}
 	logger.Debugf("request params, %v", req)
 
+	if req.PubType != rest.PubTypeDonate && req.PubType != rest.PubTypeDistribute && req.PubType != rest.PubTypeReceive {
+		e := fmt.Errorf("pub type invalid")
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
+		return
+	}
+
 	ps := make([]*models.PubSupplies, 0)
 	addrs := make([]*models.Address, 0)
 	images := make([]*models.Image, 0)
