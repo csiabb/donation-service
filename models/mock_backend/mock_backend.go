@@ -35,21 +35,6 @@ func (m *MockIDBBackend) EXPECT() *MockIDBBackendMockRecorder {
 	return m.recorder
 }
 
-// CheckAccount mocks base method
-func (m *MockIDBBackend) CheckAccount(arg0 string) (*models.Account, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckAccount", arg0)
-	ret0, _ := ret[0].(*models.Account)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CheckAccount indicates an expected call of CheckAccount
-func (mr *MockIDBBackendMockRecorder) CheckAccount(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAccount", reflect.TypeOf((*MockIDBBackend)(nil).CheckAccount), arg0)
-}
-
 // CreateAccount mocks base method
 func (m *MockIDBBackend) CreateAccount(arg0 *models.Account) error {
 	m.ctrl.T.Helper()
@@ -172,6 +157,21 @@ func (mr *MockIDBBackendMockRecorder) GetDBTransaction() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDBTransaction", reflect.TypeOf((*MockIDBBackend)(nil).GetDBTransaction))
 }
 
+// QueryAccount mocks base method
+func (m *MockIDBBackend) QueryAccount(arg0, arg1 string) (*models.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryAccount", arg0, arg1)
+	ret0, _ := ret[0].(*models.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryAccount indicates an expected call of QueryAccount
+func (mr *MockIDBBackendMockRecorder) QueryAccount(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryAccount", reflect.TypeOf((*MockIDBBackend)(nil).QueryAccount), arg0, arg1)
+}
+
 // QueryFunds mocks base method
 func (m *MockIDBBackend) QueryFunds(arg0, arg1, arg2, arg3 string, arg4 *structs.QueryParams) ([]*models.PubFunds, error) {
 	m.ctrl.T.Helper()
@@ -275,4 +275,60 @@ func (m *MockIDBBackend) QuerySuppliesDetail(arg0 string) (*models.SuppliesDetai
 func (mr *MockIDBBackendMockRecorder) QuerySuppliesDetail(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QuerySuppliesDetail", reflect.TypeOf((*MockIDBBackend)(nil).QuerySuppliesDetail), arg0)
+}
+
+// UpdateFunds mocks base method
+func (m *MockIDBBackend) UpdateFunds(arg0 *gorm.DB, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateFunds", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateFunds indicates an expected call of UpdateFunds
+func (mr *MockIDBBackendMockRecorder) UpdateFunds(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFunds", reflect.TypeOf((*MockIDBBackend)(nil).UpdateFunds), arg0, arg1, arg2)
+}
+
+// UpdateFundsBC mocks base method
+func (m *MockIDBBackend) UpdateFundsBC(arg0 *gorm.DB, arg1 string, arg2 *models.PubFunds) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateFundsBC", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateFundsBC indicates an expected call of UpdateFundsBC
+func (mr *MockIDBBackendMockRecorder) UpdateFundsBC(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFundsBC", reflect.TypeOf((*MockIDBBackend)(nil).UpdateFundsBC), arg0, arg1, arg2)
+}
+
+// UpdateSuppliesBC mocks base method
+func (m *MockIDBBackend) UpdateSuppliesBC(arg0 *gorm.DB, arg1 string, arg2 *models.PubSupplies) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSuppliesBC", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSuppliesBC indicates an expected call of UpdateSuppliesBC
+func (mr *MockIDBBackendMockRecorder) UpdateSuppliesBC(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSuppliesBC", reflect.TypeOf((*MockIDBBackend)(nil).UpdateSuppliesBC), arg0, arg1, arg2)
+}
+
+// UpdateSuppliesList mocks base method
+func (m *MockIDBBackend) UpdateSuppliesList(arg0 *gorm.DB, arg1 []*models.PubSupplies, arg2 []*structs.PubResp) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSuppliesList", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSuppliesList indicates an expected call of UpdateSuppliesList
+func (mr *MockIDBBackendMockRecorder) UpdateSuppliesList(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSuppliesList", reflect.TypeOf((*MockIDBBackend)(nil).UpdateSuppliesList), arg0, arg1, arg2)
 }

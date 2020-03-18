@@ -11,6 +11,7 @@ import (
 
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/components/aliyun"
+	"github.com/csiabb/donation-service/components/bcadapter"
 	"github.com/csiabb/donation-service/components/image"
 	"github.com/csiabb/donation-service/components/wx"
 	"github.com/csiabb/donation-service/config"
@@ -25,6 +26,7 @@ var (
 
 // Context the context of service
 type Context struct {
+	IBCAdapter    bcadapter.IBCAdapter
 	WXClient      wx.IWXClient
 	Config        *config.SrvcCfg
 	DBStorage     models.IDBBackend
@@ -47,7 +49,7 @@ func (c *Context) Init() error {
 		return fmt.Errorf("configure is nil")
 	}
 	fmt.Println("init config:", c.Config)
-	logger.Debugf("Initialization configure: %v", c.Config)
+	logger.Debugf("Initialize configure: %v", c.Config)
 
 	err := c.initStorage()
 	if nil != err {
@@ -64,6 +66,12 @@ func (c *Context) Init() error {
 	err = c.initWXBackend()
 	if nil != err {
 		logger.Errorf("Initialize wechat backend failed, %v", err)
+		return err
+	}
+
+	err = c.initBCAdapter()
+	if nil != err {
+		logger.Errorf("Initialize block chain adapter failed, %v", err)
 		return err
 	}
 
@@ -99,6 +107,17 @@ func (c *Context) initWXBackend() error {
 	c.WXClient, err = wx.NewWXBackend(&c.Config.WXCfg)
 	if err != nil {
 		logger.Errorf("Failed new wx client: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Context) initBCAdapter() error {
+	var err error
+	c.IBCAdapter, err = bcadapter.NewBCAdapterBackend(&c.Config.BCAdapterCfg)
+	if err != nil {
+		logger.Errorf("Failed new block chain adapter : %v", err)
 		return err
 	}
 

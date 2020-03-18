@@ -7,11 +7,11 @@ SPDX-License-Identifier: Apache-2.0
 package impl
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
-	"github.com/csiabb/donation-service/common/utils"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/structs"
 
@@ -29,9 +29,22 @@ func (b *DbBackendImpl) CreateFunds(tx *gorm.DB, data *models.PubFunds) error {
 		return fmt.Errorf("param is nil")
 	}
 
-	data.ID = utils.GenerateUUID()
-	err := tx.Create(data).Error
+	err := tx.Model(&models.PubFunds{}).Create(data).Error
 	return err
+}
+
+// UpdateFunds update funds information
+func (b *DbBackendImpl) UpdateFunds(tx *gorm.DB, fundsID, blockID string) error {
+	if fundsID == "" || blockID == "" {
+		return errors.New("funds or block id is \\'\\'")
+	}
+
+	err := tx.Model(&models.PubFunds{}).Where("id = ?", fundsID).Update("block_id", blockID).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateImages implement create images interface
@@ -41,7 +54,7 @@ func (b *DbBackendImpl) CreateImages(tx *gorm.DB, data []*models.Image) error {
 	}
 
 	for _, v := range data {
-		err := tx.Create(v).Error
+		err := tx.Model(&models.Image{}).Create(v).Error
 		if err != nil {
 			return err
 		}
@@ -114,7 +127,23 @@ func (b *DbBackendImpl) CreateSupplies(tx *gorm.DB, data []*models.PubSupplies) 
 	}
 
 	for _, v := range data {
-		err := tx.Create(v).Error
+		err := tx.Model(&models.PubSupplies{}).Create(v).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// UpdateSuppliesList update supplies information
+func (b *DbBackendImpl) UpdateSuppliesList(tx *gorm.DB, ps []*models.PubSupplies, data []*structs.PubResp) error {
+	if data == nil {
+		return errors.New("param is nil")
+	}
+
+	for i := 0; i < len(data); i++ {
+		err := tx.Model(&models.PubSupplies{}).Where("id = ?", ps[i].ID).Updates(models.PubSupplies{BlockID: data[i].Data.ID}).Error
 		if err != nil {
 			return err
 		}
@@ -130,7 +159,7 @@ func (b *DbBackendImpl) CreateAddresses(tx *gorm.DB, data []*models.Address) err
 	}
 
 	for _, v := range data {
-		err := tx.Create(v).Error
+		err := tx.Model(&models.Address{}).Create(v).Error
 		if err != nil {
 			return err
 		}
@@ -331,4 +360,34 @@ func (b *DbBackendImpl) QuerySuppliesDetail(id string) (*models.SuppliesDetail, 
 	}
 
 	return &detail, nil
+}
+
+// UpdateFundsBC implement update funds block chain call back
+func (b *DbBackendImpl) UpdateFundsBC(tx *gorm.DB, blockID string, funds *models.PubFunds) error {
+	if nil == funds {
+		return fmt.Errorf("param is nil")
+	}
+
+	err := tx.Model(&models.PubFunds{}).Where("block_id = ?", blockID).Updates(funds).Error
+	if err != nil {
+		logger.Errorf("update bc cb info to funds error, %v", err)
+		return err
+	}
+
+	return nil
+}
+
+// UpdateSuppliesBC implement update supplies block chain call back
+func (b *DbBackendImpl) UpdateSuppliesBC(tx *gorm.DB, blockID string, supplies *models.PubSupplies) error {
+	if nil == supplies {
+		return fmt.Errorf("param is nil")
+	}
+
+	err := tx.Model(&models.PubSupplies{}).Where("block_id = ?", blockID).Updates(supplies).Error
+	if err != nil {
+		logger.Errorf("update bc cb info to supplies error, %v", err)
+		return err
+	}
+
+	return nil
 }

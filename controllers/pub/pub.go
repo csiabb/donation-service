@@ -25,7 +25,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 
 	req := &structs.ReceiveFundsRequest{}
 	if err := c.BindJSON(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
 		return
@@ -46,7 +46,9 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		return
 	}
 
+	fundsID := utils.GenerateUUID()
 	funds := &models.PubFunds{
+		ID:                fundsID,
 		UID:               req.UID,
 		DonorName:         req.DonorName,
 		UserType:          req.UserType,
@@ -89,6 +91,55 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
 	}
+
+	acc, err := h.srvcContext.DBStorage.QueryAccount("", req.GetUIDByFundsReq())
+	if err != nil {
+		e := fmt.Errorf("query user error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	var bcJSON string
+	switch req.PubType {
+	case rest.PubTypeDonate:
+		bcJSON, err = funds.ConvertFundsDonation(images)
+	case rest.PubTypeReceive:
+		bcJSON, err = funds.ConvertFundsReceived(images)
+	case rest.PubTypeDistribute:
+		bcJSON, err = funds.ConvertFundsDistributed(images)
+	}
+
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("convert funds data error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
+		return
+	}
+
+	bcJSONs := make([]*string, 0)
+	bcJSONs = append(bcJSONs, &bcJSON)
+
+	bcResults, err := h.srvcContext.IBCAdapter.Pubs(acc.DID, bcJSONs)
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("publicity funds error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
+		return
+	}
+
+	err = h.srvcContext.DBStorage.UpdateFunds(tx, fundsID, bcResults[0].Data.ID)
+
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("update funds tx id error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
+		return
+	}
+
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(nil))
@@ -103,7 +154,7 @@ func (h *RestHandler) QueryFunds(c *gin.Context) {
 	req := &structs.QueryFundsRequest{}
 	var err error
 	if err = c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
 		return
@@ -167,7 +218,7 @@ func (h *RestHandler) QueryFundsDetail(c *gin.Context) {
 	req := &structs.FundsDetailRequest{}
 	var err error
 	if err = c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
 		return
@@ -256,7 +307,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 
 	req := &structs.ReceiveSuppliesRequest{}
 	if err := c.BindJSON(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
 		return
@@ -273,10 +324,12 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	ps := make([]*models.PubSupplies, 0)
 	addrs := make([]*models.Address, 0)
 	images := make([]*models.Image, 0)
+	bcJSONs := make([]*string, 0)
 
 	for _, v := range req.SuppliesItem {
 		suppliesID := utils.GenerateUUID()
-		ps = append(ps, &models.PubSupplies{
+
+		pubSupplies := &models.PubSupplies{
 			ID:         suppliesID,
 			WayBillNum: req.WayBillNum,
 			UID:        req.UID,
@@ -289,9 +342,10 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 			Number:     v.Number,
 			Unit:       v.Unit,
 			Remark:     req.Remark,
-		})
+		}
+		ps = append(ps, pubSupplies)
 
-		addrs = append(addrs, &models.Address{
+		billingAddr := &models.Address{
 			ID:        utils.GenerateUUID(),
 			UID:       req.UID,
 			RelatedID: suppliesID,
@@ -302,9 +356,10 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 			District:  req.BillingAddress.District,
 			Address:   req.BillingAddress.Address,
 			ZipCode:   req.BillingAddress.ZipCode,
-		})
+		}
+		addrs = append(addrs, billingAddr)
 
-		addrs = append(addrs, &models.Address{
+		shippingAddr := &models.Address{
 			ID:        utils.GenerateUUID(),
 			UID:       req.UID,
 			RelatedID: suppliesID,
@@ -315,7 +370,8 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 			District:  req.ShippingAddress.District,
 			Address:   req.ShippingAddress.Address,
 			ZipCode:   req.ShippingAddress.ZipCode,
-		})
+		}
+		addrs = append(addrs, shippingAddr)
 
 		for _, v := range req.PubProofImage {
 			images = append(images, &models.Image{
@@ -327,10 +383,40 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 				Format:    v.Format,
 			})
 		}
+
+		// publish to block chain
+		var bcJSON string
+		var err error
+
+		switch req.PubType {
+		case rest.PubTypeDonate:
+			bcJSON, err = pubSupplies.ConvertSuppliesDonation(billingAddr, shippingAddr, images)
+		case rest.PubTypeReceive:
+			bcJSON, err = pubSupplies.ConvertSuppliesReceived(billingAddr, shippingAddr, images)
+		case rest.PubTypeDistribute:
+			bcJSON, err = pubSupplies.SuppliesDistributed(billingAddr, shippingAddr, images)
+		}
+
+		if err != nil {
+			e := fmt.Errorf("convert supplies data error, %s", err.Error())
+			logger.Error(e)
+			c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+			return
+		}
+
+		bcJSONs = append(bcJSONs, &bcJSON)
+	}
+
+	acc, err := h.srvcContext.DBStorage.QueryAccount("", req.GetUIDBySuppliesReq())
+	if err != nil {
+		e := fmt.Errorf("query user error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
 	}
 
 	tx := h.srvcContext.DBStorage.GetDBTransaction()
-	err := h.srvcContext.DBStorage.CreateSupplies(tx, ps)
+	err = h.srvcContext.DBStorage.CreateSupplies(tx, ps)
 	if err != nil {
 		h.srvcContext.DBStorage.DBTransactionRollback(tx)
 		e := fmt.Errorf("create supplies error, %s", err.Error())
@@ -356,6 +442,25 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
 	}
+
+	bcResults, err := h.srvcContext.IBCAdapter.Pubs(acc.DID, bcJSONs)
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("publish supplies data to block chain error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
+		return
+	}
+
+	err = h.srvcContext.DBStorage.UpdateSuppliesList(tx, ps, bcResults)
+	if err != nil {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("update supplies tx id error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(nil))
@@ -369,7 +474,7 @@ func (h *RestHandler) QuerySupplies(c *gin.Context) {
 	req := &structs.QuerySuppliesRequest{}
 	var err error
 	if err = c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
 		return
@@ -433,7 +538,7 @@ func (h *RestHandler) QuerySuppliesDetail(c *gin.Context) {
 	req := &structs.SuppliesDetailRequest{}
 	var err error
 	if err = c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
 		return
@@ -522,7 +627,7 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 	req := &structs.PubUserRequest{}
 	var err error
 	if err = c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
 		return

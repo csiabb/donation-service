@@ -22,7 +22,7 @@ func (h *RestHandler) QueryOrgCharities(c *gin.Context) {
 
 	req := &structs.QueryOrgCharitiesRequest{}
 	if err := c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
 		return
@@ -66,7 +66,7 @@ func (h *RestHandler) QueryOrgCharitiesDetail(c *gin.Context) {
 
 	req := &structs.OrgCharitiesDetailRequest{}
 	if err := c.Bind(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
 		return

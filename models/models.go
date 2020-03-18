@@ -26,7 +26,7 @@ type Account struct {
 	BankCardNum    string `gorm:"type:varchar(64)"`              // bank card num
 	TaxID          string `gorm:"type:varchar(128)"`             // tax id
 	ShippingAddrID string `gorm:"type:varchar(256)"`             // shipping address id
-	Did            string `gorm:"type:varchar(64)"`              // did
+	DID            string `gorm:"type:varchar(128)"`             // did
 	Remark         string `gorm:"type:text"`                     // description
 	OpenID         string `gorm:"type:varchar(256)"`             // open id of wechat app
 	UnionID        string `gorm:"type:varchar(256)"`             // id of wechat app
@@ -129,9 +129,10 @@ type PubFunds struct {
 	PubType           string          `gorm:"type:varchar(16)"`              // the type of publicity
 	PayType           string          `gorm:"type:varchar(16)"`              // pay type
 	Amount            decimal.Decimal `gorm:"type:decimal(30,4)"`            // the amount of publicity funds
-	TxID              string          `gorm:"type:varchar(256)"`             // block chain tx id
 	Remark            string          `gorm:"size:1024"`                     // remark
 	BlockType         string          `gorm:"type:varchar(32)"`              // block type
+	BlockID           string          `gorm:"type:varchar(256)"`             // block chain id
+	TxID              string          `gorm:"type:varchar(256)"`             // block chain tx id
 	BlockHeight       int64           // block height
 	BlockTime         int64           // block time
 	CreatedAt         time.Time
@@ -154,6 +155,7 @@ type PubSupplies struct {
 	Name        string `gorm:"type:varchar(512)"`             // name
 	Number      int64  // number
 	Unit        string `gorm:"type:varchar(32)"`  // unit
+	BlockID     string `gorm:"type:varchar(256)"` // block chain id
 	TxID        string `gorm:"type:varchar(256)"` // block chain tx id
 	Remark      string `gorm:"size:1024"`         // remark
 	BlockType   string `gorm:"type:varchar(32)"`  // block type

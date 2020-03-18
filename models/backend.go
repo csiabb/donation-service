@@ -22,14 +22,18 @@ type IDBBackend interface {
 	DBTransactionRollback(*gorm.DB)
 
 	// account
-	CheckAccount(openID string) (*Account, error)
+	QueryAccount(openID, uid string) (*Account, error)
 	CreateAccount(*Account) error
 
 	// publicity
 	CreateFunds(*gorm.DB, *PubFunds) error
+	UpdateFunds(tx *gorm.DB, fundsID, blockID string) error
+	UpdateFundsBC(tx *gorm.DB, blockID string, funds *PubFunds) error
 	QueryFunds(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubFunds, error)
 	QueryFundsDetail(id string) (*FundsDetail, error)
 	CreateSupplies(*gorm.DB, []*PubSupplies) error
+	UpdateSuppliesList(*gorm.DB, []*PubSupplies, []*structs.PubResp) error
+	UpdateSuppliesBC(tx *gorm.DB, blockID string, supplies *PubSupplies) error
 	QuerySupplies(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubSupplies, error)
 	QuerySuppliesDetail(id string) (*SuppliesDetail, error)
 	QueryPubByUserType(userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)

@@ -20,6 +20,7 @@ const (
 	PermissionDenied        = 1009 // permission denied
 	InternalServerFailure   = 1012 // internal server failure
 	RepeatRegistration      = 1013 // repeat registration
+	PubToBlockChainFailure  = 1014 // publicity to block chain failure
 )
 
 // wechat error code

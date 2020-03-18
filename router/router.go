@@ -13,6 +13,7 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	srvctx "github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/controllers/acc"
+	"github.com/csiabb/donation-service/controllers/bc"
 	"github.com/csiabb/donation-service/controllers/image"
 	"github.com/csiabb/donation-service/controllers/org"
 	"github.com/csiabb/donation-service/controllers/pub"
@@ -41,6 +42,9 @@ const (
 	// acc
 	urlAccLoginWXApp = "acc/login/wxapp"
 
+	// block chain
+	urlBCCallBack = "bc/cb"
+
 	// pub
 	urlPubFunds          = "pub/funds"
 	urlPubFundsDetail    = "pub/funds/detail"
@@ -65,6 +69,7 @@ type Router struct {
 	orgHandler     *org.RestHandler
 	accHandler     *acc.RestHandler
 	imageHandler   *image.RestHandler
+	bcHandler      *bc.RestHandler
 }
 
 // InitRouter init router
@@ -107,6 +112,12 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 		return err
 	}
 
+	r.bcHandler, err = bc.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create block chain rest http handler instance, %+v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -127,6 +138,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 
 		// account
 		apiPrefix.POST(urlAccLoginWXApp, r.accHandler.LoginWXApp)
+
+		// block chain
+		apiPrefix.POST(urlBCCallBack, r.bcHandler.BlockChainCallBack)
 
 		// publicity
 		apiPrefix.POST(urlPubFunds, r.pubHandler.ReceiveFunds)

@@ -6,6 +6,13 @@ SPDX-License-Identifier: Apache-2.0
 
 package rest
 
+// comm http header
+const (
+	HeaderAccept          = "Accept"
+	HeaderContentType     = "Content-Type"
+	HeaderApplicationJSON = "application/json"
+)
+
 // user source
 const (
 	SourceWechat = "wx"

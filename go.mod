@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.0.7+incompatible
 	github.com/gin-gonic/gin v1.5.0
+	github.com/go-resty/resty/v2 v2.2.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/mock v1.4.1
 	github.com/hunterhug/go_image v0.0.0-20190710020854-8922226c5f4b
