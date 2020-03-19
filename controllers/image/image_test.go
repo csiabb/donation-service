@@ -23,7 +23,7 @@ import (
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/components/aliyun/mock_backend"
 	image_mock "github.com/csiabb/donation-service/components/image/mock_backend"
-	wx_mock "github.com/csiabb/donation-service/components/wx/mock_backend"
+	wx_mock "github.com/csiabb/donation-service/components/wx/mock_wx"
 	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/models"
