@@ -5,11 +5,14 @@
 package mock_wx
 
 import (
+  	image "image"
+	reflect "reflect"
+  
 	wx "github.com/csiabb/donation-service/components/wx"
 	structs "github.com/csiabb/donation-service/structs"
+  
 	gomock "github.com/golang/mock/gomock"
-	image "image"
-	reflect "reflect"
+
 )
 
 // MockIWXClient is a mock of IWXClient interface
@@ -79,6 +82,7 @@ func (mr *MockIWXClientMockRecorder) DecryptUserInfo(arg0, arg1, arg2, arg3, arg
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptUserInfo", reflect.TypeOf((*MockIWXClient)(nil).DecryptUserInfo), arg0, arg1, arg2, arg3, arg4)
 }
+
 
 // GetAccessToken mocks base method
 func (m *MockIWXClient) GetAccessToken(arg0, arg1 string) (string, error) {
