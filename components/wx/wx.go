@@ -7,6 +7,7 @@
 package wx
 
 import (
+	"image"
 	"net/http"
 
 	"github.com/csiabb/donation-service/structs"
@@ -18,6 +19,8 @@ type IWXClient interface {
 	DecryptUserInfo(rawData, encryptedData, signature, iv, ssk string) (ui UserInfo, err error)
 	DecryptPhoneNumber(ssk, data, iv string) (phone PhoneNumber, err error)
 	CheckFinger(finger structs.FingerRequest, accessToken string) (*structs.FingerResponse, error)
+	GetWXACode(token string, scene string) (image.Image, error)
+	GetAccessToken(appID string, secret string) (string, error)
 }
 
 // ClientCfg ...

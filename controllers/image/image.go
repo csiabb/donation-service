@@ -8,11 +8,10 @@ package image
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/common/utils"
 	"github.com/csiabb/donation-service/structs"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +32,7 @@ func (h *RestHandler) Upload(c *gin.Context) {
 
 	imageFileTag := utils.GenerateUUID()
 
-	if err = h.srvcContext.ALiYunServices.UploadObject(imageFileTag+".png", fileRec); err != nil {
+	if err = h.srvcContext.ALiYunBackend.UploadObject(imageFileTag+".png", fileRec); err != nil {
 		e := fmt.Errorf("image upload error : %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))
@@ -46,4 +45,44 @@ func (h *RestHandler) Upload(c *gin.Context) {
 
 	logger.Info("response image upload success.")
 	return
+}
+
+// Share define share of image
+func (h *RestHandler) Share(c *gin.Context) {
+	logger.Infof("Got query share request")
+
+	req := &structs.ShareRequest{}
+	if err := c.Bind(req); err != nil {
+		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
+		return
+	}
+	logger.Debugf("request params, %v", req)
+
+	var err error
+	var content, imagUrl string
+	if req.ShareType == rest.DonationProve {
+		content = rest.ShareDonationContent
+		if imagUrl, err = h.GetImageURL(req); err != nil {
+			e := fmt.Errorf("get image url err : %s", err.Error())
+			logger.Error(e)
+			c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
+			return
+		}
+	} else {
+		content = rest.ShareHomeContent
+		imagUrl = rest.ShareImageURL
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.ShareResp{
+		Icon:     rest.ShareIcon,
+		Title:    rest.ShareTitle,
+		Content:  content,
+		ImageURL: imagUrl,
+	}))
+
+	logger.Info("response share success.")
+	return
+
 }

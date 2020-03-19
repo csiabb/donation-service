@@ -12,6 +12,7 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/components/aliyun"
 	"github.com/csiabb/donation-service/components/database"
+	"github.com/csiabb/donation-service/components/image"
 	"github.com/csiabb/donation-service/components/wx"
 )
 
@@ -31,6 +32,7 @@ type SrvcCfg struct {
 	Database        database.DBConnectCfg
 	WXCfg           wx.ClientCfg
 	ALiYun          aliyun.Config
+	Image           image.Config
 	LocalFileSystem string
 }
 

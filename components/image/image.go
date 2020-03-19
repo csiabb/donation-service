@@ -33,6 +33,7 @@ type Client struct {
 	Bg          *image.NRGBA
 	Font        *freetype.Context
 	FontType    *truetype.Font
+	WXClient    wx.IWXClient
 }
 
 // Init initializes a new background image
@@ -78,14 +79,13 @@ func (c *Client) Init() error {
 	font.SetDst(bg)
 
 	c.Font = font
-
 	return nil
 }
 
 // CreateQrCode  create a wx qr code
 func (c *Client) CreateWXQrCode(appID string, secret string, scene string) (img image.Image, err error) {
-	token, err := wx.GetAccessToken(appID, secret)
-	qrCode, err := wx.GetWXACode(token, scene)
+	token, err := c.WXClient.GetAccessToken(appID, secret)
+	qrCode, err := c.WXClient.GetWXACode(token, scene)
 	return qrCode, err
 }
 

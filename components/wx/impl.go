@@ -170,7 +170,7 @@ func (c *Client) CheckFinger(finger structs.FingerRequest, accessToken string) (
 }
 
 // GetAccessToken ...
-func GetAccessToken(appID string, secret string) (string, error) {
+func (c *Client) GetAccessToken(appID string, secret string) (string, error) {
 	wxURL := fmt.Sprintf(accessTokenURL, wxAddress, appID, secret)
 	logger.Debugf("Get access token url: %v", wxURL)
 	response, err := http.Get(wxURL)
@@ -198,7 +198,7 @@ func GetAccessToken(appID string, secret string) (string, error) {
 }
 
 // GetWXACode ...
-func GetWXACode(token string, scene string) (image.Image, error) {
+func (c *Client) GetWXACode(token string, scene string) (image.Image, error) {
 	wxURL := fmt.Sprintf(wxacodeURL, token)
 	logger.Debugf("Get wx code url: %v", wxURL)
 	var req = &GetWXACodeRequest{
