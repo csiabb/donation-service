@@ -5,14 +5,11 @@
 package mock_wx
 
 import (
-  	image "image"
-	reflect "reflect"
-  
 	wx "github.com/csiabb/donation-service/components/wx"
 	structs "github.com/csiabb/donation-service/structs"
-  
 	gomock "github.com/golang/mock/gomock"
-
+	image "image"
+	reflect "reflect"
 )
 
 // MockIWXClient is a mock of IWXClient interface
@@ -83,7 +80,6 @@ func (mr *MockIWXClientMockRecorder) DecryptUserInfo(arg0, arg1, arg2, arg3, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptUserInfo", reflect.TypeOf((*MockIWXClient)(nil).DecryptUserInfo), arg0, arg1, arg2, arg3, arg4)
 }
 
-
 // GetAccessToken mocks base method
 func (m *MockIWXClient) GetAccessToken(arg0, arg1 string) (string, error) {
 	m.ctrl.T.Helper()
@@ -99,19 +95,19 @@ func (mr *MockIWXClientMockRecorder) GetAccessToken(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccessToken", reflect.TypeOf((*MockIWXClient)(nil).GetAccessToken), arg0, arg1)
 }
 
-// GetWXACode mocks base method
-func (m *MockIWXClient) GetWXACode(arg0, arg1 string) (image.Image, error) {
+// GetWXQrCode mocks base method
+func (m *MockIWXClient) GetWXQrCode(arg0, arg1 string) (image.Image, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetWXACode", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetWXQrCode", arg0, arg1)
 	ret0, _ := ret[0].(image.Image)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetWXACode indicates an expected call of GetWXACode
-func (mr *MockIWXClientMockRecorder) GetWXACode(arg0, arg1 interface{}) *gomock.Call {
+// GetWXQrCode indicates an expected call of GetWXQrCode
+func (mr *MockIWXClientMockRecorder) GetWXQrCode(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWXACode", reflect.TypeOf((*MockIWXClient)(nil).GetWXACode), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWXQrCode", reflect.TypeOf((*MockIWXClient)(nil).GetWXQrCode), arg0, arg1)
 }
 
 // WXLogin mocks base method

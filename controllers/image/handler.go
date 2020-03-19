@@ -108,8 +108,9 @@ func (h *RestHandler) CreateDonationImage(req *structs.ShareRequest, tag string)
 func (h *RestHandler) GetImageURL(req *structs.ShareRequest) (string, error) {
 	var err error
 	var isExist bool
-	imagURL := h.srvcContext.Config.LocalFileSystem + h.URL(req, 1) + ".png"
-	if isExist, err = h.srvcContext.ALiYunBackend.IsExist(imagURL); err != nil {
+	tag := h.URL(req, 1)
+	imagURL := h.srvcContext.Config.LocalFileSystem + tag + ".png"
+	if isExist, err = h.srvcContext.ALiYunBackend.IsExist(tag + ".png"); err != nil {
 		return "", err
 	}
 
@@ -117,7 +118,7 @@ func (h *RestHandler) GetImageURL(req *structs.ShareRequest) (string, error) {
 		return imagURL, nil
 	}
 
-	if err = h.CreateDonationImage(req, imagURL); err != nil {
+	if err = h.CreateDonationImage(req, tag); err != nil {
 		return "", err
 	}
 

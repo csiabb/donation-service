@@ -21,7 +21,7 @@ type IWXClient interface {
 	DecryptUserInfo(rawData, encryptedData, signature, iv, ssk string) (ui UserInfo, err error)
 	DecryptPhoneNumber(ssk, data, iv string) (phone PhoneNumber, err error)
 	CheckFinger(finger structs.FingerRequest, accessToken string) (*structs.FingerResponse, error)
-	GetWXACode(token string, scene string) (image.Image, error)
+	GetWXQrCode(token string, scene string) (image.Image, error)
 	GetAccessToken(appID string, secret string) (string, error)
 }
 
@@ -85,8 +85,8 @@ type PhoneNumber struct {
 	Watermark       watermark `json:"watermark"`
 }
 
-// GetWXACodeRequest ...
-type GetWXACodeRequest struct {
+// GetWXQRCodeRequest ...
+type GetWXQRCodeRequest struct {
 	Scene     string      `json:"scene"`
 	Width     int64       `json:"width"`
 	AutoColor bool        `json:"auto_color"`

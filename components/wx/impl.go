@@ -39,7 +39,7 @@ const (
 	wxAddress      = "https://api.weixin.qq.com"
 	checkFingerURL = "%s/cgi-bin/soter/verify_signature?access_token=%s"
 	accessTokenURL = "%s/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s"
-	wxacodeURL     = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s"
+	wxacodeURL     = "%s/wxa/getwxacodeunlimit?access_token=%s"
 )
 
 // NewWXBackend returns a handle to the agent endpoints
@@ -197,11 +197,11 @@ func (c *Client) GetAccessToken(appID string, secret string) (string, error) {
 	return body.AccessToken, nil
 }
 
-// GetWXACode ...
-func (c *Client) GetWXACode(token string, scene string) (image.Image, error) {
-	wxURL := fmt.Sprintf(wxacodeURL, token)
+// GetWXQrCode get WeChat qr code
+func (c *Client) GetWXQrCode(token string, scene string) (image.Image, error) {
+	wxURL := fmt.Sprintf(wxacodeURL, wxAddress, token)
 	logger.Debugf("Get wx code url: %v", wxURL)
-	var req = &GetWXACodeRequest{
+	var req = &GetWXQRCodeRequest{
 		Scene:     scene,
 		Width:     width,
 		LineColor: lineColor,

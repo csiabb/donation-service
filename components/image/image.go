@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	logger = log.MustGetLogger("components/image")
+	logger = log.MustGetLogger("image")
 )
 
 // Client image services client
@@ -82,10 +82,10 @@ func (c *Client) Init() error {
 	return nil
 }
 
-// CreateWXQrCode  create a wx qr code
+// CreateWXQrCode create a wx qr code
 func (c *Client) CreateWXQrCode(appID string, secret string, scene string) (img image.Image, err error) {
 	token, err := c.WXClient.GetAccessToken(appID, secret)
-	qrCode, err := c.WXClient.GetWXACode(token, scene)
+	qrCode, err := c.WXClient.GetWXQrCode(token, scene)
 	return qrCode, err
 }
 

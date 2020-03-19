@@ -43,36 +43,37 @@ func GetServerContext() *Context {
 // Init init service context
 func (c *Context) Init() error {
 	if nil == c.Config {
-		logger.Errorf("Initalize faild, configure is nil")
+		logger.Errorf("Initialize failed, configure is nil")
 		return fmt.Errorf("configure is nil")
 	}
 	fmt.Println("init config:", c.Config)
-	logger.Debugf("Initalization configure: %v", c.Config)
+	logger.Debugf("Initialization configure: %v", c.Config)
 
 	err := c.initStorage()
 	if nil != err {
-		logger.Errorf("Initalize database storage faild, %v", err)
+		logger.Errorf("Initialize database storage failed, %v", err)
 		return err
 	}
 
 	err = c.initALiYunServices()
 	if nil != err {
-		logger.Errorf("Initalize aliyun services faild, %v", err)
+		logger.Errorf("Initialize aliyun services failed, %v", err)
 		return err
 	}
 
 	err = c.initWXBackend()
 	if nil != err {
-		logger.Errorf("Initalize wechat backend faild, %v", err)
+		logger.Errorf("Initialize wechat backend failed, %v", err)
 		return err
 	}
 
 	err = c.initImageBackend()
 	if nil != err {
-
+		logger.Errorf("Initialize image backend failed, %v", err)
+		return err
 	}
 
-	logger.Infof("initalize context success.")
+	logger.Infof("Initialize context success.")
 
 	return nil
 }

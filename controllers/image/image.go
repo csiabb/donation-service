@@ -8,10 +8,11 @@ package image
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/common/utils"
 	"github.com/csiabb/donation-service/structs"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
