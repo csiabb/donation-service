@@ -13,6 +13,8 @@ import (
 	"github.com/csiabb/donation-service/structs"
 )
 
+//go:generate mockgen -destination=mock_wx/mock_wx.go -package=mock_wx github.com/csiabb/donation-service/components/wx IWXClient
+
 // IWXClient defines the wx client interface
 type IWXClient interface {
 	WXLogin(appID string, secret string, code string) (lres LoginResponse, err error)
