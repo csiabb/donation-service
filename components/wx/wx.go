@@ -7,10 +7,13 @@
 package wx
 
 import (
+	"image"
 	"net/http"
 
 	"github.com/csiabb/donation-service/structs"
 )
+
+//go:generate mockgen -destination=mock_wx/mock_wx.go -package=mock_wx github.com/csiabb/donation-service/components/wx IWXClient
 
 // IWXClient defines the wx client interface
 type IWXClient interface {
@@ -18,6 +21,8 @@ type IWXClient interface {
 	DecryptUserInfo(rawData, encryptedData, signature, iv, ssk string) (ui UserInfo, err error)
 	DecryptPhoneNumber(ssk, data, iv string) (phone PhoneNumber, err error)
 	CheckFinger(finger structs.FingerRequest, accessToken string) (*structs.FingerResponse, error)
+	GetWXACode(token string, scene string) (image.Image, error)
+	GetAccessToken(appID string, secret string) (string, error)
 }
 
 // ClientCfg ...

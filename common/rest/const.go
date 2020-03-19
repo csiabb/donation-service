@@ -75,9 +75,11 @@ const (
 
 // define default info of share
 const (
-	ShareTitle    = "众行公益链"
-	ShareIcon     = ""
-	ShareImageURL = ""
+	ShareTitle           = "众行公益链"
+	ShareIcon            = ""
+	ShareImageURL        = ""
+	ShareHomeContent     = "体验区块链技术！众行公益链邀请您一起，见证爱心行动"
+	ShareDonationContent = "你的爱心行动被永久登记到区块链啦～你也来试试吧"
 )
 
 // define length and width of donation image

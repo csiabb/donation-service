@@ -8,6 +8,8 @@ package image
 
 import "image"
 
+//go:generate mockgen -destination=mock_backend/mock_backend.go -package=mock_backend github.com/csiabb/donation-service/components/image IImageBackend
+
 // IImageBackend ...
 type IImageBackend interface {
 	Init() error

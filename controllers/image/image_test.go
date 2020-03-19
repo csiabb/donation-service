@@ -9,6 +9,7 @@ package image
 import (
 	"bytes"
 	"encoding/json"
+	"image"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -17,34 +18,50 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/components/aliyun/mock_backend"
+	image_mock "github.com/csiabb/donation-service/components/image/mock_backend"
+	wx_mock "github.com/csiabb/donation-service/components/wx/mock_wx"
+	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/context"
+	"github.com/csiabb/donation-service/models"
+	storage "github.com/csiabb/donation-service/models/mock_backend"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 )
 
-func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIALiYunBackend, *httptest.ResponseRecorder, *gin.Context) {
+func Init(t *testing.T) (*gomock.Controller, *RestHandler, *storage.MockIDBBackend, *mock_backend.MockIALiYunBackend, *image_mock.MockIImageBackend,
+	*wx_mock.MockIWXClient, *httptest.ResponseRecorder, *gin.Context) {
 	mockCtl := gomock.NewController(t)
-	mockBackend := mock_backend.NewMockIALiYunBackend(mockCtl)
-
+	mockBackend := storage.NewMockIDBBackend(mockCtl)
+	aliyunMockBackend := mock_backend.NewMockIALiYunBackend(mockCtl)
+	imageMockBackend := image_mock.NewMockIImageBackend(mockCtl)
+	accMockBackend := wx_mock.NewMockIWXClient(mockCtl)
 	// init mock handler
 	handler := RestHandler{}
 	handler.srvcContext = &context.Context{}
-	handler.srvcContext.ALiYunServices = mockBackend
+	handler.srvcContext.ALiYunBackend = aliyunMockBackend
+	handler.srvcContext.ImageBackend = imageMockBackend
+	handler.srvcContext.WXClient = accMockBackend
+	handler.srvcContext.DBStorage = mockBackend
+	handler.srvcContext.Config = &config.SrvcCfg{
+		LocalFileSystem: "",
+	}
+
 	// init test mode gin
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	return mockCtl, &handler, mockBackend, w, c
+	return mockCtl, &handler, mockBackend, aliyunMockBackend, imageMockBackend, accMockBackend, w, c
 }
 
 // TestRestHandler_Upload test the upload of image
 func TestRestHandler_Upload(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, _, aliyunMockBackend, _, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	imgFile, _ := os.Open("../../build/bin/bg.png")
@@ -57,12 +74,163 @@ func TestRestHandler_Upload(t *testing.T) {
 	io.Copy(part, imgFile)
 	writer.Close()
 
-	mockBackend.EXPECT().UploadObject(gomock.Any(), gomock.Any()).Return(nil)
-
+	aliyunMockBackend.EXPECT().UploadObject(gomock.Any(), gomock.Any()).Return(nil)
 	c.Request, _ = http.NewRequest(http.MethodPost, "/api/v1/image/upload", body)
 	c.Request.Header.Add("Content-Type", writer.FormDataContentType())
 
 	handler.Upload(c)
+	CommRespCheck(t, w)
+}
+
+// TestRestHandler_Share test the share of image
+func TestRestHandler_Share(t *testing.T) {
+	mockCtl, handler, mockBackend, aliyunMockBackend, imageMockBackend, _, w, c := Init(t)
+	defer mockCtl.Finish()
+
+	dst := image.NewNRGBA(image.Rect(0, 0, 120, 120*150/150))
+	url := "/api/v1/image/share?share_type=donation_prove&donation_type=supplies&donation_id=supplies_id&scene=1012"
+
+	aliyunMockBackend.EXPECT().UploadObject(gomock.Any(), gomock.Any()).Return(nil)
+	aliyunMockBackend.EXPECT().IsExist(gomock.Any()).Return(false, nil)
+	imageMockBackend.EXPECT().CreateDonationImage(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(dst, nil)
+	mockBackend.EXPECT().QuerySuppliesDetail(gomock.Any()).Return(&models.SuppliesDetail{
+		Supplies: models.PubSupplies{
+			ID:          "supplies_id_test",
+			WayBillNum:  "8292-2323-3232",
+			UID:         "uid_test",
+			DonorName:   "donor_name_test",
+			UserType:    "normal",
+			AidUID:      "",
+			AidName:     "",
+			TargetUID:   "target_uid_test",
+			TargetName:  "target_name_test",
+			PubType:     "donate",
+			Name:        "3M 一次性口罩",
+			Number:      2320,
+			Unit:        "个",
+			TxID:        "",
+			Remark:      "",
+			BlockType:   "",
+			BlockHeight: 0,
+			BlockTime:   0,
+			CreatedAt:   time.Now(),
+		},
+		BillingAddr: models.Address{
+			ID:        "addr_id",
+			UID:       "uid_test",
+			RelatedID: "supplies_id_test",
+			Type:      "billing",
+			Country:   "中国",
+			Province:  "江苏",
+			City:      "徐州",
+			District:  "云龙",
+			Address:   "云龙湖小区32号",
+			ZipCode:   "221400",
+			CreatedAt: time.Now(),
+		},
+		ShippingAddr: models.Address{
+			ID:        "addr_id",
+			UID:       "uid_test",
+			RelatedID: "supplies_id_test",
+			Type:      "shipping",
+			Country:   "中国",
+			Province:  "",
+			City:      "北京",
+			District:  "昌平区",
+			Address:   "龙泽苑小区32号",
+			ZipCode:   "100000",
+			CreatedAt: time.Now(),
+		},
+		ProofImages: []*models.Image{
+			{
+				ID:        "image_id",
+				RelatedID: "supplies_id_test",
+				Type:      "proof",
+				URL:       "www.baidu.com/aaa.png",
+				Hash:      "aadkaaka",
+				Index:     "aabbcc",
+				Format:    "png",
+				CreatedAt: time.Now(),
+			},
+		},
+	}, nil)
+
+	/*mockBackend.EXPECT().QueryFundsDetail(gomock.Any()).Return(&models.FundsDetail{
+		Funds: models.PubFunds{
+			ID:                "funds_id",
+			UID:               "uid_test",
+			DonorName:         "donor_name_test",
+			UserType:          "normal",
+			AidUID:            "aid_uid",
+			AidName:           "aid_name_test",
+			AidBankCardNum:    "2233-9933-2232-2323",
+			TargetUID:         "target_uid",
+			TargetName:        "target_name_test",
+			TargetBankCardNum: "2233-9933-2232-9233",
+			PubType:           "pub_type",
+			PayType:           "pay_type",
+			Amount:            decimal.NewFromInt(20),
+			TxID:              "",
+			Remark:            "remark test",
+			BlockType:         "",
+			BlockHeight:       0,
+			BlockTime:         0,
+			CreatedAt:         time.Now(),
+			UpdatedAt:         time.Time{},
+			DeletedAt:         nil,
+		},
+		BillingAddr: models.Address{
+			ID:        "address_billing_id",
+			UID:       "uid_test",
+			Type:      "billing",
+			Country:   "cn",
+			Province:  "jiangsu",
+			City:      "xuzhou",
+			District:  "huabei",
+			Address:   "xihuanlu50",
+			ZipCode:   "221411",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: nil,
+		},
+		ShippingAddr: models.Address{
+			ID:        "address_shipping_id",
+			UID:       "uid_test",
+			Type:      "shipping",
+			Country:   "cn",
+			Province:  "beijing",
+			City:      "beijing",
+			District:  "huabei",
+			Address:   "tiananmen",
+			ZipCode:   "100000",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: nil,
+		},
+		ProofImages: []*models.Image{
+			{
+				ID:        "image_id",
+				RelatedID: "funds_id",
+				Type:      "proof",
+				URL:       "www.baidu.com",
+				Hash:      "aabbcc",
+				Index:     "adkadkadk",
+				Format:    "png",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				DeletedAt: nil,
+			},
+		},
+	}, nil)*/
+
+	// accMockBackend.EXPECT().GetAccessToken(gomock.Any(), gomock.Any()).Return("token", nil)
+	// accMockBackend.EXPECT().GetWXACode(gomock.Any(), gomock.Any()).Return(dst, nil)
+
+	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
+	c.Request.Header.Add("Accept", "application/json")
+
+	handler.Share(c)
 	CommRespCheck(t, w)
 }
 
