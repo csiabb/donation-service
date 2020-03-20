@@ -82,7 +82,7 @@ func (c *Client) Init() error {
 	return nil
 }
 
-// CreateQrCode  create a wx qr code
+// CreateWXQrCode create a wx qr code
 func (c *Client) CreateWXQrCode(appID string, secret string, scene string) (img image.Image, err error) {
 	token, err := wx.GetAccessToken(appID, secret)
 	qrCode, err := wx.GetWXACode(token, scene)
