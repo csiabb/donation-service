@@ -14,5 +14,6 @@ import (
 
 // IALiYunBackend aliyun services interface
 type IALiYunBackend interface {
+	IsExist(name string) (bool, error)
 	UploadObject(name string, content io.Reader) error
 }
