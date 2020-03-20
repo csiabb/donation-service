@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	logger = log.MustGetLogger("models/aliyun")
+	logger = log.MustGetLogger("aliyun")
 )
 
 // BackendImpl ...

@@ -53,7 +53,7 @@ Database:
 # - aliyun to store image donation data
 #
 ################################################################################
-ALiYun:
+ALiYunCfg:
     Endpoint: https://oss-cn-beijing.aliyuncs.com
     AccessKeyID: test
     AccessKeySecret: test
@@ -70,3 +70,19 @@ WXCfg:
     Secret: 123456
     Name: zx
     Env: debug
+
+################################################################################
+#
+# local file system
+#
+################################################################################
+LocalFileSystem: https://127.0.0.1:8888/
+
+################################################################################
+#
+# image configuration
+#
+################################################################################
+ImageCfg:
+    BackgroundPath: bg.png
+    FontPath: SourceHanSansCN-Regular.ttf

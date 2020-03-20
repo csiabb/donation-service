@@ -33,7 +33,7 @@ func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIAL
 	// init mock handler
 	handler := RestHandler{}
 	handler.srvcContext = &context.Context{}
-	handler.srvcContext.ALiYunServices = mockBackend
+	handler.srvcContext.ALiYunBackend = mockBackend
 	// init test mode gin
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()

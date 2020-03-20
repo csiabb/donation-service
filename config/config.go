@@ -12,6 +12,7 @@ import (
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/components/aliyun"
 	"github.com/csiabb/donation-service/components/database"
+	"github.com/csiabb/donation-service/components/image"
 	"github.com/csiabb/donation-service/components/wx"
 )
 
@@ -26,11 +27,13 @@ var (
 
 // SrvcCfg  service configure
 type SrvcCfg struct {
-	ServerGeneral ServerGeneralCfg
-	Log           log.Config
-	Database      database.DBConnectCfg
-	WXCfg         wx.ClientCfg
-	ALiYun        aliyun.Config
+	ServerGeneral   ServerGeneralCfg
+	Log             log.Config
+	Database        database.DBConnectCfg
+	WXCfg           wx.ClientCfg
+	ALiYunCfg       aliyun.Config
+	ImageCfg        image.Config
+	LocalFileSystem string
 }
 
 // ServerGeneralCfg general configure of service

@@ -7,6 +7,7 @@
 package wx
 
 import (
+	"image"
 	"net/http"
 
 	"github.com/csiabb/donation-service/structs"
@@ -20,6 +21,8 @@ type IWXClient interface {
 	DecryptUserInfo(rawData, encryptedData, signature, iv, ssk string) (ui UserInfo, err error)
 	DecryptPhoneNumber(ssk, data, iv string) (phone PhoneNumber, err error)
 	CheckFinger(finger structs.FingerRequest, accessToken string) (*structs.FingerResponse, error)
+	GetWXQrCode(token string, scene string) (image.Image, error)
+	GetAccessToken(appID string, secret string) (string, error)
 }
 
 // ClientCfg ...
@@ -80,4 +83,13 @@ type PhoneNumber struct {
 	PurePhoneNumber string    `json:"purePhoneNumber"`
 	CountryCode     string    `json:"countryCode"`
 	Watermark       watermark `json:"watermark"`
+}
+
+// GetWXQRCodeRequest ...
+type GetWXQRCodeRequest struct {
+	Scene     string      `json:"scene"`
+	Width     int64       `json:"width"`
+	AutoColor bool        `json:"auto_color"`
+	LineColor interface{} `json:"line_color"`
+	IsHyaLine bool        `json:"is_hyaline"`
 }

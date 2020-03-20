@@ -61,6 +61,32 @@ const (
 
 // the type of items donated
 const (
-	DonatedTypeFunds    = "funds"
-	DonatedTypeSupplies = "supplies"
+	DonatedTypeFunds    = "funds"    // funds of donation
+	DonatedTypeSupplies = "supplies" // supplies of donation
+)
+
+// the type of share
+const (
+	Prove = "prove" // donation prove of share
+	Home  = "home"  // home of share
+)
+
+// define default info of share
+const (
+	ShareTitle    = "众行公益链" // title of share
+	ShareIcon     = ""      // icon url of share
+	ShareImageURL = ""      // home image url of share
+)
+
+// define length and width of donation image
+const (
+	Width     = 750 // width of donation prove image
+	SubWidth  = 655 // subWith of donation prove image
+	SubHeight = 597 // subHeight of donation prove image
+)
+
+//  define information of qr
+const (
+	QrCodeSize = 120       // qr code size
+	QRContent  = "长按识别二维码" // qr code content
 )
