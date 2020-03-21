@@ -23,5 +23,8 @@ type BackendImpl struct {
 func NewALiYunBackend(cfg *Config) (*BackendImpl, error) {
 	logger.Infof("creating aliyun service ...")
 	d := &BackendImpl{Client: Client{ALiYunConfig: cfg}}
+	if err := d.Init(); err != nil {
+		return nil, err
+	}
 	return d, nil
 }

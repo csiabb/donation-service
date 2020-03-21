@@ -5,10 +5,9 @@
 package mock_backend
 
 import (
+	gomock "github.com/golang/mock/gomock"
 	io "io"
 	reflect "reflect"
-
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockIALiYunBackend is a mock of IALiYunBackend interface
@@ -32,6 +31,21 @@ func NewMockIALiYunBackend(ctrl *gomock.Controller) *MockIALiYunBackend {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockIALiYunBackend) EXPECT() *MockIALiYunBackendMockRecorder {
 	return m.recorder
+}
+
+// IsExist mocks base method
+func (m *MockIALiYunBackend) IsExist(arg0 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsExist", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsExist indicates an expected call of IsExist
+func (mr *MockIALiYunBackendMockRecorder) IsExist(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsExist", reflect.TypeOf((*MockIALiYunBackend)(nil).IsExist), arg0)
 }
 
 // UploadObject mocks base method
