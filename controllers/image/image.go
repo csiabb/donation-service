@@ -24,7 +24,7 @@ func (h *RestHandler) Upload(c *gin.Context) {
 	c.Request.ParseMultipartForm(32 << 20)
 	fileRec, _, err := c.Request.FormFile("image_file")
 	if err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
 		return

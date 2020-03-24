@@ -25,7 +25,7 @@ func (h *RestHandler) LoginWXApp(c *gin.Context) {
 
 	req := &structs.LoginRequest{}
 	if err := c.BindJSON(req); err != nil {
-		e := fmt.Errorf("invalid parameters: %s", err.Error())
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
 		logger.Error(e)
 		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.ParseRequestParamsError, e.Error()))
 		return
@@ -53,7 +53,7 @@ func (h *RestHandler) LoginWXApp(c *gin.Context) {
 		return
 	}
 
-	user, err := h.srvcContext.DBStorage.CheckAccount(wxCredentials.OpenID)
+	user, err := h.srvcContext.DBStorage.QueryAccount(wxCredentials.OpenID, "")
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {
 			logger.Errorf("query account return err %v", err)
@@ -70,8 +70,17 @@ func (h *RestHandler) LoginWXApp(c *gin.Context) {
 		}
 	}
 
+	id := utils.GenerateUUID()
+	bcResp, err := h.srvcContext.IBCAdapter.Register(id)
+	if err != nil {
+		e := fmt.Errorf("register on block chain failed, %v", err)
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))
+		return
+	}
+
 	acc := &models.Account{
-		ID:       utils.GenerateUUID(),
+		ID:       id,
 		Access:   req.Access,
 		Password: req.Password,
 		NickName: req.Nickname,
@@ -81,9 +90,10 @@ func (h *RestHandler) LoginWXApp(c *gin.Context) {
 		OpenID:   wxCredentials.OpenID,
 		AppID:    wxApp.AppID,
 		UnionID:  wxCredentials.UnionID,
+		DID:      bcResp.Data.ID,
 	}
-	err = h.srvcContext.DBStorage.CreateAccount(acc)
 
+	err = h.srvcContext.DBStorage.CreateAccount(acc)
 	if err != nil {
 		e := fmt.Errorf("create account error, %v", err)
 		logger.Error(e.Error())

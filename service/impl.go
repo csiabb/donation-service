@@ -79,20 +79,20 @@ func (s *ServerImpl) init() (err error) {
 	// init server context
 	err = s.context.Init()
 	if nil != err {
-		logger.Errorf("Initalize server context error: %v", err)
+		logger.Errorf("Initialize server context error: %v", err)
 		return err
 	}
 
 	s.httpRouter = &router.Router{}
 	err = s.httpRouter.InitRouter(s.context)
 	if nil != err {
-		logger.Errorf("Initalize router error: %v", err)
+		logger.Errorf("Initialize router error: %v", err)
 		return err
 	}
 
 	//Init the rest http service
 	if err = s.httpSrvInit(); err != nil {
-		logger.Errorf("Failed to initialize %s restful API: %s", s.version.ProgramName, err)
+		logger.Errorf("Failed to Initialize %s restful API: %s", s.version.ProgramName, err)
 		return err
 	}
 	return nil

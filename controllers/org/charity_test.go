@@ -64,7 +64,7 @@ func TestRestHandler_QueryOrgCharities(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QueryOrgCharities(c)
 	CommRespCheck(t, w)
 }
@@ -91,7 +91,7 @@ func TestRestHandler_QueryOrgCharitiesDetail(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, "/api/v1/pub/funds/detail?uid=uid_test", nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QueryOrgCharitiesDetail(c)
 	CommRespCheck(t, w)
 }

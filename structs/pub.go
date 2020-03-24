@@ -17,6 +17,7 @@ import (
 // ReceiveFundsRequest defines the request of receiving funds
 type ReceiveFundsRequest struct {
 	UID               string                  `json:"uid" binding:"required"`                  // user id of the one who donate
+	DonorUID          string                  `json:"donor_uid" binding:"required"`            // user did
 	DonorName         string                  `json:"donor_name" binding:"required"`           // user name of the one who donate
 	UserType          string                  `json:"user_type" binding:"required"`            // user type
 	TargetUID         string                  `json:"target_uid" binding:"required"`           // user id of charity
@@ -27,6 +28,20 @@ type ReceiveFundsRequest struct {
 	Amount            decimal.Decimal         `json:"amount" binding:"required"`               // pay amount
 	Remark            string                  `json:"remark"`                                  // remark text
 	PubProofImage     []*PubProofImageRequest `json:"proof_images" binding:"required"`         // images of proof
+}
+
+// GetUIDByFundsReq implement get funds uid
+func (rsr *ReceiveFundsRequest) GetUIDByFundsReq() string {
+	switch rsr.PubType {
+	case rest.PubTypeDonate:
+		return rsr.UID
+	case rest.PubTypeDistribute:
+		return rsr.TargetUID
+	case rest.PubTypeReceive:
+		return rsr.DonorUID
+	default:
+		return ""
+	}
 }
 
 // QueryFundsRequest defines the request of query funds
@@ -82,6 +97,7 @@ type FundsDetailRequest struct {
 // ReceiveSuppliesRequest defines the struct of received supplies
 type ReceiveSuppliesRequest struct {
 	UID             string                  `json:"uid"`                              // user id
+	DonorUID        string                  `json:"donor_uid"`                        // user id of the one who donate
 	DonorName       string                  `json:"donor_name"`                       // user name of the one who donate
 	UserType        string                  `json:"user_type"`                        // user type
 	TargetUID       string                  `json:"target_uid" binding:"required"`    // user id of charity
@@ -93,6 +109,20 @@ type ReceiveSuppliesRequest struct {
 	BillingAddress  PubAddress              `json:"billing_addr"`                     // billing address
 	ShippingAddress PubAddress              `json:"shipping_addr"`                    // donation shipping address
 	PubProofImage   []*PubProofImageRequest `json:"proof_images" binding:"required"`  // images of proof
+}
+
+// GetUIDBySuppliesReq defines get the uid of who originated
+func (rsr *ReceiveSuppliesRequest) GetUIDBySuppliesReq() string {
+	switch rsr.PubType {
+	case rest.PubTypeDonate:
+		return rsr.UID
+	case rest.PubTypeDistribute:
+		return rsr.TargetUID
+	case rest.PubTypeReceive:
+		return rsr.DonorUID
+	default:
+		return ""
+	}
 }
 
 // SuppliesItem defines the struct item of received supplies
@@ -245,7 +275,7 @@ type PubAddress struct {
 
 // PubProofImageRequest defines the request proof image of publicity detail information
 type PubProofImageRequest struct {
-	Type   string `json:"type" binding:"required"`  // user type
+	Type   string `json:"type" binding:"required"`  // image type
 	URL    string `json:"url" binding:"required"`   // image url
 	Index  string `json:"index" binding:"required"` // image index
 	Format string `json:"format"`                   // image file format

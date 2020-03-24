@@ -12,19 +12,6 @@ import (
 	"github.com/csiabb/donation-service/models"
 )
 
-// CheckAccount implement check user account exist or not
-func (b *DbBackendImpl) CheckAccount(openID string) (*models.Account, error) {
-	where := b.GetConn().Model(&models.Account{})
-
-	if openID != "" {
-		where = where.Where("open_id = ?", openID)
-	}
-
-	acc := &models.Account{}
-	err := where.First(acc).Error
-	return acc, err
-}
-
 // CreateAccount implement create user account
 func (b *DbBackendImpl) CreateAccount(data *models.Account) error {
 	if nil == data {
@@ -32,4 +19,21 @@ func (b *DbBackendImpl) CreateAccount(data *models.Account) error {
 	}
 
 	return b.GetConn().Create(data).Error
+}
+
+// QueryAccount implement check user account exist or not
+func (b *DbBackendImpl) QueryAccount(openID, uid string) (*models.Account, error) {
+	where := b.GetConn().Model(&models.Account{})
+
+	if openID != "" {
+		where = where.Where("open_id = ?", openID)
+	}
+
+	if uid != "" {
+		where = where.Where("id = ?", uid)
+	}
+
+	acc := &models.Account{}
+	err := where.First(acc).Error
+	return acc, err
 }

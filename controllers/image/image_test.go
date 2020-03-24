@@ -77,7 +77,7 @@ func TestRestHandler_Upload(t *testing.T) {
 
 	aliyunMockBackend.EXPECT().UploadObject(gomock.Any(), gomock.Any()).Return(nil)
 	c.Request, _ = http.NewRequest(http.MethodPost, "/api/v1/image/upload", body)
-	c.Request.Header.Add("Content-Type", writer.FormDataContentType())
+	c.Request.Header.Add(rest.HeaderContentType, writer.FormDataContentType())
 
 	handler.Upload(c)
 	CommRespCheck(t, w)

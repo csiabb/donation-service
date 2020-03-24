@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
+	"github.com/csiabb/donation-service/components/bcadapter/mock_bcadapter"
 	"github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/mock_backend"
@@ -39,6 +40,7 @@ const (
 const (
 	fundsBodyJSON = `{
   "uid": "uid_test",
+  "donor_uid": "donor_uid_test",
   "donor_name": "donor_name",
   "user_type": "normal",
   "target_uid": "target_uid_test",
@@ -60,6 +62,7 @@ const (
 
 	suppliesBodyJSON = `{
   "uid": "uid_test",
+  "donor_uid": "donor_uid_test",
   "donor_name": "donor_name",
   "user_type": "normal",
   "target_uid": "target_uid_test",
@@ -105,42 +108,72 @@ const (
 }`
 )
 
-func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDBBackend, *httptest.ResponseRecorder, *gin.Context) {
+func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDBBackend, *mock_bcadapter.MockIBCAdapter, *httptest.ResponseRecorder, *gin.Context) {
 	mockCtl := gomock.NewController(t)
 	mockBackend := mock_backend.NewMockIDBBackend(mockCtl)
+	mockBCAdapter := mock_bcadapter.NewMockIBCAdapter(mockCtl)
 
 	// init mock handler
 	handler := RestHandler{}
 	handler.srvcContext = &context.Context{}
 	handler.srvcContext.DBStorage = mockBackend
+	handler.srvcContext.IBCAdapter = mockBCAdapter
 
 	// init test mode gin
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	return mockCtl, &handler, mockBackend, w, c
+	return mockCtl, &handler, mockBackend, mockBCAdapter, w, c
 }
 
 func TestReceiveFundsSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, mockBCAdapter, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	db := &gorm.DB{}
 	mockBackend.EXPECT().GetDBTransaction().Return(db)
 	mockBackend.EXPECT().CreateFunds(gomock.Any(), gomock.Any()).Return(nil)
 	mockBackend.EXPECT().CreateImages(gomock.Any(), gomock.Any()).Return(nil)
+	mockBackend.EXPECT().QueryAccount(gomock.Any(), gomock.Any()).Return(&models.Account{
+		ID:             "account_id",
+		Access:         "access",
+		Password:       "Aa111111",
+		NickName:       "nick_name",
+		Type:           "normal",
+		Phone:          "18518265711",
+		Email:          "kellan@qq.com",
+		KycStatus:      "verified",
+		Bank:           "",
+		BankCardNum:    "",
+		TaxID:          "",
+		ShippingAddrID: "",
+		DID:            "did:axn:da-322e9abb-841e-4778-be61-93741d8f4621",
+		Remark:         "",
+		OpenID:         "",
+		UnionID:        "",
+		AppID:          "",
+		CreatedAt:      time.Now(),
+	}, nil)
+	mockBCAdapter.EXPECT().Pubs(gomock.Any(), gomock.Any()).Return([]*structs.PubResp{
+		{
+			Code: 0,
+			Msg:  "",
+			Data: structs.PubRespData{ID: "aabbcc"},
+		},
+	}, nil)
+	mockBackend.EXPECT().UpdateFunds(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 	mockBackend.EXPECT().DBTransactionCommit(gomock.Any())
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodPost, urlPubFunds, bytes.NewBufferString(fundsBodyJSON))
-	c.Request.Header.Add("Content-Type", "application/json")
+	c.Request.Header.Add(rest.HeaderContentType, rest.HeaderApplicationJSON)
 	handler.ReceiveFunds(c)
 	CommRespCheck(t, w)
 }
 
 func TestReceiveFundsParams(t *testing.T) {
-	mockCtl, handler, _, w, c := Init(t)
+	mockCtl, handler, _, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// post body
@@ -148,7 +181,7 @@ func TestReceiveFundsParams(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodPost, urlPubFunds, body)
-	c.Request.Header.Add("Content-Type", "application/json")
+	c.Request.Header.Add(rest.HeaderContentType, rest.HeaderApplicationJSON)
 	handler.ReceiveFunds(c)
 
 	_, err := ioutil.ReadAll(w.Body)
@@ -162,7 +195,7 @@ func TestReceiveFundsParams(t *testing.T) {
 }
 
 func TestReceiveFundsDB(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// post body
@@ -176,7 +209,7 @@ func TestReceiveFundsDB(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodPost, urlPubFunds, body)
-	c.Request.Header.Add("Content-Type", "application/json")
+	c.Request.Header.Add(rest.HeaderContentType, rest.HeaderApplicationJSON)
 	handler.ReceiveFunds(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -190,7 +223,7 @@ func TestReceiveFundsDB(t *testing.T) {
 }
 
 func TestQueryFundsSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	mockBackend.EXPECT().QueryFunds(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.PubFunds{
@@ -218,13 +251,13 @@ func TestQueryFundsSucceed(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QueryFunds(c)
 	CommRespCheck(t, w)
 }
 
 func TestQueryFundsDB(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	mockBackend.EXPECT().QueryFunds(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("query funds failed"))
@@ -233,7 +266,7 @@ func TestQueryFundsDB(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QueryFunds(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -247,7 +280,7 @@ func TestQueryFundsDB(t *testing.T) {
 }
 
 func TestQueryFundsDetailSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// mock db
@@ -321,13 +354,13 @@ func TestQueryFundsDetailSucceed(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, urlPubFundsDetail+"?uid=uid_test", nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QueryFundsDetail(c)
 	CommRespCheck(t, w)
 }
 
 func TestQueryFundsDetailDB(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// mock db
@@ -335,7 +368,7 @@ func TestQueryFundsDetailDB(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodGet, urlPubFundsDetail+"?uid=uid_test", nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QueryFundsDetail(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -349,26 +382,54 @@ func TestQueryFundsDetailDB(t *testing.T) {
 }
 
 func TestReceiveSuppliesSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, mockBCAdapter, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// mock db
+	mockBackend.EXPECT().QueryAccount(gomock.Any(), gomock.Any()).Return(&models.Account{
+		ID:             "account_id",
+		Access:         "access",
+		Password:       "Aa111111",
+		NickName:       "nick_name",
+		Type:           "normal",
+		Phone:          "18518265711",
+		Email:          "kellan@qq.com",
+		KycStatus:      "verified",
+		Bank:           "",
+		BankCardNum:    "",
+		TaxID:          "",
+		ShippingAddrID: "",
+		DID:            "did:axn:da-eecf83b7-2bc9-49f2-8005-e0e39f606450",
+		Remark:         "",
+		OpenID:         "",
+		UnionID:        "",
+		AppID:          "",
+		CreatedAt:      time.Now(),
+	}, nil)
 	db := &gorm.DB{}
 	mockBackend.EXPECT().GetDBTransaction().Return(db)
 	mockBackend.EXPECT().CreateSupplies(gomock.Any(), gomock.Any()).Return(nil)
 	mockBackend.EXPECT().CreateAddresses(gomock.Any(), gomock.Any()).Return(nil)
 	mockBackend.EXPECT().CreateImages(gomock.Any(), gomock.Any()).Return(nil)
+	mockBCAdapter.EXPECT().Pubs(gomock.Any(), gomock.Any()).Return([]*structs.PubResp{
+		{
+			Code: 0,
+			Msg:  "",
+			Data: structs.PubRespData{ID: "aabbcc"},
+		},
+	}, nil)
+	mockBackend.EXPECT().UpdateSuppliesList(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 	mockBackend.EXPECT().DBTransactionCommit(gomock.Any())
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodPost, urlPubSupplies, bytes.NewBufferString(suppliesBodyJSON))
-	c.Request.Header.Add("Content-Type", "application/json")
+	c.Request.Header.Add(rest.HeaderContentType, rest.HeaderApplicationJSON)
 	handler.ReceiveSupplies(c)
 	CommRespCheck(t, w)
 }
 
 func TestReceiveSuppliesParams(t *testing.T) {
-	mockCtl, handler, _, w, c := Init(t)
+	mockCtl, handler, _, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// mock request
@@ -380,7 +441,7 @@ func TestReceiveSuppliesParams(t *testing.T) {
   "target_name": "target_name",
   "pub_type": "donate"}`))
 
-	c.Request.Header.Add("Content-Type", "application/json")
+	c.Request.Header.Add(rest.HeaderContentType, rest.HeaderApplicationJSON)
 	handler.ReceiveSupplies(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -394,10 +455,30 @@ func TestReceiveSuppliesParams(t *testing.T) {
 }
 
 func TestReceiveSuppliesDB(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	// mock db
+	mockBackend.EXPECT().QueryAccount(gomock.Any(), gomock.Any()).Return(&models.Account{
+		ID:             "account_id",
+		Access:         "access",
+		Password:       "Aa111111",
+		NickName:       "nick_name",
+		Type:           "normal",
+		Phone:          "18518265711",
+		Email:          "kellan@qq.com",
+		KycStatus:      "verified",
+		Bank:           "",
+		BankCardNum:    "",
+		TaxID:          "",
+		ShippingAddrID: "",
+		DID:            "did:axn:da-eecf83b7-2bc9-49f2-8005-e0e39f606450",
+		Remark:         "",
+		OpenID:         "",
+		UnionID:        "",
+		AppID:          "",
+		CreatedAt:      time.Now(),
+	}, nil)
 	db := &gorm.DB{}
 	mockBackend.EXPECT().GetDBTransaction().Return(db)
 	mockBackend.EXPECT().CreateSupplies(gomock.Any(), gomock.Any()).Return(nil)
@@ -407,7 +488,7 @@ func TestReceiveSuppliesDB(t *testing.T) {
 
 	// mock request
 	c.Request, _ = http.NewRequest(http.MethodPost, urlPubSupplies, bytes.NewBufferString(suppliesBodyJSON))
-	c.Request.Header.Add("Content-Type", "application/json")
+	c.Request.Header.Add(rest.HeaderContentType, rest.HeaderApplicationJSON)
 	handler.ReceiveSupplies(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -421,7 +502,7 @@ func TestReceiveSuppliesDB(t *testing.T) {
 }
 
 func TestQuerySuppliesSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	mockBackend.EXPECT().QuerySupplies(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.PubSupplies{
@@ -450,13 +531,13 @@ func TestQuerySuppliesSucceed(t *testing.T) {
 
 	url := urlPubSupplies + "uid=&target_uid=&pub_type=distribute&user_type=&start_time=0&end_time=0&page_num=1&page_limit=10"
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QuerySupplies(c)
 	CommRespCheck(t, w)
 }
 
 func TestQuerySuppliesDetailSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	mockBackend.EXPECT().QuerySuppliesDetail(gomock.Any()).Return(&models.SuppliesDetail{
@@ -522,17 +603,17 @@ func TestQuerySuppliesDetailSucceed(t *testing.T) {
 	}, nil)
 
 	c.Request, _ = http.NewRequest(http.MethodGet, urlPubSuppliesDetail+"?supplies_id=aaa", nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QuerySuppliesDetail(c)
 	CommRespCheck(t, w)
 }
 
 func TestQuerySuppliesDetailParam(t *testing.T) {
-	mockCtl, handler, _, w, c := Init(t)
+	mockCtl, handler, _, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	c.Request, _ = http.NewRequest(http.MethodGet, urlPubSuppliesDetail, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.QuerySuppliesDetail(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -546,7 +627,7 @@ func TestQuerySuppliesDetailParam(t *testing.T) {
 }
 
 func TestPubUserListSucceed(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	mockBackend.EXPECT().QueryPubByUserType(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*structs.PubUserItem{
@@ -577,17 +658,17 @@ func TestPubUserListSucceed(t *testing.T) {
 
 	url := urlPubList + "?user_type=&target_uid=uid_charity_2&pub_type=distribute&start_time=0&end_time=0&page_num=1&page_limit=50"
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.PubUserList(c)
 	CommRespCheck(t, w)
 }
 
 func TestPubUserListParams(t *testing.T) {
-	mockCtl, handler, _, w, c := Init(t)
+	mockCtl, handler, _, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	c.Request, _ = http.NewRequest(http.MethodGet, urlPubList, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.PubUserList(c)
 	_, err := ioutil.ReadAll(w.Body)
 
@@ -601,14 +682,14 @@ func TestPubUserListParams(t *testing.T) {
 }
 
 func TestPubUserListDB(t *testing.T) {
-	mockCtl, handler, mockBackend, w, c := Init(t)
+	mockCtl, handler, mockBackend, _, w, c := Init(t)
 	defer mockCtl.Finish()
 
 	mockBackend.EXPECT().QueryPubByUserType(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("records not exist"))
 
 	url := urlPubList + "?user_type=&target_uid=uid_charity_2&pub_type=distribute&start_time=0&end_time=0&page_num=1&page_limit=50"
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
-	c.Request.Header.Add("Accept", "application/json")
+	c.Request.Header.Add(rest.HeaderAccept, rest.HeaderApplicationJSON)
 	handler.PubUserList(c)
 	_, err := ioutil.ReadAll(w.Body)
 
