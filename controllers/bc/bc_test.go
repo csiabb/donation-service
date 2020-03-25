@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/csiabb/donation-service/structs"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -19,10 +18,12 @@ import (
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/context"
 	"github.com/csiabb/donation-service/models/mock_backend"
+	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/gorm"
+	"github.com/rafaeljusto/redigomock"
 )
 
 const (
@@ -43,15 +44,19 @@ func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDB
 	mockCtl := gomock.NewController(t)
 	mockBackend := mock_backend.NewMockIDBBackend(mockCtl)
 
-	// init mock handler
-	handler := RestHandler{}
-	handler.srvcContext = &context.Context{}
-	handler.srvcContext.DBStorage = mockBackend
-
 	// init test mode gin
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
+
+	// init redigo mock connection
+	redisCli := redigomock.NewConn()
+
+	// init mock handler
+	handler := RestHandler{}
+	handler.srvcContext = &context.Context{}
+	handler.srvcContext.DBStorage = mockBackend
+	handler.srvcContext.RedisCli = redisCli
 
 	return mockCtl, &handler, mockBackend, w, c
 }

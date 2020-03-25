@@ -99,3 +99,10 @@ const (
 	QrCodeSize = 120       // qr code size
 	QRContent  = "长按识别二维码" // qr code content
 )
+
+// define redis cmd
+const (
+	RedisSet      = "SET"
+	RedisGet      = "GET"
+	RedisExpireAt = "EXPIREAT"
+)

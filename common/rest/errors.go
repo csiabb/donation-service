@@ -8,19 +8,20 @@ package rest
 
 // common error code
 const (
-	SuccCode                = 0    // succeed
-	InvalidParamsErrCode    = 1000 // params invalid
-	MissingParamsErrCode    = 1001 // missing params
-	ParseRequestParamsError = 1002 // parse request params error
-	DatabaseOperationFailed = 1003 // database operate failed
-	SerializeDataFail       = 1004 // serialize data fail
-	DeserializeDataFail     = 1005 // deserialize data fail
-	DatabaseUnavailable     = 1007 // database not available
-	DatabaseDisabled        = 1008 // database disabled
-	PermissionDenied        = 1009 // permission denied
-	InternalServerFailure   = 1012 // internal server failure
-	RepeatRegistration      = 1013 // repeat registration
-	PubToBlockChainFailure  = 1014 // publicity to block chain failure
+	SuccCode                  = 0    // succeed
+	InvalidParamsErrCode      = 1000 // params invalid
+	MissingParamsErrCode      = 1001 // missing params
+	ParseRequestParamsError   = 1002 // parse request params error
+	DatabaseOperationFailed   = 1003 // database operate failed
+	SerializeDataFail         = 1004 // serialize data fail
+	DeserializeDataFail       = 1005 // deserialize data fail
+	DatabaseUnavailable       = 1007 // database not available
+	DatabaseDisabled          = 1008 // database disabled
+	PermissionDenied          = 1009 // permission denied
+	InternalServerFailure     = 1012 // internal server failure
+	RepeatRegistration        = 1013 // repeat registration
+	PubToBlockChainFailure    = 1014 // publicity to block chain failure
+	BlockChainCallBackTimeout = 1015 // block chain call back timeout
 )
 
 // wechat error code
