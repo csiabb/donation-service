@@ -28,7 +28,7 @@ const (
 
 const (
 	retryCount = 3  // retry times
-	timeOut    = 30 // time out 30 seconds
+	timeOut    = 40 // seconds
 )
 
 // Register defines register on block chain

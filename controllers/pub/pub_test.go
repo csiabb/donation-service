@@ -26,6 +26,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/gorm"
+	"github.com/rafaeljusto/redigomock"
 	"github.com/shopspring/decimal"
 )
 
@@ -113,16 +114,21 @@ func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDB
 	mockBackend := mock_backend.NewMockIDBBackend(mockCtl)
 	mockBCAdapter := mock_bcadapter.NewMockIBCAdapter(mockCtl)
 
+	// init test mode gin
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	// init redigo mock connection
+	redisCli := redigomock.NewConn()
+	redisCli.Command(rest.RedisGet, "block_id_1").Expect("tx_id_test")
+
 	// init mock handler
 	handler := RestHandler{}
 	handler.srvcContext = &context.Context{}
 	handler.srvcContext.DBStorage = mockBackend
 	handler.srvcContext.IBCAdapter = mockBCAdapter
-
-	// init test mode gin
-	gin.SetMode(gin.TestMode)
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
+	handler.srvcContext.RedisCli = redisCli
 
 	return mockCtl, &handler, mockBackend, mockBCAdapter, w, c
 }
@@ -159,7 +165,7 @@ func TestReceiveFundsSucceed(t *testing.T) {
 		{
 			Code: 0,
 			Msg:  "",
-			Data: structs.PubRespData{ID: "aabbcc"},
+			Data: structs.PubRespData{ID: "block_id_1"},
 		},
 	}, nil)
 	mockBackend.EXPECT().UpdateFunds(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
@@ -415,7 +421,7 @@ func TestReceiveSuppliesSucceed(t *testing.T) {
 		{
 			Code: 0,
 			Msg:  "",
-			Data: structs.PubRespData{ID: "aabbcc"},
+			Data: structs.PubRespData{ID: "block_id_1"},
 		},
 	}, nil)
 	mockBackend.EXPECT().UpdateSuppliesList(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)

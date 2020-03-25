@@ -9,6 +9,7 @@ package bc
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/models"
@@ -63,6 +64,10 @@ func (h *RestHandler) BlockChainCallBack(c *gin.Context) {
 		return
 	}
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
+
+	key := req.ID
+	h.srvcContext.RedisCli.Do(rest.RedisSet, key, req.TxID)
+	h.srvcContext.RedisCli.Do(rest.RedisExpireAt, key, time.Now().Add(1000*60*60))
 
 	c.JSON(http.StatusOK, &structs.BCCBResp{Code: "success", Msg: ""})
 	logger.Info("response bc call back success.")

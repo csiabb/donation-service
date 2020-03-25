@@ -9,6 +9,7 @@ package pub
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/common/utils"
@@ -16,8 +17,23 @@ import (
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gomodule/redigo/redis"
 	"github.com/shopspring/decimal"
 )
+
+const (
+	timeoutOfOneSingleReq = 60 // seconds
+)
+
+func bcCallBackInfoInRedis(redisCli redis.Conn, blockChainID string) (string, error) {
+	s, err := redis.String(redisCli.Do(rest.RedisGet, blockChainID))
+
+	if err != nil {
+		return "", err
+	}
+
+	return s, nil
+}
 
 // ReceiveFunds defines the request of received funds
 func (h *RestHandler) ReceiveFunds(c *gin.Context) {
@@ -130,7 +146,8 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		return
 	}
 
-	err = h.srvcContext.DBStorage.UpdateFunds(tx, fundsID, bcResults[0].Data.ID)
+	blockChainID := bcResults[0].Data.ID
+	err = h.srvcContext.DBStorage.UpdateFunds(tx, fundsID, blockChainID)
 
 	if err != nil {
 		h.srvcContext.DBStorage.DBTransactionRollback(tx)
@@ -142,9 +159,36 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(nil))
-	logger.Infof("response receive funds success.")
-	return
+	reqTime := time.Now().Unix()
+
+	for {
+		time.Sleep(time.Duration(1) * time.Second)
+
+		respTime := time.Now().Unix()
+		if respTime-reqTime >= timeoutOfOneSingleReq*1 {
+			c.JSON(http.StatusRequestTimeout, rest.ErrorResponse(rest.BlockChainCallBackTimeout, "block chain call back timeout"))
+			logger.Infof("block chain call back timeout")
+			return
+		}
+
+		result, err := bcCallBackInfoInRedis(h.srvcContext.RedisCli, blockChainID)
+		logger.Debug("block chain call back result, %v", result)
+
+		if err != nil {
+			if err == redis.ErrNil {
+				continue
+			}
+
+			e := fmt.Errorf("get block chain call back data from redis error, %v", err)
+			logger.Error(e)
+			c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, rest.SuccessResponse(nil))
+		logger.Infof("response receive funds success.")
+		return
+	}
 }
 
 // QueryFunds defines the request of query funds
@@ -463,8 +507,49 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(nil))
-	logger.Info("response create supplies success.")
+	bcMap := make(map[string]bool)
+	reqTime := time.Now().Unix()
+
+	for {
+		time.Sleep(time.Duration(1) * time.Second)
+
+		respTime := time.Now().Unix()
+		if respTime-reqTime >= timeoutOfOneSingleReq*3 {
+			c.JSON(http.StatusRequestTimeout, rest.ErrorResponse(rest.BlockChainCallBackTimeout, "block chain call back timeout"))
+			logger.Infof("block chain call back timeout")
+			return
+		}
+
+		done := true
+		for _, v := range bcResults {
+			bcID := v.Data.ID
+			_, err := bcCallBackInfoInRedis(h.srvcContext.RedisCli, bcID)
+
+			if err != nil {
+				if !bcMap[bcID] {
+					done = false
+				}
+
+				if err == redis.ErrNil {
+					continue
+				}
+
+				e := fmt.Errorf("get block chain call back data from redis error, %v", err)
+				logger.Error(e)
+				c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))
+				return
+			}
+
+			bcMap[bcID] = true
+			continue
+		}
+
+		if done {
+			c.JSON(http.StatusOK, rest.SuccessResponse(nil))
+			logger.Infof("response receive funds success.")
+			return
+		}
+	}
 }
 
 // QuerySupplies defines the request of query supplies

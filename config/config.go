@@ -36,12 +36,19 @@ type SrvcCfg struct {
 	ImageCfg        image.Config
 	LocalFileSystem string
 	BCAdapterCfg    bcadapter.Config
+	Redis           RedisCfg
 }
 
 // ServerGeneralCfg general configure of service
 type ServerGeneralCfg struct {
 	Host string
 	Port int
+}
+
+// RedisCfg redis config
+type RedisCfg struct {
+	Addr string
+	Auth string
 }
 
 // GetServiceCfg returns the configurations for the service

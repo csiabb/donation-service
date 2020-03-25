@@ -17,6 +17,8 @@ import (
 	"github.com/csiabb/donation-service/config"
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/impl"
+
+	"github.com/gomodule/redigo/redis"
 )
 
 var (
@@ -32,6 +34,7 @@ type Context struct {
 	DBStorage     models.IDBBackend
 	ALiYunBackend aliyun.IALiYunBackend
 	ImageBackend  image.IImageBackend
+	RedisCli      redis.Conn
 }
 
 // GetServerContext ...
@@ -78,6 +81,12 @@ func (c *Context) Init() error {
 	err = c.initImageBackend()
 	if nil != err {
 		logger.Errorf("Initialize image backend failed, %v", err)
+		return err
+	}
+
+	err = c.initRedis()
+	if nil != err {
+		logger.Errorf("Initialize redis backend failed, %v", err)
 		return err
 	}
 
@@ -140,6 +149,17 @@ func (c *Context) initImageBackend() error {
 	c.ImageBackend, err = image.NewImageBackend(&c.Config.ImageCfg, c.WXClient)
 	if nil != err {
 		logger.Errorf("New aliyun services error, %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Context) initRedis() error {
+	var err error
+	c.RedisCli, err = redis.Dial("tcp", c.Config.Redis.Addr, redis.DialPassword(c.Config.Redis.Auth))
+	if err != nil {
+		logger.Errorf("Connect redis failed: %v", err)
 		return err
 	}
 
