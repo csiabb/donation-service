@@ -11,16 +11,17 @@ type ImageUploadResp struct {
 	ID string `json:"id"` // image id
 }
 
-// ShareRequest  defines the request of query share
-type ShareRequest struct {
-	ShareType    string `form:"share_type"`
+// DrawRequest  defines the request of query draw
+type DrawRequest struct {
+	DrawType     string `form:"draw_type"`
 	DonationType string `form:"donation_type"`
 	DonationID   string `form:"donation_id"`
 	Scene        string `form:"scene"`
+	IsShare      bool   `form:"is_share"`
 }
 
-// ShareResp defines the response of image share
-type ShareResp struct {
+// DrawResp defines the response of image draw
+type DrawResp struct {
 	Icon     string `json:"icon"`
 	Title    string `json:"title"`
 	Content  string `json:"content"`

@@ -80,11 +80,11 @@ const (
 
 // define default info of share
 const (
-	ShareTitle           = "众行公益链"                     // title of share
-	ShareIcon            = ""                          // icon url of share
-	ShareImageURL        = ""                          // home image url of share
-	ShareHomeContent     = "体验区块链技术！众行公益链邀请您一起，见证爱心行动" // home content of share
-	ShareDonationContent = "你的爱心行动被永久登记到区块链啦～你也来试试吧"   // donation content of share
+	DrawTitle           = "众行公益链"                     // title of draw
+	DrawIcon            = "csiabb.png"                // icon url of draw
+	DrawImageURL        = "home_share.png"            // home image url of draw
+	DrawHomeContent     = "体验区块链技术！众行公益链邀请您一起，见证爱心行动" // home content of draw
+	DrawDonationContent = "你的爱心行动被永久登记到区块链啦～你也来试试吧"   // donation content of draw
 )
 
 // define length and width of donation image
