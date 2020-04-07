@@ -185,7 +185,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, rest.SuccessResponse(nil))
+		c.JSON(http.StatusOK, rest.SuccessResponse(&structs.ReceiveFundsResp{FundsID: fundsID}))
 		logger.Infof("response receive funds success.")
 		return
 	}
@@ -369,6 +369,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	addrs := make([]*models.Address, 0)
 	images := make([]*models.Image, 0)
 	bcJSONs := make([]*string, 0)
+	ids := make([]*structs.ReceiveSuppliesRespItem, 0)
 
 	for _, v := range req.SuppliesItem {
 		suppliesID := utils.GenerateUUID()
@@ -388,6 +389,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 			Remark:     req.Remark,
 		}
 		ps = append(ps, pubSupplies)
+		ids = append(ids, &structs.ReceiveSuppliesRespItem{SuppliesID: suppliesID})
 
 		billingAddr := &models.Address{
 			ID:        utils.GenerateUUID(),
@@ -545,7 +547,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 		}
 
 		if done {
-			c.JSON(http.StatusOK, rest.SuccessResponse(nil))
+			c.JSON(http.StatusOK, rest.SuccessResponse(ids))
 			logger.Infof("response receive funds success.")
 			return
 		}

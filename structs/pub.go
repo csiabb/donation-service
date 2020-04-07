@@ -30,6 +30,11 @@ type ReceiveFundsRequest struct {
 	PubProofImage     []*PubProofImageRequest `json:"proof_images" binding:"required"`         // images of proof
 }
 
+// ReceiveFundsResp defines the response of receiving funds
+type ReceiveFundsResp struct {
+	FundsID string `json:"funds_id"` // funds id
+}
+
 // GetUIDByFundsReq implement get funds uid
 func (rsr *ReceiveFundsRequest) GetUIDByFundsReq() string {
 	switch rsr.PubType {
@@ -123,6 +128,11 @@ func (rsr *ReceiveSuppliesRequest) GetUIDBySuppliesReq() string {
 	default:
 		return ""
 	}
+}
+
+// ReceiveSuppliesRespItem defines the response of receiving supplies
+type ReceiveSuppliesRespItem struct {
+	SuppliesID string `json:"supplies_id"` // supplies id
 }
 
 // SuppliesItem defines the struct item of received supplies
