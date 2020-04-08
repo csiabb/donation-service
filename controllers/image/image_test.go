@@ -89,7 +89,7 @@ func TestRestHandler_Share(t *testing.T) {
 	defer mockCtl.Finish()
 
 	dst := image.NewNRGBA(image.Rect(0, 0, 120, 120*150/150))
-	url := "/api/v1/image/share?share_type=prove&donation_type=supplies&donation_id=supplies_id&scene=1012"
+	url := "/api/v1/image/draw?draw_type=prove&donation_type=supplies&donation_id=supplies_id&scene=1012&is_share=true"
 
 	aliyunMockBackend.EXPECT().UploadObject(gomock.Any(), gomock.Any()).Return(nil)
 	aliyunMockBackend.EXPECT().IsExist(gomock.Any()).Return(false, nil)
@@ -160,7 +160,7 @@ func TestRestHandler_Share(t *testing.T) {
 	c.Request, _ = http.NewRequest(http.MethodGet, url, nil)
 	c.Request.Header.Add("Accept", "application/json")
 
-	handler.Share(c)
+	handler.Draw(c)
 	CommRespCheck(t, w)
 }
 

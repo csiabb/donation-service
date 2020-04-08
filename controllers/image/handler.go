@@ -36,7 +36,7 @@ func NewRestHandler(c *context.Context) (*RestHandler, error) {
 }
 
 // GetContent define the prove content of donation items
-func (h *RestHandler) GetContent(req *structs.ShareRequest) ([]string, error) {
+func (h *RestHandler) GetContent(req *structs.DrawRequest) ([]string, error) {
 	var err error
 	var content []string
 	if req.DonationType == rest.DonatedTypeSupplies {
@@ -76,7 +76,7 @@ func (h *RestHandler) GetContent(req *structs.ShareRequest) ([]string, error) {
 }
 
 // CreateDonationImage create image of donation prove items
-func (h *RestHandler) CreateDonationImage(req *structs.ShareRequest, tag string) error {
+func (h *RestHandler) CreateDonationImage(req *structs.DrawRequest, tag string) error {
 	// get content
 	content, err := h.GetContent(req)
 	if err != nil {
@@ -85,7 +85,7 @@ func (h *RestHandler) CreateDonationImage(req *structs.ShareRequest, tag string)
 
 	// create donation image
 	img, err := h.srvcContext.ImageBackend.CreateDonationImage(content, h.srvcContext.Config.WXCfg.AppID,
-		h.srvcContext.Config.WXCfg.Secret, req.Scene, true)
+		h.srvcContext.Config.WXCfg.Secret, req.Scene, req.IsShare)
 	if err != nil {
 		return err
 	}
@@ -105,10 +105,10 @@ func (h *RestHandler) CreateDonationImage(req *structs.ShareRequest, tag string)
 }
 
 // GetImageURL donation proof picture aliyun path
-func (h *RestHandler) GetImageURL(req *structs.ShareRequest) (string, error) {
+func (h *RestHandler) GetImageURL(req *structs.DrawRequest) (string, error) {
 	var err error
 	var isExist bool
-	tag := h.URL(req, 1)
+	tag := h.URL(req, 0)
 	imagURL := h.srvcContext.Config.LocalFileSystem + tag + ".png"
 	if isExist, err = h.srvcContext.ALiYunBackend.IsExist(tag + ".png"); err != nil {
 		return "", err
@@ -126,8 +126,11 @@ func (h *RestHandler) GetImageURL(req *structs.ShareRequest) (string, error) {
 }
 
 // URL create aliyun image name
-func (h *RestHandler) URL(req *structs.ShareRequest, isShare int) string {
-	src := fmt.Sprintf("%s%s%s%d", req.ShareType, req.DonationType, req.DonationID, isShare)
+func (h *RestHandler) URL(req *structs.DrawRequest, isShare int) string {
+	if req.IsShare {
+		isShare = 1
+	}
+	src := fmt.Sprintf("%s%s%s%d", req.DrawType, req.DonationType, req.DonationID, isShare)
 	md5Inst := md5.New()
 	md5Inst.Write([]byte(src))
 	result := md5Inst.Sum([]byte(""))

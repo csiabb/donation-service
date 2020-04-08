@@ -48,11 +48,11 @@ func (h *RestHandler) Upload(c *gin.Context) {
 	return
 }
 
-// Share define share of image
-func (h *RestHandler) Share(c *gin.Context) {
+// Draw define draw of image
+func (h *RestHandler) Draw(c *gin.Context) {
 	logger.Infof("Got query share request")
 
-	req := &structs.ShareRequest{}
+	req := &structs.DrawRequest{}
 	if err := c.Bind(req); err != nil {
 		e := fmt.Errorf("invalid parameters: %s", err.Error())
 		logger.Error(e)
@@ -63,8 +63,8 @@ func (h *RestHandler) Share(c *gin.Context) {
 
 	var err error
 	var content, imagURL string
-	if req.ShareType == rest.Prove {
-		content = rest.ShareDonationContent
+	if req.DrawType == rest.Prove {
+		content = rest.DrawDonationContent
 		if imagURL, err = h.GetImageURL(req); err != nil {
 			e := fmt.Errorf("get image url err : %s", err.Error())
 			logger.Error(e)
@@ -72,13 +72,13 @@ func (h *RestHandler) Share(c *gin.Context) {
 			return
 		}
 	} else {
-		content = rest.ShareHomeContent
-		imagURL = rest.ShareImageURL
+		content = rest.DrawHomeContent
+		imagURL = h.srvcContext.Config.LocalFileSystem + rest.DrawImageURL
 	}
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.ShareResp{
-		Icon:     rest.ShareIcon,
-		Title:    rest.ShareTitle,
+	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.DrawResp{
+		Icon:     h.srvcContext.Config.LocalFileSystem + rest.DrawIcon,
+		Title:    rest.DrawTitle,
 		Content:  content,
 		ImageURL: imagURL,
 	}))

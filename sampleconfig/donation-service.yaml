@@ -76,7 +76,7 @@ WXCfg:
 # local file system
 #
 ################################################################################
-LocalFileSystem: https://127.0.0.1:8888/
+LocalFileSystem: https://donation-oss.oss-cn-beijing.aliyuncs.com/
 
 ################################################################################
 #
@@ -84,8 +84,8 @@ LocalFileSystem: https://127.0.0.1:8888/
 #
 ################################################################################
 ImageCfg:
-    BackgroundPath: bg.png
-    FontPath: SourceHanSansCN-Regular.ttf
+    BackgroundPath: /opt/csiabb/data/image/bg.png
+    FontPath: /opt/csiabb/data/image/SourceHanSansCN-Regular.ttf
 
 ################################################################################
 #
