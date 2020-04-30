@@ -146,6 +146,14 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		return
 	}
 
+	if bcResults[0].Code == rest.PubToBlockChainFailure {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("publicity funds error, %v", bcResults[0].Msg)
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
+		return
+	}
+
 	blockChainID := bcResults[0].Data.ID
 	err = h.srvcContext.DBStorage.UpdateFunds(tx, fundsID, blockChainID)
 

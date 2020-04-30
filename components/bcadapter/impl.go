@@ -86,14 +86,20 @@ func (bc *BackendImpl) Pubs(bcID string, pubs []*string) ([]*structs.PubResp, er
 		logger.Debug("request body : %v, result : %v", body, result)
 
 		if err != nil {
-			results = append(results, nil)
+			results = append(results, &structs.PubResp{
+				Code: rest.PubToBlockChainFailure,
+				Msg:  err.Error(),
+			})
 			e := fmt.Errorf("pub error, %v", err)
 			logger.Error(e)
 			continue
 		}
 
 		if resp.StatusCode() != http.StatusOK {
-			results = append(results, nil)
+			results = append(results, &structs.PubResp{
+				Code: rest.PubToBlockChainFailure,
+				Msg:  resp.String(),
+			})
 			e := fmt.Errorf("pub failed, code : %v, msg : %v", resp.StatusCode(), resp.Status())
 			logger.Error(e)
 			continue
