@@ -8,6 +8,7 @@ package bcadapter
 
 import (
 	"fmt"
+	wlog "github.com/csiabb/donation-service/common/log"
 	"net/http"
 	"time"
 
@@ -82,7 +83,7 @@ func (bc *BackendImpl) Pubs(bcID string, pubs []*string) ([]*structs.PubResp, er
 			SetBody(body).
 			SetResult(result).
 			Post(fmt.Sprintf("%s/api/%s/%s", bc.Config.Address, apiVersion, urlBlockChainPublicities))
-
+		wlog.Debugf(fmt.Sprintf("%s/api/%s/%s", bc.Config.Address, apiVersion, urlBlockChainPublicities))
 		logger.Debug("request body : %v, result : %v", body, result)
 
 		if err != nil {

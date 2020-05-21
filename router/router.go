@@ -51,6 +51,7 @@ const (
 	urlPubSupplies       = "pub/supplies"
 	urlPubSuppliesDetail = "pub/supplies/detail"
 	urlPubList           = "pub/list"
+	urlPubListz          = "pub/listz"
 
 	// org
 	urlOrgCharities       = "org/charities"
@@ -137,7 +138,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 		apiPrefix.Use(middleware.RequestResponseLogger())
 
 		// account
-		apiPrefix.POST(urlAccLoginWXApp, r.accHandler.LoginWXApp)
+		apiPrefix.POST(urlAccLoginWXApp, r.accHandler.LoginWXApp) // 微信登录
 
 		// block chain
 		apiPrefix.POST(urlBCCallBack, r.bcHandler.BlockChainCallBack)
@@ -150,6 +151,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 		apiPrefix.GET(urlPubSupplies, r.pubHandler.QuerySupplies)
 		apiPrefix.GET(urlPubSuppliesDetail, r.pubHandler.QuerySuppliesDetail)
 		apiPrefix.GET(urlPubList, r.pubHandler.PubUserList)
+		apiPrefix.GET(urlPubListz, r.pubHandler.PubUserListz)
 
 		// org
 		apiPrefix.GET(urlOrgCharities, r.orgHandler.QueryOrgCharities)

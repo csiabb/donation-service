@@ -33,9 +33,8 @@ func cleanup() {
 }
 
 func main() {
-	defer cleanup()
-
-	kingpin.Version("0.0.1")
+	defer cleanup()          // 执行最后清理工作
+	kingpin.Version("0.0.1") // 显示版本号
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	// "start" command
 	case startCmd.FullCommand():

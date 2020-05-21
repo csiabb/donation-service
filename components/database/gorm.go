@@ -82,6 +82,8 @@ func (d *GormClient) Init() error {
 	if d.DbConfig.MaxIdleConns > 0 {
 		db.DB().SetMaxIdleConns(d.DbConfig.MaxIdleConns)
 	}
+	db.LogMode(true) // 打印sql日志
+	db.Debug()
 	return nil
 }
 

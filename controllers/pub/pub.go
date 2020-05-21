@@ -8,6 +8,7 @@ package pub
 
 import (
 	"fmt"
+	wlog "github.com/csiabb/donation-service/common/log"
 	"net/http"
 	"time"
 
@@ -38,7 +39,7 @@ func bcCallBackInfoInRedis(redisCli redis.Conn, blockChainID string) (string, er
 // ReceiveFunds defines the request of received funds
 func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 	logger.Info("got receive funds request")
-
+	wlog.Debugf("听说参数错误了,我了看看:%+v", wlog.ReaderToJSON(&c.Request.Body))
 	req := &structs.ReceiveFundsRequest{}
 	if err := c.BindJSON(req); err != nil {
 		e := fmt.Errorf("invalid parameters, %s", err.Error())
@@ -115,7 +116,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
 		return
 	}
-
+	wlog.Debugf("这里出错了么? %+v", acc)
 	var bcJSON string
 	switch req.PubType {
 	case rest.PubTypeDonate:
@@ -125,6 +126,7 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 	case rest.PubTypeDistribute:
 		bcJSON, err = funds.ConvertFundsDistributed(images)
 	}
+	wlog.Debugf("估计可能是这里")
 
 	if err != nil {
 		h.srvcContext.DBStorage.DBTransactionRollback(tx)
@@ -134,10 +136,14 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		return
 	}
 
+	wlog.Debugf("难道是这里有bug")
+
 	bcJSONs := make([]*string, 0)
 	bcJSONs = append(bcJSONs, &bcJSON)
 
 	bcResults, err := h.srvcContext.IBCAdapter.Pubs(acc.DID, bcJSONs)
+	wlog.Debugf("这里好像出错了:%+v", bcResults)
+	wlog.Debugf("这里好像出错了err:%+v", err)
 	if err != nil {
 		h.srvcContext.DBStorage.DBTransactionRollback(tx)
 		e := fmt.Errorf("publicity funds error, %s", err.Error())
@@ -153,10 +159,12 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
 		return
 	}
-
+	wlog.Debugf("bcResult:%+v", bcResults)
 	blockChainID := bcResults[0].Data.ID
+	wlog.Debugf("blockChainID:%+v", blockChainID)
 	err = h.srvcContext.DBStorage.UpdateFunds(tx, fundsID, blockChainID)
 
+	wlog.Debugf("打印日志不给行号，太坑了")
 	if err != nil {
 		h.srvcContext.DBStorage.DBTransactionRollback(tx)
 		e := fmt.Errorf("update funds tx id error, %s", err.Error())
@@ -517,7 +525,8 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 	}
 
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
-
+	
+	// 上区块链
 	bcMap := make(map[string]bool)
 	reqTime := time.Now().Unix()
 
@@ -561,6 +570,11 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 			return
 		}
 	}
+	//*/
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(ids))
+	wlog.Debug("完成上链")
+	logger.Infof("response receive funds success.")
 }
 
 // QuerySupplies defines the request of query supplies
@@ -739,6 +753,58 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 	}
 
 	result, err := h.srvcContext.DBStorage.QueryPubByUserType(req.UserType, req.TargetUID, req.PubType, params)
+	if err != nil {
+		e := fmt.Errorf("query funds error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	var fundsNum, suppliesNum int64
+	for _, v := range result {
+		v.ConvertTime()
+		v.Count(&fundsNum, &suppliesNum)
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.PubUserResp{
+		Total:       params.Total,
+		PageNum:     params.PageNum,
+		PageLimit:   params.PageLimit,
+		StartTime:   params.StartTime,
+		EndTime:     params.EndTime,
+		SuppliesNum: suppliesNum,
+		FundsNum:    fundsNum,
+		Results:     result,
+	}))
+
+	logger.Info("response query records success.")
+	return
+}
+
+func (h *RestHandler) PubUserListz(c *gin.Context) {
+	logger.Info("got publicity person list request")
+	wlog.Debug("wayaya")
+
+	// 添加了一个uid参数
+	req := &structs.PubUserzRequest{}
+	var err error
+	if err = c.Bind(req); err != nil {
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
+		return
+	}
+	wlog.Debugf("uid:%+v", req)
+	//logger.Debugf("request params %+v", req)
+
+	params := &structs.QueryParams{
+		PageNum:   req.PageNum,
+		PageLimit: req.PageLimit,
+		StartTime: req.StartTime,
+		EndTime:   req.EndTime,
+	}
+
+	result, err := h.srvcContext.DBStorage.QueryPubByUser(req.Uid, req.UserType, req.TargetUID, req.PubType, params)
 	if err != nil {
 		e := fmt.Errorf("query funds error, %s", err.Error())
 		logger.Error(e)

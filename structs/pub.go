@@ -205,6 +205,17 @@ type PubUserRequest struct {
 	EndTime   int64  `form:"end_time"`                    // end time
 }
 
+type PubUserzRequest struct {
+	Uid       string `form:"uid"`                         // uid
+	UserType  string `form:"user_type"`                   // user type
+	TargetUID string `form:"target_uid"`                  // user id of charity
+	PubType   string `form:"pub_type" binding:"required"` // publicity type
+	PageNum   int    `form:"page_num"`                    // page num
+	PageLimit int    `form:"page_limit"`                  // page limit
+	StartTime int64  `form:"start_time"`                  // start time
+	EndTime   int64  `form:"end_time"`                    // end time
+}
+
 // PubUserResp defines the response of publicity information
 type PubUserResp struct {
 	PageNum     int            `json:"page_num"`     // page num

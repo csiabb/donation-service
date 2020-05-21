@@ -20,7 +20,7 @@ var (
 )
 
 // defaultCfgPath default conigure file path
-const defaultCfgPath = "/etc/csiabb/"
+const defaultCfgPath = "/home/dongsibei/go/src/donation-service/sampleconfig/"
 
 // initConfig Init configuration and return the viper instance
 func initConfig(configName string) *viper.Viper {
