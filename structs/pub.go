@@ -302,3 +302,15 @@ type PubProofImageResp struct {
 	Index  string `json:"index"`  // image index
 	Format string `json:"format"` // image file format
 }
+
+// PubUserzRequest defines the request of publicity information
+type PubUserzRequest struct {
+	UID       string `form:"uid"`                         // uid
+	UserType  string `form:"user_type"`                   // user type
+	TargetUID string `form:"target_uid"`                  // user id of charity
+	PubType   string `form:"pub_type" binding:"required"` // publicity type
+	PageNum   int    `form:"page_num"`                    // page num
+	PageLimit int    `form:"page_limit"`                  // page limit
+	StartTime int64  `form:"start_time"`                  // start time
+	EndTime   int64  `form:"end_time"`                    // end time
+}

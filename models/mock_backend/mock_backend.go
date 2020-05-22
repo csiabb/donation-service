@@ -232,6 +232,21 @@ func (mr *MockIDBBackendMockRecorder) QueryOrgCharitiesDetail(arg0 interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryOrgCharitiesDetail", reflect.TypeOf((*MockIDBBackend)(nil).QueryOrgCharitiesDetail), arg0)
 }
 
+// QueryPubByUser mocks base method
+func (m *MockIDBBackend) QueryPubByUser(arg0, arg1, arg2, arg3 string, arg4 *structs.QueryParams) ([]*structs.PubUserItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryPubByUser", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].([]*structs.PubUserItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryPubByUser indicates an expected call of QueryPubByUser
+func (mr *MockIDBBackendMockRecorder) QueryPubByUser(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryPubByUser", reflect.TypeOf((*MockIDBBackend)(nil).QueryPubByUser), arg0, arg1, arg2, arg3, arg4)
+}
+
 // QueryPubByUserType mocks base method
 func (m *MockIDBBackend) QueryPubByUserType(arg0, arg1, arg2 string, arg3 *structs.QueryParams) ([]*structs.PubUserItem, error) {
 	m.ctrl.T.Helper()

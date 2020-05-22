@@ -21,6 +21,7 @@ import (
 const (
 	sqlQueryPublicityByUserType = "select * from (select id, 'funds' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, pay_type, amount, null as name, null as number, null as unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_funds where user_type = ? and pub_type = ? and created_at >= ? and created_at <= ? union all select id, 'supplies' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, null as pay_type, null as amount, name, number, unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_supplies where user_type = ? and pub_type = ? and created_at >= ? and created_at <= ?) as temp order by temp.time limit ? offset ?"
 	sqlQueryPublicityByCharity  = "select * from (select id, 'funds' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, pay_type, amount, null as name, null as number, null as unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_funds where target_uid = ? and pub_type = ? and created_at >= ? and created_at <= ? union all select id, 'supplies' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, null as pay_type, null as amount, name, number, unit, tx_id, remark, block_type, block_height, block_time, created_at as time from pub_supplies where target_uid = ? and pub_type = ? and created_at >= ? and created_at <= ?) as temp order by temp.time limit ? offset ?"
+	sqlQueryPublicityByUser     = "select * from (select id, 'funds' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, pay_type, amount, null as name, null as number, null as unit, tx_id, remark, block_type, block_height, block_time, updated_at as time from pub_funds  where uid = ? and created_at >= ? and created_at <= ? union all select id, 'supplies' as type, uid, donor_name, user_type, aid_uid, aid_name, target_uid, target_name, pub_type, null as pay_type, null as amount, name, number, unit, tx_id, remark, block_type, block_height, block_time, updated_at as time from pub_supplies  where uid = ? and created_at >= ? and created_at <= ?) as temp order by temp.time desc limit ? offset ? "
 )
 
 // CreateFunds implement receive funds interface
@@ -106,7 +107,7 @@ func (b *DbBackendImpl) QueryFunds(uid, targetUID, userType, pubType string, par
 	var out []*models.PubFunds
 	offset := (params.PageNum - 1) * params.PageLimit
 
-	if err := where.Count(&params.Total).Offset(offset).Limit(params.PageLimit).Find(&out).Order("created_at desc").Error; err != nil {
+	if err := where.Count(&params.Total).Limit(params.PageLimit).Offset(offset).Order("updated_at desc").Find(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
 			logger.Error(e)
@@ -211,7 +212,7 @@ func (b *DbBackendImpl) QuerySupplies(uid, targetUID, userType, pubType string, 
 	var out []*models.PubSupplies
 	offset := (params.PageNum - 1) * params.PageLimit
 
-	if err := where.Count(&params.Total).Offset(offset).Limit(params.PageLimit).Find(&out).Order("created_at desc").Error; err != nil {
+	if err := where.Count(&params.Total).Limit(params.PageLimit).Offset(offset).Order("updated_at desc").Find(&out).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
 			logger.Error(e)
@@ -390,4 +391,44 @@ func (b *DbBackendImpl) UpdateSuppliesBC(tx *gorm.DB, blockID string, supplies *
 	}
 
 	return nil
+}
+
+// QueryPubByUser defines the query of publicity by user
+func (b *DbBackendImpl) QueryPubByUser(uid, userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error) {
+	if params.StartTime > 0 && params.EndTime > 0 {
+		if params.EndTime < params.StartTime {
+			return nil, fmt.Errorf("end time can not less than start time")
+		}
+	} else {
+		now := time.Now()
+		params.EndTime = now.Unix()
+		params.StartTime = params.EndTime - rest.TenDayBySecond
+	}
+
+	offset := (params.PageNum - 1) * params.PageLimit
+	var out []*structs.PubUserItem
+	var err error
+
+	if pubType == "" {
+		return nil, fmt.Errorf("pub type can not be \\'\\'")
+	}
+
+	if userType == "" && targetUID == "" {
+		return nil, fmt.Errorf("user type and target id can not be \\'\\' the same time")
+	}
+
+	err = b.GetConn().Raw(sqlQueryPublicityByUser, uid, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), uid, time.Unix(params.StartTime, 0), time.Unix(params.EndTime, 0), params.PageLimit, offset).Scan(&out).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			e := fmt.Errorf("records not found")
+			logger.Error(e)
+			return nil, e
+		}
+
+		logger.Errorf("query records error: %v", err)
+		return nil, err
+	}
+
+	params.Total = int64(len(out))
+	return out, nil
 }
