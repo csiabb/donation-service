@@ -88,6 +88,7 @@ type QueryFundsItems struct {
 	Amount            string `json:"amount"`               // the amount of publicity funds
 	TxID              string `json:"tx_id"`                // block chain tx id
 	Remark            string `json:"remark"`               // remark
+	BlockID           string `json:"block_id"`             // block id
 	BlockType         string `json:"block_type"`           // block type
 	BlockHeight       int64  `json:"block_height"`         // block height
 	BlockTime         int64  `json:"block_time"`           // block time
@@ -181,6 +182,7 @@ type QuerySuppliesItems struct {
 	Unit        string `json:"unit"`         // unit
 	TxID        string `json:"tx_id"`        // block chain tx id
 	Remark      string `json:"remark"`       // remark
+	BlockID     string `json:"block_id"`     // block id
 	BlockType   string `json:"block_type"`   // block type
 	BlockHeight int64  `json:"block_height"` // block height
 	BlockTime   int64  `json:"block_time"`   // block time

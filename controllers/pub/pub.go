@@ -146,6 +146,14 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 		return
 	}
 
+	if bcResults[0].Code == rest.PubToBlockChainFailure {
+		h.srvcContext.DBStorage.DBTransactionRollback(tx)
+		e := fmt.Errorf("publicity funds error, %v", bcResults[0].Msg)
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.PubToBlockChainFailure, e.Error()))
+		return
+	}
+
 	blockChainID := bcResults[0].Data.ID
 	err = h.srvcContext.DBStorage.UpdateFunds(tx, fundsID, blockChainID)
 
@@ -293,6 +301,7 @@ func (h *RestHandler) QueryFundsDetail(c *gin.Context) {
 		Amount:            f.Funds.Amount.String(),
 		TxID:              f.Funds.TxID,
 		Remark:            f.Funds.Remark,
+		BlockID:           f.Funds.BlockID,
 		BlockType:         f.Funds.BlockType,
 		BlockHeight:       f.Funds.BlockHeight,
 		BlockTime:         f.Funds.BlockTime,
@@ -656,6 +665,7 @@ func (h *RestHandler) QuerySuppliesDetail(c *gin.Context) {
 		Unit:        s.Supplies.Unit,
 		TxID:        s.Supplies.TxID,
 		Remark:      s.Supplies.Remark,
+		BlockID:     s.Supplies.BlockID,
 		BlockType:   s.Supplies.BlockType,
 		BlockHeight: s.Supplies.BlockHeight,
 		BlockTime:   s.Supplies.BlockTime,

@@ -106,7 +106,7 @@ func (b *DbBackendImpl) QueryFunds(uid, targetUID, userType, pubType string, par
 	var out []*models.PubFunds
 	offset := (params.PageNum - 1) * params.PageLimit
 
-	if err := where.Offset(offset).Limit(params.PageLimit).Find(&out).Count(&params.Total).Order("created_at desc").Error; err != nil {
+	if err := where.Count(&params.Total).Offset(offset).Limit(params.PageLimit).Find(&out).Order("created_at desc").Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
 			logger.Error(e)
@@ -211,7 +211,7 @@ func (b *DbBackendImpl) QuerySupplies(uid, targetUID, userType, pubType string, 
 	var out []*models.PubSupplies
 	offset := (params.PageNum - 1) * params.PageLimit
 
-	if err := where.Offset(offset).Limit(params.PageLimit).Find(&out).Count(&params.Total).Order("created_at desc").Error; err != nil {
+	if err := where.Count(&params.Total).Offset(offset).Limit(params.PageLimit).Find(&out).Order("created_at desc").Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			e := fmt.Errorf("records not found")
 			logger.Error(e)
