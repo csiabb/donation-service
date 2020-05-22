@@ -23,6 +23,10 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
+const (
+	defaultImagePath = "/opt/csiabb/data/"
+)
+
 var (
 	logger = log.MustGetLogger("image")
 )
@@ -50,7 +54,7 @@ type Client struct {
 
 // Init initializes a new background image
 func (c *Client) Init() error {
-	imgFile, err := os.Open(c.ImageConfig.BackgroundPath)
+	imgFile, err := os.Open(defaultImagePath + c.ImageConfig.BackgroundPath)
 	if err != nil {
 		logger.Errorf("failed to read bg path %s: %s", c.ImageConfig.BackgroundPath, err)
 		return err
@@ -71,7 +75,7 @@ func (c *Client) Init() error {
 	}
 	c.Bg = bg
 
-	fontBytes, err := ioutil.ReadFile(c.ImageConfig.FontPath)
+	fontBytes, err := ioutil.ReadFile(defaultImagePath + c.ImageConfig.FontPath)
 	if err != nil {
 		logger.Errorf("failed to read font path %s: %s", c.ImageConfig.FontPath, err)
 		return err
