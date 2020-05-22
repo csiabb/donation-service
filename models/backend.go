@@ -37,6 +37,7 @@ type IDBBackend interface {
 	QuerySupplies(uid, targetUID, userType, pubType string, params *structs.QueryParams) ([]*PubSupplies, error)
 	QuerySuppliesDetail(id string) (*SuppliesDetail, error)
 	QueryPubByUserType(userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
+	QueryPubByUser(uid, userType, targetUID, pubType string, params *structs.QueryParams) ([]*structs.PubUserItem, error)
 	CreateImages(tx *gorm.DB, data []*Image) error
 	CreateAddresses(tx *gorm.DB, data []*Address) error
 

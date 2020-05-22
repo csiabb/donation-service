@@ -766,3 +766,53 @@ func (h *RestHandler) PubUserList(c *gin.Context) {
 	logger.Info("response query records success.")
 	return
 }
+
+// PubUserListz defines the publicity information of user
+func (h *RestHandler) PubUserListz(c *gin.Context) {
+	logger.Info("got publicity person list request")
+
+	req := &structs.PubUserzRequest{}
+	var err error
+	if err = c.Bind(req); err != nil {
+		e := fmt.Errorf("invalid parameters, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusBadRequest, rest.ErrorResponse(rest.InvalidParamsErrCode, e.Error()))
+		return
+	}
+	logger.Debugf("request params %+v", req)
+
+	params := &structs.QueryParams{
+		PageNum:   req.PageNum,
+		PageLimit: req.PageLimit,
+		StartTime: req.StartTime,
+		EndTime:   req.EndTime,
+	}
+
+	result, err := h.srvcContext.DBStorage.QueryPubByUser(req.UID, req.UserType, req.TargetUID, req.PubType, params)
+	if err != nil {
+		e := fmt.Errorf("query funds error, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.DatabaseOperationFailed, e.Error()))
+		return
+	}
+
+	var fundsNum, suppliesNum int64
+	for _, v := range result {
+		v.ConvertTime()
+		v.Count(&fundsNum, &suppliesNum)
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.PubUserResp{
+		Total:       params.Total,
+		PageNum:     params.PageNum,
+		PageLimit:   params.PageLimit,
+		StartTime:   params.StartTime,
+		EndTime:     params.EndTime,
+		SuppliesNum: suppliesNum,
+		FundsNum:    fundsNum,
+		Results:     result,
+	}))
+
+	logger.Info("response query records success.")
+	return
+}
