@@ -84,8 +84,8 @@ LocalFileSystem: https://donation-oss.oss-cn-beijing.aliyuncs.com/
 #
 ################################################################################
 ImageCfg:
-    BackgroundPath: image/bg.png
-    FontPath: image/SourceHanSansCN-Regular.ttf
+    BackgroundPath: bg.png
+    FontPath: SourceHanSansCN-Regular.ttf
 
 ################################################################################
 #

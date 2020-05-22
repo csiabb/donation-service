@@ -10,6 +10,8 @@ RUN mkdir -p ${DONATION_SERVICE_CFG_PATH} ${DONATION_SERVICE_LOG_PATH} ${DONATIO
 
 COPY build/bin/donation-service /usr/local/bin
 COPY sampleconfig/donation-service.yaml ${DONATION_SERVICE_CFG_PATH}/
+COPY sampleconfig/images/bg.png ${DONATION_SERVICE_DATA}/
+COPY sampleconfig/images/SourceHanSansCN-Regular.ttf ${DONATION_SERVICE_DATA}/
 
 EXPOSE 8888
 
