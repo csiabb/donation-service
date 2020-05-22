@@ -9,6 +9,7 @@ package bc
 import (
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
@@ -16,6 +17,10 @@ import (
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	lock sync.Mutex
 )
 
 // BlockChainCallBack defines call back of block chain
@@ -66,8 +71,11 @@ func (h *RestHandler) BlockChainCallBack(c *gin.Context) {
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
 	key := req.ID
+
+	lock.Lock()
 	h.srvcContext.RedisCli.Do(rest.RedisSet, key, req.TxID)
 	h.srvcContext.RedisCli.Do(rest.RedisExpireAt, key, time.Now().Add(1000*60*60))
+	lock.Unlock()
 
 	c.JSON(http.StatusOK, &structs.BCCBResp{Code: "success", Msg: ""})
 	logger.Info("response bc call back success.")
