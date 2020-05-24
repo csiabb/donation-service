@@ -9,6 +9,7 @@ package pub
 import (
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
@@ -25,7 +26,14 @@ const (
 	timeoutOfOneSingleReq = 60 // seconds
 )
 
+var (
+	lock sync.Mutex
+)
+
 func bcCallBackInfoInRedis(redisCli redis.Conn, blockChainID string) (string, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	s, err := redis.String(redisCli.Do(rest.RedisGet, blockChainID))
 
 	if err != nil {
