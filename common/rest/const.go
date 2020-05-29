@@ -106,3 +106,12 @@ const (
 	RedisGet      = "GET"
 	RedisExpireAt = "EXPIREAT"
 )
+
+const (
+	TokenValidExpiration = 30 * (24 * 60 * 60) // 30 days
+)
+
+const (
+	AuthToken = "Auth-Token"
+	AuthUID   = "uid"
+)

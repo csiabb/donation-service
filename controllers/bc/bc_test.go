@@ -56,7 +56,7 @@ func Init(t *testing.T) (*gomock.Controller, *RestHandler, *mock_backend.MockIDB
 	handler := RestHandler{}
 	handler.srvcContext = &context.Context{}
 	handler.srvcContext.DBStorage = mockBackend
-	handler.srvcContext.RedisCli = redisCli
+	handler.srvcContext.Redis = redisCli
 
 	return mockCtl, &handler, mockBackend, w, c
 }

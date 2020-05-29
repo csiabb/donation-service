@@ -103,3 +103,9 @@ BCAdapterCfg:
 Redis:
     Addr: 192.168.20.90:6379
     Auth:
+    DialTimeout: 10
+    ReadTimeout: 30
+    WriteTimeout: 30
+    PoolSize: 10
+    PoolTimeout: 30
+

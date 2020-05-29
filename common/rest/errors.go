@@ -22,6 +22,11 @@ const (
 	RepeatRegistration        = 1013 // repeat registration
 	PubToBlockChainFailure    = 1014 // publicity to block chain failure
 	BlockChainCallBackTimeout = 1015 // block chain call back timeout
+	TokenMissingCode          = 1014 // 缺少token
+	TokenExpiredCode          = 1015 // 授权已过期
+	TokenNotValidYetCode      = 1016 // 授权未生效
+	TokenNotMalformedCode     = 1017 // Auth-Token格式错误
+	TokenInvalidCode          = 1018 // Auth-Token无效
 )
 
 // wechat error code
@@ -30,4 +35,12 @@ const (
 	WXUnboundDID      = 2101 // wechat account not bind, not auth
 	WXAlreadyboundDID = 2102 // wechat account not bind, auth fine
 	WhitelistNotExist = 2103 // user not in white list
+)
+
+const (
+	TokenMsgMissing     = "token missing"
+	TokenMsgExpired     = "token expired"
+	TokenMsgNotValidYet = "token not valid yet"
+	TokenMsgInvalid     = "token invalid"
+	TokenGenerateFailed = "generate token failed"
 )

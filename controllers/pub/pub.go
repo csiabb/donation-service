@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package pub
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
@@ -18,7 +19,7 @@ import (
 	"github.com/csiabb/donation-service/structs"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/shopspring/decimal"
 )
 
@@ -30,11 +31,8 @@ var (
 	lock sync.Mutex
 )
 
-func bcCallBackInfoInRedis(redisCli redis.Conn, blockChainID string) (string, error) {
-	lock.Lock()
-	defer lock.Unlock()
-
-	s, err := redis.String(redisCli.Do(rest.RedisGet, blockChainID))
+func bcCallBackInfoInRedis(redis *redis.Client, blockChainID string) (string, error) {
+	s, err := redis.Get(context.Background(), blockChainID).Result()
 
 	if err != nil {
 		return "", err
@@ -187,11 +185,11 @@ func (h *RestHandler) ReceiveFunds(c *gin.Context) {
 			return
 		}
 
-		result, err := bcCallBackInfoInRedis(h.srvcContext.RedisCli, blockChainID)
+		result, err := bcCallBackInfoInRedis(h.srvcContext.Redis, blockChainID)
 		logger.Debug("block chain call back result, %v", result)
 
 		if err != nil {
-			if err == redis.ErrNil {
+			if result == "" {
 				continue
 			}
 
@@ -533,7 +531,7 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 		time.Sleep(time.Duration(1) * time.Second)
 
 		respTime := time.Now().Unix()
-		if respTime-reqTime >= timeoutOfOneSingleReq*3 {
+		if respTime-reqTime >= timeoutOfOneSingleReq*int64(len(ids)) {
 			c.JSON(http.StatusRequestTimeout, rest.ErrorResponse(rest.BlockChainCallBackTimeout, "block chain call back timeout"))
 			logger.Infof("block chain call back timeout")
 			return
@@ -542,14 +540,14 @@ func (h *RestHandler) ReceiveSupplies(c *gin.Context) {
 		done := true
 		for _, v := range bcResults {
 			bcID := v.Data.ID
-			_, err := bcCallBackInfoInRedis(h.srvcContext.RedisCli, bcID)
+			result, err := bcCallBackInfoInRedis(h.srvcContext.Redis, bcID)
 
 			if err != nil {
 				if !bcMap[bcID] {
 					done = false
 				}
 
-				if err == redis.ErrNil {
+				if result == "" {
 					continue
 				}
 

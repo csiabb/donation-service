@@ -47,8 +47,13 @@ type ServerGeneralCfg struct {
 
 // RedisCfg redis config
 type RedisCfg struct {
-	Addr string
-	Auth string
+	Addr         string
+	Auth         string
+	DialTimeout  int
+	ReadTimeout  int
+	WriteTimeout int
+	PoolSize     int
+	PoolTimeout  int
 }
 
 // GetServiceCfg returns the configurations for the service

@@ -32,7 +32,7 @@ func (rbl *responseLogger) Write(b []byte) (int, error) {
 }
 
 // RequestResponseLogger we use this middleware to log api request/response and check api latency
-func RequestResponseLogger() gin.HandlerFunc {
+func (m *Middleware) RequestResponseLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := time.Now()
 		// get request body and log it

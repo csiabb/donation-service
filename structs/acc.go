@@ -23,7 +23,8 @@ type LoginRequest struct {
 
 // LoginResp defines the response of user registration
 type LoginResp struct {
-	UID string `json:"uid"` // user id
+	UID   string `json:"uid"`   // user id
+	Token string `json:"token"` // token
 }
 
 //CheckFingerPrintRequest ...
