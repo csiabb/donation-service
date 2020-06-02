@@ -7,7 +7,9 @@ SPDX-License-Identifier: Apache-2.0
 package context
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/csiabb/donation-service/common/log"
 	"github.com/csiabb/donation-service/components/aliyun"
@@ -18,7 +20,7 @@ import (
 	"github.com/csiabb/donation-service/models"
 	"github.com/csiabb/donation-service/models/impl"
 
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 var (
@@ -34,7 +36,7 @@ type Context struct {
 	DBStorage     models.IDBBackend
 	ALiYunBackend aliyun.IALiYunBackend
 	ImageBackend  image.IImageBackend
-	RedisCli      redis.Conn
+	Redis         *redis.Client
 }
 
 // GetServerContext ...
@@ -156,10 +158,21 @@ func (c *Context) initImageBackend() error {
 }
 
 func (c *Context) initRedis() error {
-	var err error
-	c.RedisCli, err = redis.Dial("tcp", c.Config.Redis.Addr, redis.DialPassword(c.Config.Redis.Auth))
+	opt := &redis.Options{
+		Addr:         c.Config.Redis.Addr,
+		DB:           0,
+		DialTimeout:  time.Duration(c.Config.Redis.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(c.Config.Redis.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(c.Config.Redis.WriteTimeout) * time.Second,
+		PoolSize:     c.Config.Redis.PoolSize,
+		PoolTimeout:  time.Duration(c.Config.Redis.PoolTimeout) * time.Second,
+	}
+
+	c.Redis = redis.NewClient(opt)
+	_, err := c.Redis.Ping(context.Background()).Result()
 	if err != nil {
-		logger.Errorf("Connect redis failed: %v", err)
+		e := fmt.Errorf("init redis client error, %v", err)
+		logger.Error(e)
 		return err
 	}
 

@@ -7,8 +7,10 @@
 package acc
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/csiabb/donation-service/common/rest"
 	"github.com/csiabb/donation-service/common/utils"
@@ -79,6 +81,15 @@ func (h *RestHandler) LoginWXApp(c *gin.Context) {
 		return
 	}
 
+	token := utils.GenerateUUID()
+	err = h.srvcContext.Redis.Set(context.Background(), token, id, time.Duration(rest.TokenValidExpiration) * time.Second).Err()
+	if err != nil {
+		e := fmt.Errorf("redis set error when reg, %v", err)
+		logger.Errorf(e.Error())
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))
+		return
+	}
+
 	acc := &models.Account{
 		ID:       id,
 		Access:   req.Access,
@@ -102,6 +113,7 @@ func (h *RestHandler) LoginWXApp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, rest.SuccessResponse(&structs.LoginResp{
-		UID: acc.ID,
+		Token: token,
+		UID:   acc.ID,
 	}))
 }

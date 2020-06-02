@@ -7,6 +7,7 @@
 package bc
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
@@ -71,12 +72,15 @@ func (h *RestHandler) BlockChainCallBack(c *gin.Context) {
 	h.srvcContext.DBStorage.DBTransactionCommit(tx)
 
 	key := req.ID
-
-	lock.Lock()
-	h.srvcContext.RedisCli.Do(rest.RedisSet, key, req.TxID)
-	h.srvcContext.RedisCli.Do(rest.RedisExpireAt, key, time.Now().Add(1000*60*60))
-	lock.Unlock()
+	err = h.srvcContext.Redis.Set(context.Background(), key, req.TxID, time.Duration(60*60)*time.Second).Err()
+	if err != nil {
+		e := fmt.Errorf("update bc info error when set redis, %s", err.Error())
+		logger.Error(e)
+		c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerFailure, e.Error()))
+		return
+	}
 
 	c.JSON(http.StatusOK, &structs.BCCBResp{Code: "success", Msg: ""})
 	logger.Info("response bc call back success.")
+	return
 }

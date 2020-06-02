@@ -65,6 +65,7 @@ const (
 // Router service router
 type Router struct {
 	context        *srvctx.Context
+	middleware     *middleware.Middleware
 	versionHandler *version.RestHandler
 	pubHandler     *pub.RestHandler
 	orgHandler     *org.RestHandler
@@ -81,8 +82,13 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 
 	r.context = ctx
 
-	// Init version handler
 	var err error
+	r.middleware, err = middleware.NewMiddleware(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create middleware instance, %+v", err)
+		return err
+	}
+
 	r.versionHandler, err = version.NewRestHandler(r.context)
 	if err != nil {
 		logger.Errorf("Failed to create version rest http handler instance, %+v", err)
@@ -127,6 +133,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Delims("{{", "}}")
 	router.Use(Cors())
+	router.Use(r.middleware.RequestResponseLogger())
 
 	// service version
 	router.GET(checkVersionURL, r.versionHandler.Version)
@@ -134,8 +141,8 @@ func (r *Router) SetupRouter() *gin.Engine {
 	// v1 group api
 	apiPrefix := router.Group(apiPrefix)
 	{
-		// log reponse and request
-		apiPrefix.Use(middleware.RequestResponseLogger())
+		// token check
+		apiPrefix.Use(r.middleware.TokenCheck())
 
 		// account
 		apiPrefix.POST(urlAccLoginWXApp, r.accHandler.LoginWXApp)
